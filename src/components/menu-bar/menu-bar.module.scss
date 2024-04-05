@@ -1,0 +1,18 @@
+@import '@/styles/variables.scss';
+
+.menuBarWrapper {
+    display: flex;
+    width: max-content;
+    flex-flow: column;
+    padding: 1rem;
+    text-wrap: nowrap;
+
+    .logoWrapper {
+        width: 4rem;
+
+        .logo {
+            width: 150%;
+            clip-path: inset(0px 32% 0px 0px);
+        }
+    }
+}
