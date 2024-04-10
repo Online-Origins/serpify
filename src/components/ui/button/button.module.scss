@@ -1,0 +1,46 @@
+@import '@/styles/variables.scss';
+
+.buttonWrapper {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: .5rem 1rem;
+    border-radius: .75rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: .3s all ease-in-out;
+    width: max-content;
+
+    svg {
+        font-size: 1.2rem;
+    }
+
+    &.solid {
+        background: $purple_primary;
+        color: $white;
+
+    }
+
+    &.outline {
+        border: 2px $purple_primary solid;
+        color: $purple_primary;
+    }
+
+    &:hover {
+        background: $purple_secundary;
+    }
+
+    &.textOnly {
+        color: $purple_primary;
+        padding: 0;
+
+        &:hover{
+            background: none;
+        }
+    }
+
+    &.disabled{
+        pointer-events: none;
+        opacity: .1;
+    }
+}
