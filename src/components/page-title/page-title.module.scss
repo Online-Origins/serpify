@@ -7,4 +7,19 @@
     width: 100%;
     padding-bottom: 1rem;
     border-bottom: solid 2px $black;
+
+    .leftWrapper {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+
+        .arrowWrapper {
+            height: max-content;
+            display: flex;
+            svg {
+                font-size: 2.5rem;
+                color: $purple_primary;
+            }
+        }
+    }
 }

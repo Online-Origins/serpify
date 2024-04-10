@@ -1,9 +1,10 @@
+import InnerWrapper from '@/components/inner-wrapper/inner-wrapper.component';
 import styles from './index.module.scss';
 
 export default function Home() {
   return (
-    <div className={styles.wrapper}>
+    <InnerWrapper>
       <h1>Welcome [user]!</h1>
-    </div>
+    </InnerWrapper>
   );
 }

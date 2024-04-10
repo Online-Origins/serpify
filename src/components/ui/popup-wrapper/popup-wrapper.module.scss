@@ -10,4 +10,14 @@
     align-items: center;
     justify-content: center;
     background: rgba($color: $purple_50, $alpha: .5);
+    animation: showAni .3s ease-in-out forwards;
+
+    @keyframes showAni {
+        0% {
+            opacity: 0%;
+        }
+        100% {
+            opacity: 100%;
+        }
+    }
 }

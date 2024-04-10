@@ -12,13 +12,14 @@ import PageTitle from "@/components/page-title/page-title.component";
 import PopUpWrapper from "@/components/ui/popup-wrapper/popup-wrapper.component";
 import PopUp from "@/components/ui/popup/popup.component";
 import { SubjectSharp } from "@mui/icons-material";
+import InnerWrapper from "@/components/inner-wrapper/inner-wrapper.component";
 
 export default function CollectionsPage({
-  setPage,
+  setPages,
   filters,
   setFilters,
 }: {
-  setPage: any;
+  setPages: any;
   filters: any;
   setFilters: any;
 }) {
@@ -27,19 +28,18 @@ export default function CollectionsPage({
   const [subjectsInput, setSubjectsInput] = useState("");
 
   const startSearching = () => {
-
     const subjectArray = subjectsInput.split(",");
-    
+
     setFilters((prevState: any) => ({
       ...prevState,
       subjects: subjectArray,
     }));
 
-    setPage("search");
+    setPages((prevState: any) => [...prevState, "search"]);
   };
 
   return (
-    <div className={styles.wrapper}>
+    <InnerWrapper>
       <PageTitle
         title={"Keyword collections"}
         buttons={
@@ -48,6 +48,7 @@ export default function CollectionsPage({
           </Button>
         }
       />
+      <p>No collections found</p>
       {popUpOpen && (
         <PopUpWrapper>
           <PopUp
@@ -70,13 +71,13 @@ export default function CollectionsPage({
             }
           >
             <input
+              className={styles.input}
               type="text"
               onChange={(event) => setSubjectsInput(event.target.value)}
             />
-            <p>{filters.subjects}</p>
           </PopUp>
         </PopUpWrapper>
       )}
-    </div>
+    </InnerWrapper>
   );
 }

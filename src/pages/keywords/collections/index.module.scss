@@ -1,10 +1,8 @@
 @import '@/styles/variables.scss';
 
-.wrapper{
-
-    input{
-        width: 200px;
-        padding: .5rem;
-        font-size: 1rem;
+.textWrapper{
+    margin-bottom: 1rem;
+    li{
+        font-family: $roboto;
     }
 }
