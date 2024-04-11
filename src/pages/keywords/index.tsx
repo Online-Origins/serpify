@@ -63,20 +63,17 @@ export default function Keywords() {
 
       const data = await response.json();
 
-      // googleAdsKeywords([...searching.subjects, ...data.generatedKeywordsList]);
-
-      console.log(data.KeywordMetrics);
       setKeywordsArray(data.generatedKeywordsList);
+      
+      const KeywordMetrics = await getKeywordMetrics(
+        [...data.generatedKeywordsList,...searching.subjects]
+      );
+
+      console.log(KeywordMetrics);
     } catch (error: any) {
       console.error(error);
       alert(error.message);
     }
-  }
-
-  async function googleAdsKeywords(keywords: any) {
-    // console.log(keywords)
-    console.log("Start generating with Google Ads");
-
   }
 
   if (page == "collections") {
