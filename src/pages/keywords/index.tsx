@@ -3,6 +3,8 @@ import styles from "./index.module.scss";
 import CollectionsPage from "./collections";
 import KeywordSearching from "./searching";
 
+import { getKeywordMetrics } from "@/app/api/keywordMetrics/route";
+
 export default function Keywords() {
   const [pages, setPages] = useState(["collections"]);
   const page = pages[pages.length - 1];
@@ -42,27 +44,39 @@ export default function Keywords() {
     if (pages[pages.length - 1] == "collections") {
       setKeywordsArray([]);
     }
-  }, [pages])
+  }, [pages]);
 
   async function generateKeywords() {
-    console.log("Start generating");
+    console.log("Start generating with OpenAI");
     try {
       const response = await fetch("/api/generateKeywords", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ keywords: searching.subjects, location: "The Netherlands", wordsLength: ["shorttail", "longtail"]})
+        body: JSON.stringify({
+          keywords: searching.subjects,
+          language: "Nederlands",
+          wordsLength: ["shorttail", "longtail"],
+        }),
       });
 
       const data = await response.json();
 
-      setKeywordsArray(data.generatedKeywordsList);
+      // googleAdsKeywords([...searching.subjects, ...data.generatedKeywordsList]);
 
+      console.log(data.KeywordMetrics);
+      setKeywordsArray(data.generatedKeywordsList);
     } catch (error: any) {
       console.error(error);
       alert(error.message);
     }
+  }
+
+  async function googleAdsKeywords(keywords: any) {
+    // console.log(keywords)
+    console.log("Start generating with Google Ads");
+
   }
 
   if (page == "collections") {
@@ -74,7 +88,13 @@ export default function Keywords() {
       />
     );
   } else if (page == "search") {
-    return <KeywordSearching filters={searching} setPages={setPages} generatedKeywords={keywordsArray} />;
+    return (
+      <KeywordSearching
+        filters={searching}
+        setPages={setPages}
+        generatedKeywords={keywordsArray}
+      />
+    );
   } else {
     return null;
   }
