@@ -29,13 +29,6 @@ export default function Keywords() {
     ],
   });
 
-  // Reset the generated keywords
-  // useEffect(() => {
-  //   if (pages[pages.length - 1] == "collections") {
-  //     setKeywordsArray([]);
-  //   }
-  // }, [pages]);
-
   if (page == "collections") {
     return (
       <CollectionsPage

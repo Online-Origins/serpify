@@ -1,7 +1,7 @@
 import PageTitle from "@/components/page-title/page-title.component";
 import styles from "./index.module.scss";
 import InnerWrapper from "@/components/inner-wrapper/inner-wrapper.component";
-import { SetStateAction, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import classNames from "classnames";
 
 import { getGoogleKeywords } from "@/app/api/googleKeywords/route";
@@ -20,12 +20,13 @@ export default function KeywordSearching({
   setPages: any;
   setFilters: any;
 }) {
-  const [aiKeywords, setAiKeywords] = useState([]);
   const [generatedKeywords, setGeneratedKeywords] = useState<any[]>([]);
   const [shownKeywords, setShownKeywords] = useState<any[]>([]);
   const [selectedKeywords, setSelectedKeywords] = useState<any[]>([]);
 
   const [sorting, setSorting] = useState("potential");
+
+  const [subjectInput, setSubjectInput] = useState("");
 
   const isKeywordsGenerated = useRef(false);
 
@@ -200,6 +201,19 @@ export default function KeywordSearching({
     }
   }
 
+  function addNewSubjects() {
+    if (subjectInput != "") {
+      const subjectArray = subjectInput.split(",");
+
+      setFilters((prevState: any) => ({
+        ...prevState,
+        subjects: [...prevState.subjects, ...subjectArray],
+      }));
+      setSubjectInput("");
+      isKeywordsGenerated.current = false;
+    }
+  }
+
   return (
     <InnerWrapper>
       <PageTitle
@@ -213,10 +227,15 @@ export default function KeywordSearching({
       />
       <div className={styles.filterWrapper}>
         <TextInput
-          onChange={(value: any) => console.log(value)}
+          value={subjectInput}
+          onChange={(value: any) => setSubjectInput(value)}
           className={styles.filterInput}
           currentValues={filters.subjects}
-          icon={<SearchRoundedIcon />}
+          icon={
+            <div onClick={() => addNewSubjects()}>
+              <SearchRoundedIcon />
+            </div>
+          }
         />
         <h2>Filter</h2>
       </div>

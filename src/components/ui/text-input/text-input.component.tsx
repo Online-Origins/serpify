@@ -10,6 +10,7 @@ export default function TextInput({
   className,
   currentValues,
   icon,
+  value,
 }: {
   title?: string;
   required?: boolean;
@@ -17,6 +18,7 @@ export default function TextInput({
   className?: any;
   currentValues?: any;
   icon?: React.ReactNode;
+  value?: any;
 }) {
   return (
     <div className={classNames(styles.wrapper, className)}>
@@ -29,7 +31,7 @@ export default function TextInput({
                 )}
             </div>
         }
-        <input type="text" onChange={(event) => onChange(event.target.value)} />
+        <input type="text" value={value} onChange={(event) => onChange(event.target.value)} />
         {icon &&
             icon
         }

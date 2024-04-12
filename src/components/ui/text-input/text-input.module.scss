@@ -20,6 +20,10 @@
         &:focus-within {
             outline: solid rgba($color: $purple_primary, $alpha: .5) 2px;
         }
+
+        svg {
+            cursor: pointer;
+        }
     }
 
     .currentValues {
