@@ -1,0 +1,56 @@
+@import '@/styles/variables.scss';
+
+.wrapper {
+    width: 100%;
+    display: flex;
+    flex-flow: column;
+    gap: .5rem;
+
+    .inputWrapper {
+        width: calc(100% - 1rem);
+        display: flex;
+        gap: .5rem;
+        align-items: center;
+        padding: .5rem;
+        background: $purple_50;
+        border-radius: .75rem;
+        outline: solid $white 2px;
+        transition: .3s all ease-in-out;
+
+        &:focus-within {
+            outline: solid rgba($color: $purple_primary, $alpha: .5) 2px;
+        }
+    }
+
+    .currentValues {
+        display: flex;
+        gap: .5rem;
+
+        .value {
+            background-color: $purple_primary;
+            color: $white;
+            padding: .5rem;
+            border-radius: .5rem;
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            text-wrap: nowrap;
+
+            svg{
+                font-size: 1rem;
+            }
+        }
+    }
+
+    input[type=text] {
+        width: 100%;
+        border: none;
+        font-size: 1rem;
+        line-height: 1.2;
+        background: $purple_50;
+
+        &:focus {
+            outline: none;
+        }
+    }
+}

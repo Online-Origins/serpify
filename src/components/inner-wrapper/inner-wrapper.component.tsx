@@ -1,10 +1,15 @@
-import React from 'react';
-import styles from './inner-wrapper.module.scss';
+import React from "react";
+import styles from "./inner-wrapper.module.scss";
+import classNames from "classnames";
 
-export default function InnerWrapper({children} : {children: React.ReactNode}) {
-    return (
-        <div className={styles.wrapper}>
-            {children}
-        </div>
-    );
+export default function InnerWrapper({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: any;
+}) {
+  return (
+    <div className={classNames(styles.wrapper, className)}>{children}</div>
+  );
 }

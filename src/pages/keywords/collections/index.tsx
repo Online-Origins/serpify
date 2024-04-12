@@ -13,6 +13,7 @@ import PopUpWrapper from "@/components/ui/popup-wrapper/popup-wrapper.component"
 import PopUp from "@/components/ui/popup/popup.component";
 import { SubjectSharp } from "@mui/icons-material";
 import InnerWrapper from "@/components/inner-wrapper/inner-wrapper.component";
+import TextInput from "@/components/ui/text-input/text-input.component";
 
 export default function CollectionsPage({
   setPages,
@@ -70,10 +71,10 @@ export default function CollectionsPage({
               </Button>
             }
           >
-            <input
-              className={styles.input}
-              type="text"
-              onChange={(event) => setSubjectsInput(event.target.value)}
+            <TextInput
+              title="Subjects:"
+              required={true}
+              onChange={(value: any) => setSubjectsInput(value)}
             />
           </PopUp>
         </PopUpWrapper>

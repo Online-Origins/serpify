@@ -62,18 +62,3 @@ p{
     font-family: $roboto;
     line-height: 1.1;
 }
-
-input[type=text] {
-    border: none;
-    border-radius: .5rem;
-    font-size: 1rem;
-    line-height: 1.2;
-    padding: .5rem;
-    background: $purple_50;
-    transition: .3s all ease-in-out;
-    outline: solid $white 2px;
-    
-    &:focus {
-        outline: solid rgba($color: $purple_primary, $alpha: .5) 2px;
-    }
-}

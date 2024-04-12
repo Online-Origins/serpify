@@ -45,10 +45,10 @@ const tokenRequestData = {
       keywords: keywords,
       historicalMetricsOptions: {
         yearMonthRange: {
-          start: { year: 2022, month: "OCTOBER" },
-          end: { year: 2023, month: "MARCH" },
+          start: { year: 2023, month: "OCTOBER" },
+          end: { year: 2024, month: "MARCH" },
         },
-        includeAverageCpc: true,
+        includeAverageCpc: false,
       },
       keywordPlanNetwork: "GOOGLE_SEARCH_AND_PARTNERS",
       geo_target_constants: ["geoTargetConstants/20765"], // Netherlands GEO Location
@@ -63,7 +63,7 @@ const tokenRequestData = {
   
     try {
       const response = await fetch(
-        `https://googleads.googleapis.com/v14/customers/${process.env.CUSTOMER_ID}:generateKeywordHistoricalMetrics`,
+        `https://googleads.googleapis.com/v16/customers/${process.env.CUSTOMER_ID}:generateKeywordHistoricalMetrics`,
         {
           method: "POST",
           headers: googleAdsRequestHeaders,
