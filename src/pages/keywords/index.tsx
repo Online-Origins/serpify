@@ -27,6 +27,8 @@ export default function Keywords() {
         max: 100,
       },
     ],
+    location: "",
+    keywordLength: [],
   });
 
   if (page == "collections") {

@@ -1,8 +1,31 @@
 @import '@/styles/variables.scss';
 
-.textWrapper{
+.textWrapper {
     margin-bottom: 1rem;
-    li{
+
+    li {
         font-family: $roboto;
+    }
+}
+
+.underline {
+    text-decoration: underline;
+}
+
+.filters {
+    display: flex;
+    flex-flow: column;
+    gap: 1rem;
+}
+
+.sliderWrapper {
+    display: flex;
+    flex-flow: column;
+    gap: .5rem;
+    margin-right: 2rem;
+
+    .slider {
+        color: $purple_primary;
+        margin-left: 1rem;
     }
 }

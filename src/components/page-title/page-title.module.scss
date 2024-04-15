@@ -16,6 +16,7 @@
         .arrowWrapper {
             height: max-content;
             display: flex;
+            cursor: pointer;
             svg {
                 font-size: 2.5rem;
                 color: $purple_primary;

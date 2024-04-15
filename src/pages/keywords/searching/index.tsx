@@ -1,15 +1,15 @@
 import PageTitle from "@/components/page-title/page-title.component";
-import styles from "./index.module.scss";
+import Information from "@/components/information/information.component";
+import InputWrapper from "@/components/ui/input-wrapper/input-wrapper.component";
 import InnerWrapper from "@/components/inner-wrapper/inner-wrapper.component";
 import { useEffect, useRef, useState } from "react";
 import classNames from "classnames";
+import styles from "./index.module.scss";
 
 import { getGoogleKeywords } from "@/app/api/googleKeywords/route";
-import TextInput from "@/components/ui/text-input/text-input.component";
 
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
-import ArrowDownwardRoundedIcon from "@mui/icons-material/ArrowDownwardRounded";
-import ArrowUpwardRoundedIcon from "@mui/icons-material/ArrowUpwardRounded";
+import Table from "@/components/table/table.component";
 
 export default function KeywordSearching({
   filters,
@@ -30,6 +30,8 @@ export default function KeywordSearching({
 
   const isKeywordsGenerated = useRef(false);
 
+  const [loading, setLoading] = useState(false);
+
   // Generate keywords if the user filled in the subjects
   useEffect(() => {
     if (filters.subjects.length > 0 && !isKeywordsGenerated.current) {
@@ -39,6 +41,7 @@ export default function KeywordSearching({
   }, [filters.subjects, generateKeywords]);
 
   async function generateKeywords() {
+    setLoading(true);
     try {
       const response = await fetch("/api/generateKeywords", {
         method: "POST",
@@ -48,7 +51,7 @@ export default function KeywordSearching({
         body: JSON.stringify({
           keywords: filters.subjects,
           language: "Nederlands",
-          wordsLength: ["shorttail", "longtail"],
+          wordsLength: filters.keywordLength,
         }),
       });
 
@@ -85,10 +88,28 @@ export default function KeywordSearching({
         return keywordData;
       });
 
-      setGeneratedKeywords(keywordsWithData);
+      const filterWithUserValue = keywordsWithData.filter(
+        (keyword: any) =>
+          keyword.keywordIdeaMetrics.avgMonthlySearches >=
+            filters.volume[0].min &&
+          keyword.keywordIdeaMetrics.avgMonthlySearches <=
+            filters.volume[0].max &&
+          keyword.keywordIdeaMetrics.competitionIndex >=
+            filters.competition[0].min &&
+          keyword.keywordIdeaMetrics.competitionIndex <=
+            filters.competition[0].max &&
+          keyword.keywordIdeaMetrics.potential >= filters.potential[0].min &&
+          keyword.keywordIdeaMetrics.potential <= filters.potential[0].max
+      );
+
+      setGeneratedKeywords(filterWithUserValue);
+      setLoading(false);
     } catch (error: any) {
-      console.error(error);
-      alert(error.message);
+      alert("Something went wrong. Please try again");
+      setPages((prevPages: any) => {
+        // Create a new array with all elements except the last one
+        return prevPages.slice(0, -1);
+      });
     }
   }
 
@@ -159,21 +180,6 @@ export default function KeywordSearching({
     }
   }
 
-  function competitionIndex(competitionIndex: number) {
-    switch (true) {
-      case competitionIndex >= 0 && competitionIndex < 25:
-        return "extreme";
-      case competitionIndex >= 25 && competitionIndex < 50:
-        return "high";
-      case competitionIndex >= 50 && competitionIndex < 75:
-        return "medium";
-      case competitionIndex >= 75 && competitionIndex < 100:
-        return "low";
-      default:
-        return competitionIndex;
-    }
-  }
-
   function potentialIndex(googleVolume: number, competition: number) {
     const search = searchVolume(googleVolume);
 
@@ -188,16 +194,6 @@ export default function KeywordSearching({
         return (100 + (100 - competition)) / 2;
       default:
         return 0;
-    }
-  }
-
-  function selecting(clickedKeyword: string) {
-    if (!selectedKeywords.includes(clickedKeyword)) {
-      setSelectedKeywords([...selectedKeywords, clickedKeyword]);
-    } else {
-      setSelectedKeywords(
-        selectedKeywords.filter((index) => index !== clickedKeyword)
-      );
     }
   }
 
@@ -226,11 +222,13 @@ export default function KeywordSearching({
         }
       />
       <div className={styles.filterWrapper}>
-        <TextInput
+        <InputWrapper
+          type="text"
           value={subjectInput}
           onChange={(value: any) => setSubjectInput(value)}
           className={styles.filterInput}
           currentValues={filters.subjects}
+          placeholder="Search more subjects..."
           icon={
             <div onClick={() => addNewSubjects()}>
               <SearchRoundedIcon />
@@ -239,80 +237,20 @@ export default function KeywordSearching({
         />
         <h2>Filter</h2>
       </div>
-      <div className={styles.keywordsTable}>
-        <div className={styles.row}>
-          <div className={classNames(styles.item, styles.select)}>
-            <p>Select</p>
-          </div>
-          <div
-            onClick={() => setSorting("keyword")}
-            className={classNames(styles.item, styles.keyword)}
-          >
-            <p>Keyword</p>
-            {sorting == "keyword" && <ArrowDownwardRoundedIcon />}
-          </div>
-          <div
-            onClick={() => setSorting("searchVolume")}
-            className={classNames(styles.item, styles.searchVolume)}
-          >
-            {sorting == "searchVolume" && <ArrowDownwardRoundedIcon />}
-            <p>Search volume</p>
-          </div>
-          <div
-            onClick={() => setSorting("competition")}
-            className={classNames(styles.item, styles.competition)}
-          >
-            {sorting == "competition" && <ArrowUpwardRoundedIcon />}
-            <p>Competition</p>
-          </div>
-          <div
-            onClick={() => setSorting("potential")}
-            className={classNames(styles.item, styles.potential)}
-          >
-            {sorting == "potential" && <ArrowDownwardRoundedIcon />}
-            <p>Potential</p>
-          </div>
-        </div>
-        {shownKeywords.length > 0 ? (
-          shownKeywords.map((keyword) => (
-            <div className={styles.row} key={keyword.text}>
-              <div className={classNames(styles.item, styles.select)}>
-                <div
-                  className={classNames(
-                    styles.selector,
-                    selectedKeywords.includes(keyword.text) && styles.selected
-                  )}
-                  onClick={() => selecting(keyword.text)}
-                ></div>
-              </div>
-              <div className={classNames(styles.item, styles.keyword)}>
-                <p>{keyword.text}</p>
-              </div>
-              <div className={classNames(styles.item, styles.searchVolume)}>
-                <p>
-                  {searchVolume(keyword.keywordIdeaMetrics.avgMonthlySearches)}
-                  {/* {keyword.keywordIdeaMetrics.avgMonthlySearches} */}
-                </p>
-              </div>
-              <div className={classNames(styles.item, styles.competition)}>
-                <p>{keyword.keywordIdeaMetrics.competitionIndex}</p>
-              </div>
-              <div className={classNames(styles.item, styles.potential)}>
-                <p>
-                  {Math.ceil(
-                    potentialIndex(
-                      keyword.keywordIdeaMetrics.avgMonthlySearches,
-                      keyword.keywordIdeaMetrics.competitionIndex
-                    )
-                  ).toString()}
-                </p>
-              </div>
-            </div>
-          ))
-        ) : (
-          <p>Loading...</p>
-        )}
-      </div>
+      {!loading ? (
+        <Table
+          small={false}
+          shownKeywords={shownKeywords}
+          sorting={sorting}
+          setSorting={setSorting}
+          selectedKeywords={selectedKeywords}
+          setSelectedKeywords={setSelectedKeywords}
+          searchVolume={searchVolume}
+          potentialIndex={potentialIndex}
+        />
+      ) : (
+        <h5>Loading...</h5>
+      )}
     </InnerWrapper>
   );
 }
