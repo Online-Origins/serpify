@@ -11,10 +11,11 @@ import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import PageTitle from "@/components/page-title/page-title.component";
 import PopUpWrapper from "@/components/ui/popup-wrapper/popup-wrapper.component";
 import PopUp from "@/components/ui/popup/popup.component";
-import { SubjectSharp } from "@mui/icons-material";
 import InnerWrapper from "@/components/inner-wrapper/inner-wrapper.component";
 import InputWrapper from "@/components/ui/input-wrapper/input-wrapper.component";
 import { Slider } from "@mui/material";
+
+import languageCodes from '@/json/language-codes.json';
 
 export default function CollectionsPage({
   setPages,
@@ -29,7 +30,7 @@ export default function CollectionsPage({
   const [moreFilters, setMoreFilters] = useState(false);
 
   const [subjectsInput, setSubjectsInput] = useState("");
-  const [keywordsLocation, setKeywordsLocation] = useState("");
+  const [keywordsLanguage, setKeywordsLanguage] = useState(languageCodes[0].criterionId);
   const [keywordLength, setKeywordLength] = useState(["shorttail", "longtail"]);
   const [searchVolume, setSearchVolume] = useState<number[]>([0, 100]);
   const [competition, setCompetition] = useState<number[]>([0, 100]);
@@ -41,7 +42,7 @@ export default function CollectionsPage({
     setFilters((prevState: any) => ({
       ...prevState,
       subjects: subjectArray,
-      location: keywordsLocation,
+      language: keywordsLanguage,
       keywordLength: keywordLength,
       volume: [{ min: searchVolumeTranslate(searchVolume[0]), max: searchVolumeTranslate(searchVolume[1]) }],
       competition: [{ min: competition[0], max: competition[1] }],
@@ -110,11 +111,13 @@ export default function CollectionsPage({
             {moreFilters && (
               <div className={styles.filters}>
                 <InputWrapper
-                  type="text"
-                  title="Location:"
+                  type="dropdown"
+                  title="Language:"
                   required={false}
-                  onChange={(value: any) => setKeywordsLocation(value)}
-                  placeholder="For what location do you want keywords?"
+                  value={keywordsLanguage}
+                  options={languageCodes}
+                  onChange={(value: any) => setKeywordsLanguage(value)}
+                  placeholder="In what language should the keywords be?"
                 />
                 <InputWrapper
                   type="multiSelect"

@@ -50,7 +50,7 @@ export default function KeywordSearching({
         },
         body: JSON.stringify({
           keywords: filters.subjects,
-          language: "Nederlands",
+          language: filters.language,
           wordsLength: filters.keywordLength,
         }),
       });
@@ -59,7 +59,7 @@ export default function KeywordSearching({
 
       const GoogleGeneratedKeywords = await getGoogleKeywords(
         [...filters.subjects, ...data.generatedKeywordsList],
-        "1010" // Dutch language id
+        filters.language
       );
 
       // Filter the keywords with data

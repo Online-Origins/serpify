@@ -52,7 +52,6 @@ async function generateGoogleKeywords(accessToken, keywords, language) {
 
   try {
     const requestBody = {
-      geoTargetConstants: ["geoTargetConstants/20765"], // Netherlands GEO Location
       keywordSeed: {
         keywords: keywords,
       },

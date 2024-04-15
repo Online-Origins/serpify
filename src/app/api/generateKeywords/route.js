@@ -19,7 +19,7 @@ export async function POST(request) {
             },
             {
                 "role": "user",
-                "content": `Generate 5 meta keywords that are related to the subjects ${keywords.join(',')}. Make sure that the keywords are in ${language} and are ${wordsLength.join(' and ')}. Only give back an array with the keywords and nothing more, for code purposes`
+                "content": `Generate 5 meta keywords that are related to the subjects ${keywords.join(',')}. Make sure that the keywords are in the language with the code ${language} and are ${wordsLength.join(' and ')}. Only give back an array with the keywords and nothing more, for code purposes`
             }
         ],
         model: "gpt-3.5-turbo",

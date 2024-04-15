@@ -3,6 +3,7 @@ import styles from "./input-wrapper.module.scss";
 
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import Information from "@/components/information/information.component";
+import { MenuItem, Select } from "@mui/material";
 
 export default function InputWrapper({
   title,
@@ -16,6 +17,7 @@ export default function InputWrapper({
   defValue,
   information,
   placeholder,
+  options,
 }: {
   title?: string;
   required?: boolean;
@@ -28,6 +30,7 @@ export default function InputWrapper({
   defValue?: any;
   information?: string;
   placeholder?: string;
+  options?: any;
 }) {
   const handleChange = (length: string) => {
     if (defValue.includes(length)) {
@@ -50,43 +53,56 @@ export default function InputWrapper({
       )}
       {type == "text" ? (
         <div className={styles.inputWrapper}>
-        {currentValues && (
-          <div className={styles.currentValues}>
-            {currentValues.map((value: string) => (
-              <p className={styles.value} key={value}>
-                {value} <CloseRoundedIcon />{" "}
-              </p>
-            ))}
-          </div>
-        )}
-        <input
-          type="text"
+          {currentValues && (
+            <div className={styles.currentValues}>
+              {currentValues.map((value: string) => (
+                <p className={styles.value} key={value}>
+                  {value} <CloseRoundedIcon />{" "}
+                </p>
+              ))}
+            </div>
+          )}
+          <input
+            type="text"
+            value={value}
+            onChange={(event) => onChange(event.target.value)}
+            placeholder={placeholder}
+          />
+          {icon && icon}
+        </div>
+      ) : type == "multiSelect" ? (
+        <div className={styles.multiSelect}>
+          <label>
+            <input
+              type="checkbox"
+              checked={defValue.includes("shorttail")}
+              onChange={() => handleChange("shorttail")}
+            />
+            <p>Short tail</p>
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={defValue.includes("longtail")}
+              onChange={() => handleChange("longtail")}
+            />
+            <p>Long tail</p>
+          </label>
+        </div>
+      ) : type == "dropdown" && options ? (
+        <Select
           value={value}
           onChange={(event) => onChange(event.target.value)}
-          placeholder={placeholder}
-        />
-        {icon && icon}
-      </div>
-      ) : (type == "multiSelect" ? (
-        <div className={styles.multiSelect}>
-            <label>
-              <input
-                type="checkbox"
-                checked={defValue.includes("shorttail")}
-                onChange={() => handleChange("shorttail")}
-              />
-              <p>Short tail</p>
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                checked={defValue.includes("longtail")}
-                onChange={() => handleChange("longtail")}
-              />
-              <p>Long tail</p>
-            </label>
-          </div>
-      ) : null)}
+          className={styles.dropdown}
+          variant="standard"
+        >
+          {options.map((option: any) => (
+            <MenuItem key={option.criterionId} value={option.criterionId}>
+              {option.languageName}
+            </MenuItem>
+          ))}
+        </Select>
+      ) : null}
     </div>
   );
 }

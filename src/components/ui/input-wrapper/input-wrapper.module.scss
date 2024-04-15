@@ -89,4 +89,25 @@
             }
         }
     }
+
+    .dropdown{
+        background: $purple_50;
+        border-radius: .75rem;
+        outline: solid $white 2px;
+        transition: .3s all ease-in-out;
+        font-family: $roboto;
+        padding: 0.25rem .5rem;
+
+        &::before, &::after{
+            display: none;
+        }
+
+        &:focus{
+            background-color: none;
+        }
+
+        &:hover{
+            outline: solid rgba($color: $purple_primary, $alpha: .5) 2px;
+        }
+    }
 }

@@ -27,7 +27,7 @@ export default function Keywords() {
         max: 100,
       },
     ],
-    location: "",
+    language: "",
     keywordLength: [],
   });
 
