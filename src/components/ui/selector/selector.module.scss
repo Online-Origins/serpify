@@ -1,0 +1,15 @@
+@import '@/styles/variables.scss';
+
+.selector {
+    width: 1rem;
+    height: 1rem;
+    background-color: white;
+    border: solid 1px $purple_primary;
+    border-radius: .3rem;
+    cursor: pointer;
+    transition: .3s all ease-in-out;
+
+    &.selected {
+        background-color: $purple_primary;
+    }
+}

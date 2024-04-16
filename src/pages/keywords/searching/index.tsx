@@ -12,12 +12,13 @@ import { supabase } from "@/app/api/supabaseClient/route";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
-import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
+import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 
 import Table from "@/components/table/table.component";
 import Button from "@/components/ui/button/button.component";
 import PopUpWrapper from "@/components/ui/popup-wrapper/popup-wrapper.component";
 import PopUp from "@/components/ui/popup/popup.component";
+import Selector from "@/components/ui/selector/selector.component";
 
 export default function KeywordSearching({
   filters,
@@ -36,6 +37,25 @@ export default function KeywordSearching({
   const isKeywordsGenerated = useRef(false);
   const [loading, setLoading] = useState(false);
   const [popUpOpen, setPopUpOpen] = useState(false);
+
+  const [collections, setCollections] = useState<{ collection_name: string }[]>(
+    []
+  );
+  const [collectionToSave, setCollectionToSave] = useState("");
+  const [newCollection, setNewCollection] = useState("");
+
+  useEffect(() => {
+    getCollections();
+  }, []);
+
+  async function getCollections() {
+    const { data } = await supabase
+      .from("collections")
+      .select("collection_name");
+    if (data) {
+      setCollections(data);
+    }
+  }
 
   // Generate keywords if the user filled in the subjects
   useEffect(() => {
@@ -219,11 +239,23 @@ export default function KeywordSearching({
     const { error } = await supabase
       .from("collections")
       .insert([
-        { collection_name: "test collection", keywords: selectedKeywords },
+        { collection_name: collectionToSave, keywords: selectedKeywords },
       ]);
     if (error) {
       console.log(error);
+    } else{
+      setPopUpOpen(false);
+      setPages((prevState: any) => [...prevState, "collections"]);
     }
+  }
+
+  function addNewCollection() {
+    setCollections((prevState: any) => [
+      ...prevState,
+      { collection_name: newCollection },
+    ]);
+    setCollectionToSave(newCollection);
+    setNewCollection("");
   }
 
   return (
@@ -292,14 +324,42 @@ export default function KeywordSearching({
               <Button
                 type={"solid"}
                 onClick={() => createKeywordCollection()}
-                // disabled={subjectsInput == ""}
+                disabled={collectionToSave == ""}
               >
                 <p>Save</p>
                 <SaveOutlinedIcon />
               </Button>
             }
           >
-            <h5>Hoi</h5>
+            <div>
+              {collections.map((collection) => (
+                <div
+                  key={collection.collection_name}
+                  className={styles.collection}
+                >
+                  <Selector
+                    group={collectionToSave}
+                    item={collection.collection_name}
+                    selecting={(value:any) => setCollectionToSave(value)}
+                  />
+                  <p>{collection.collection_name}</p>
+                </div>
+              ))}
+              <div className={styles.newCollectionInput}>
+                <span
+                  className={styles.iconWrapper}
+                  onClick={() => addNewCollection()}
+                >
+                  <AddRoundedIcon />
+                </span>
+                <input
+                  type="text"
+                  placeholder="Name of new collection"
+                  value={newCollection}
+                  onChange={(event) => setNewCollection(event.target.value)}
+                />
+              </div>
+            </div>
           </PopUp>
         </PopUpWrapper>
       )}

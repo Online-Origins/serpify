@@ -7,6 +7,7 @@ import ArrowUpwardRoundedIcon from "@mui/icons-material/ArrowUpwardRounded";
 
 import Information from "@/components/information/information.component";
 import IndicationIcon from "../indication-icon/indication-icon.component";
+import Selector from "../ui/selector/selector.component";
 
 export default function Table({
   shownKeywords,
@@ -127,13 +128,7 @@ export default function Table({
             shownKeywords.map((keyword: any) => (
               <div className={styles.row} key={keyword.text}>
                 <div className={classNames(styles.item, styles.select)}>
-                  <div
-                    className={classNames(
-                      styles.selector,
-                      selectedKeywords.includes(keyword.text) && styles.selected
-                    )}
-                    onClick={() => selecting(keyword.text)}
-                  ></div>
+                  <Selector group={selectedKeywords} item={keyword.text} selecting={(value:any) => selecting(value)} />
                 </div>
                 <div className={classNames(styles.item, styles.keyword)}>
                   <p>{keyword.text}</p>

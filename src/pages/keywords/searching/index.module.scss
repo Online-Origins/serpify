@@ -23,3 +23,38 @@
         height: max-content;
     }
 }
+
+.collection{
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    border-bottom: solid 2px $purple_50;
+}
+
+.newCollectionInput{
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    align-items: center;
+    border-bottom: solid 2px $purple_50;
+
+    .iconWrapper{
+        width: 18px;
+        aspect-ratio: 1 / 1;
+    }
+
+    svg {
+        color: $purple_primary;
+    }
+
+    input[type=text] {
+        width: 100%;
+        border: none;
+        font-size: 1rem;
+        line-height: 1.2;
+
+        &:focus {
+            outline: none;
+        }
+    }
+}
