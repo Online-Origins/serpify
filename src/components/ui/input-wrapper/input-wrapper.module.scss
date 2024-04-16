@@ -97,6 +97,7 @@
         transition: .3s all ease-in-out;
         font-family: $roboto;
         padding: 0.25rem .5rem;
+        cursor: pointer;
 
         &::before, &::after{
             display: none;

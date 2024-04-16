@@ -7,9 +7,17 @@ import classNames from "classnames";
 import styles from "./index.module.scss";
 
 import { getGoogleKeywords } from "@/app/api/googleKeywords/route";
+import { supabase } from "@/app/api/supabaseClient/route";
 
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
+import AddRoundedIcon from "@mui/icons-material/AddRounded";
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
+import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
+
 import Table from "@/components/table/table.component";
+import Button from "@/components/ui/button/button.component";
+import PopUpWrapper from "@/components/ui/popup-wrapper/popup-wrapper.component";
+import PopUp from "@/components/ui/popup/popup.component";
 
 export default function KeywordSearching({
   filters,
@@ -23,14 +31,11 @@ export default function KeywordSearching({
   const [generatedKeywords, setGeneratedKeywords] = useState<any[]>([]);
   const [shownKeywords, setShownKeywords] = useState<any[]>([]);
   const [selectedKeywords, setSelectedKeywords] = useState<any[]>([]);
-
   const [sorting, setSorting] = useState("potential");
-
   const [subjectInput, setSubjectInput] = useState("");
-
   const isKeywordsGenerated = useRef(false);
-
   const [loading, setLoading] = useState(false);
+  const [popUpOpen, setPopUpOpen] = useState(false);
 
   // Generate keywords if the user filled in the subjects
   useEffect(() => {
@@ -210,6 +215,17 @@ export default function KeywordSearching({
     }
   }
 
+  async function createKeywordCollection() {
+    const { error } = await supabase
+      .from("collections")
+      .insert([
+        { collection_name: "test collection", keywords: selectedKeywords },
+      ]);
+    if (error) {
+      console.log(error);
+    }
+  }
+
   return (
     <InnerWrapper>
       <PageTitle
@@ -238,18 +254,54 @@ export default function KeywordSearching({
         <h2>Filter</h2>
       </div>
       {!loading ? (
-        <Table
-          small={false}
-          shownKeywords={shownKeywords}
-          sorting={sorting}
-          setSorting={setSorting}
-          selectedKeywords={selectedKeywords}
-          setSelectedKeywords={setSelectedKeywords}
-          searchVolume={searchVolume}
-          potentialIndex={potentialIndex}
-        />
+        <div className={styles.outerTableWrapper}>
+          <Table
+            small={false}
+            shownKeywords={shownKeywords}
+            sorting={sorting}
+            setSorting={setSorting}
+            selectedKeywords={selectedKeywords}
+            setSelectedKeywords={setSelectedKeywords}
+            searchVolume={searchVolume}
+            potentialIndex={potentialIndex}
+          />
+          <div className={styles.buttonWrapper}>
+            <Button
+              type={"solid"}
+              onClick={() => setPopUpOpen(true)}
+              disabled={selectedKeywords.length == 0}
+            >
+              <p>Save to</p> <AddRoundedIcon />
+            </Button>
+          </div>
+        </div>
       ) : (
         <h5>Loading...</h5>
+      )}
+      {popUpOpen && (
+        <PopUpWrapper>
+          <PopUp
+            title={"Keyword research"}
+            titleButtons={
+              <Button type={"textOnly"} onClick={() => setPopUpOpen(false)}>
+                <p>Close</p>
+                <CloseRoundedIcon />
+              </Button>
+            }
+            buttons={
+              <Button
+                type={"solid"}
+                onClick={() => createKeywordCollection()}
+                // disabled={subjectsInput == ""}
+              >
+                <p>Save</p>
+                <SaveOutlinedIcon />
+              </Button>
+            }
+          >
+            <h5>Hoi</h5>
+          </PopUp>
+        </PopUpWrapper>
       )}
     </InnerWrapper>
   );

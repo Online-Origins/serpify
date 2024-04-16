@@ -16,7 +16,7 @@ export default function Table({
   setSelectedKeywords,
   searchVolume,
   potentialIndex,
-  small
+  small,
 }: {
   shownKeywords: any;
   sorting: any;
@@ -70,7 +70,7 @@ export default function Table({
   if (!small) {
     return (
       <div className={styles.keywordsTable}>
-        <div className={styles.row}>
+        <div className={classNames(styles.row, styles.topRow)}>
           <div className={classNames(styles.item, styles.select)}>
             <p>Select</p>
           </div>
@@ -122,65 +122,69 @@ export default function Table({
             <Information information="The ability of a particular keyword or key phrase to drive traffic, engagement, or conversions." />
           </div>
         </div>
-        {shownKeywords.length > 0 ? (
-          shownKeywords.map((keyword: any) => (
-            <div className={styles.row} key={keyword.text}>
-              <div className={classNames(styles.item, styles.select)}>
-                <div
-                  className={classNames(
-                    styles.selector,
-                    selectedKeywords.includes(keyword.text) && styles.selected
-                  )}
-                  onClick={() => selecting(keyword.text)}
-                ></div>
-              </div>
-              <div className={classNames(styles.item, styles.keyword)}>
-                <p>{keyword.text}</p>
-              </div>
-              <div className={classNames(styles.item, styles.searchVolume)}>
-                <p>
-                  {searchVolume(keyword.keywordIdeaMetrics.avgMonthlySearches)}
-                </p>
-                <IndicationIcon
-                  indication={searchVolumeIndication(
-                    keyword.keywordIdeaMetrics.avgMonthlySearches
-                  )}
-                />
-              </div>
-              <div className={classNames(styles.item, styles.competition)}>
-                <p>{keyword.keywordIdeaMetrics.competitionIndex}</p>
-                <IndicationIcon
-                  indication={Indexation(
-                    100 - keyword.keywordIdeaMetrics.competitionIndex
-                  )}
-                />
-              </div>
-              <div className={classNames(styles.item, styles.potential)}>
-                <p>
-                  {Math.ceil(
-                    potentialIndex(
-                      keyword.keywordIdeaMetrics.avgMonthlySearches,
-                      keyword.keywordIdeaMetrics.competitionIndex
-                    )
-                  ).toString()}
-                </p>
-                <IndicationIcon
-                  indication={Indexation(
-                    100 -
-                      Math.ceil(
-                        potentialIndex(
-                          keyword.keywordIdeaMetrics.avgMonthlySearches,
-                          keyword.keywordIdeaMetrics.competitionIndex
-                        )
+        <div className={styles.tableContent}>
+          {shownKeywords.length > 0 ? (
+            shownKeywords.map((keyword: any) => (
+              <div className={styles.row} key={keyword.text}>
+                <div className={classNames(styles.item, styles.select)}>
+                  <div
+                    className={classNames(
+                      styles.selector,
+                      selectedKeywords.includes(keyword.text) && styles.selected
+                    )}
+                    onClick={() => selecting(keyword.text)}
+                  ></div>
+                </div>
+                <div className={classNames(styles.item, styles.keyword)}>
+                  <p>{keyword.text}</p>
+                </div>
+                <div className={classNames(styles.item, styles.searchVolume)}>
+                  <p>
+                    {searchVolume(
+                      keyword.keywordIdeaMetrics.avgMonthlySearches
+                    )}
+                  </p>
+                  <IndicationIcon
+                    indication={searchVolumeIndication(
+                      keyword.keywordIdeaMetrics.avgMonthlySearches
+                    )}
+                  />
+                </div>
+                <div className={classNames(styles.item, styles.competition)}>
+                  <p>{keyword.keywordIdeaMetrics.competitionIndex}</p>
+                  <IndicationIcon
+                    indication={Indexation(
+                      100 - keyword.keywordIdeaMetrics.competitionIndex
+                    )}
+                  />
+                </div>
+                <div className={classNames(styles.item, styles.potential)}>
+                  <p>
+                    {Math.ceil(
+                      potentialIndex(
+                        keyword.keywordIdeaMetrics.avgMonthlySearches,
+                        keyword.keywordIdeaMetrics.competitionIndex
                       )
-                  )}
-                />
+                    ).toString()}
+                  </p>
+                  <IndicationIcon
+                    indication={Indexation(
+                      100 -
+                        Math.ceil(
+                          potentialIndex(
+                            keyword.keywordIdeaMetrics.avgMonthlySearches,
+                            keyword.keywordIdeaMetrics.competitionIndex
+                          )
+                        )
+                    )}
+                  />
+                </div>
               </div>
-            </div>
-          ))
-        ) : (
-          <p>Couldn't find any matching keywords. please try again.</p>
-        )}
+            ))
+          ) : (
+            <p>Couldn't find any matching keywords. please try again.</p>
+          )}
+        </div>
       </div>
     );
   } else {

@@ -1,7 +1,7 @@
 @import '@/styles/variables.scss';
 
 .popUpWrapper{
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
@@ -11,6 +11,7 @@
     justify-content: center;
     background: rgba($color: $purple_50, $alpha: .5);
     animation: showAni .3s ease-in-out forwards;
+    z-index: 100;
 
     @keyframes showAni {
         0% {

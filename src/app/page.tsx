@@ -5,7 +5,6 @@ import Home from "@/pages/home";
 import Keywords from "@/pages/keywords";
 
 import styles from "./index.module.scss";
-import "@/styles/global.scss";
 
 import { useEffect, useState } from "react";
 import classNames from "classnames";

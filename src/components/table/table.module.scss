@@ -4,6 +4,7 @@
     display: flex;
     flex-flow: column;
     width: 100%;
+    overflow: hidden;
 
     .row {
         width: 100%;
@@ -62,7 +63,7 @@
             }
         }
 
-        &:first-of-type {
+        &.topRow {
             background-color: $purple_50;
             cursor: pointer;
             border-radius: .5rem .5rem 0 0;
@@ -84,6 +85,12 @@
                 }
             }
         }
+    }
+
+    .tableContent{
+        display: flex;
+        flex-flow: column;
+        overflow-y: scroll;
     }
 
 }
