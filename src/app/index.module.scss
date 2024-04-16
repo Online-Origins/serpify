@@ -11,18 +11,18 @@
     .innerWrapper{
         padding-top: 1rem;
         max-height: 100%;
-        min-width: 1200px;
+        min-width: 1600px;
         transition: .6s width ease-in-out;
         transition-delay: .2s;
         margin-bottom: 1rem;
     }
 
-    @media (max-width: 1300px){
+    @media (max-width: 1750px){
         justify-content: start;
     }
 
     &.smallerWrapper{
-        @media (max-width: 1550px){
+        @media (max-width: 1800px){
             justify-content: start;
         }
     }

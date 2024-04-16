@@ -1,0 +1,24 @@
+@import '@/styles/variables.scss';
+
+.collectionCard{
+    display: flex;
+    flex-flow: column;
+    background: $white;
+    border: solid 1px $purple_50;
+    padding: 1rem;
+    box-shadow: $shadow;
+    border-radius: .5rem;
+    gap: 1rem;
+
+    .cardTopWrapper{
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .cardButtonWrapper{
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+    }
+}

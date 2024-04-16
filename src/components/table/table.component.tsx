@@ -1,6 +1,6 @@
 import styles from "./table.module.scss";
 import classNames from "classnames";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import ArrowDownwardRoundedIcon from "@mui/icons-material/ArrowDownwardRounded";
 import ArrowUpwardRoundedIcon from "@mui/icons-material/ArrowUpwardRounded";
@@ -8,6 +8,8 @@ import ArrowUpwardRoundedIcon from "@mui/icons-material/ArrowUpwardRounded";
 import Information from "@/components/information/information.component";
 import IndicationIcon from "../indication-icon/indication-icon.component";
 import Selector from "../ui/selector/selector.component";
+
+import {getKeywordMetrics} from '@/app/api/keywordMetrics/route';
 
 export default function Table({
   shownKeywords,
@@ -17,17 +19,16 @@ export default function Table({
   setSelectedKeywords,
   searchVolume,
   potentialIndex,
-  small,
 }: {
   shownKeywords: any;
-  sorting: any;
-  setSorting: any;
-  selectedKeywords: any;
-  setSelectedKeywords: any;
-  searchVolume: any;
-  potentialIndex: any;
-  small: boolean;
+  sorting?: any;
+  setSorting?: any;
+  selectedKeywords?: any;
+  setSelectedKeywords?: any;
+  searchVolume?: any;
+  potentialIndex?: any;
 }) {
+
   function selecting(clickedKeyword: string) {
     if (!selectedKeywords.includes(clickedKeyword)) {
       setSelectedKeywords([...selectedKeywords, clickedKeyword]);
@@ -68,7 +69,6 @@ export default function Table({
     }
   }
 
-  if (!small) {
     return (
       <div className={styles.keywordsTable}>
         <div className={classNames(styles.row, styles.topRow)}>
@@ -128,7 +128,11 @@ export default function Table({
             shownKeywords.map((keyword: any) => (
               <div className={styles.row} key={keyword.text}>
                 <div className={classNames(styles.item, styles.select)}>
-                  <Selector group={selectedKeywords} item={keyword.text} selecting={(value:any) => selecting(value)} />
+                  <Selector
+                    group={selectedKeywords}
+                    item={keyword.text}
+                    selecting={(value: any) => selecting(value)}
+                  />
                 </div>
                 <div className={classNames(styles.item, styles.keyword)}>
                   <p>{keyword.text}</p>
@@ -182,11 +186,4 @@ export default function Table({
         </div>
       </div>
     );
-  } else {
-    return (
-      <div className={styles.smallTable}>
-        <h5>Small table</h5>
-      </div>
-    );
-  }
 }

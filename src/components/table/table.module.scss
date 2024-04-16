@@ -1,5 +1,20 @@
 @import '@/styles/variables.scss';
 
+.row {
+    display: flex;
+    transition: .3s all ease-in-out;
+    border-bottom: solid 2px $purple_50;
+
+
+    .item {
+        padding: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        text-wrap: nowrap;
+    }
+}
+
 .keywordsTable {
     display: flex;
     flex-flow: column;
@@ -8,20 +23,12 @@
 
     .row {
         width: 100%;
-        display: flex;
-        transition: .3s all ease-in-out;
-        border-bottom: solid 2px $purple_50;
 
         &:hover {
             background: $purple_50;
         }
 
         .item {
-            padding: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-
             &.select {
                 min-width: 3rem;
             }
@@ -47,36 +54,58 @@
                     opacity: 1;
                 }
             }
+
+            &:not(:last-of-type) {
+                border-right: solid 2px $white;
+            }
         }
 
-        &.topRow {
-            background-color: $purple_50;
-            cursor: pointer;
-            border-radius: .5rem .5rem 0 0;
+        &:not(.topRow) {
 
-            .item {
-                align-items: center;
-
-                &:not(:last-of-type) {
-                    border-right: solid 2px $white;
-                }
-
-                p {
-                    font-weight: 600;
-                }
-
-                svg {
-                    font-size: 1rem;
-
-                }
+            .potential {
+                padding-right: .5rem;
             }
         }
     }
 
-    .tableContent{
+    .tableContent {
         display: flex;
         flex-flow: column;
-        overflow-y: scroll;
+        overflow-y: overlay;
+        position: relative;
+
+        &::-webkit-scrollbar {
+            width: .5rem;
+            position: absolute;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background-color: $purple_secundary;
+            border-radius: 1rem;
+        }
     }
 
+}
+
+.topRow {
+    background-color: $purple_50;
+    cursor: pointer;
+    border-radius: .5rem .5rem 0 0;
+
+    .item {
+        align-items: center;
+
+        &:not(:last-of-type) {
+            border-right: solid 2px $white;
+        }
+
+        p {
+            font-weight: 600;
+        }
+
+        svg {
+            font-size: 1rem;
+
+        }
+    }
 }

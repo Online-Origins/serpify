@@ -1,21 +1,22 @@
-import Button from "@/components/ui/button/button.component";
-
 import styles from "./index.module.scss";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
+import { Slider } from "@mui/material";
 
+import Button from "@/components/ui/button/button.component";
 import PageTitle from "@/components/page-title/page-title.component";
 import PopUpWrapper from "@/components/ui/popup-wrapper/popup-wrapper.component";
 import PopUp from "@/components/ui/popup/popup.component";
 import InnerWrapper from "@/components/inner-wrapper/inner-wrapper.component";
 import InputWrapper from "@/components/ui/input-wrapper/input-wrapper.component";
-import { Slider } from "@mui/material";
 
-import languageCodes from '@/json/language-codes.json';
+import languageCodes from "@/json/language-codes.json";
+import { supabase } from "@/app/api/supabaseClient/route";
+import CollectionCard from "@/components/collection-card/collection-card.component";
 
 export default function CollectionsPage({
   setPages,
@@ -30,11 +31,36 @@ export default function CollectionsPage({
   const [moreFilters, setMoreFilters] = useState(false);
 
   const [subjectsInput, setSubjectsInput] = useState("");
-  const [keywordsLanguage, setKeywordsLanguage] = useState(languageCodes[0].criterionId);
+  const [keywordsLanguage, setKeywordsLanguage] = useState(
+    languageCodes[0].criterionId
+  );
   const [keywordLength, setKeywordLength] = useState(["shorttail", "longtail"]);
   const [searchVolume, setSearchVolume] = useState<number[]>([0, 100]);
   const [competition, setCompetition] = useState<number[]>([0, 100]);
   const [potential, setPotential] = useState<number[]>([0, 100]);
+
+  const getCollectionsRef = useRef(false);
+  interface Collection {
+    id: number;
+    collection_name: string;
+    keywords: [];
+    // other properties
+  }
+  const [collections, setCollections] = useState<Collection[]>([]);
+
+  useEffect(() => {
+    if (!getCollectionsRef.current) {
+      getCollections();
+      getCollectionsRef.current = true;
+    }
+  }, []);
+
+  async function getCollections() {
+    const { data } = await supabase.from("collections").select();
+    if (data) {
+      setCollections(data);
+    }
+  }
 
   const startSearching = () => {
     const subjectArray = subjectsInput.split(",");
@@ -44,7 +70,12 @@ export default function CollectionsPage({
       subjects: subjectArray,
       language: keywordsLanguage,
       keywordLength: keywordLength,
-      volume: [{ min: searchVolumeTranslate(searchVolume[0]), max: searchVolumeTranslate(searchVolume[1]) }],
+      volume: [
+        {
+          min: searchVolumeTranslate(searchVolume[0]),
+          max: searchVolumeTranslate(searchVolume[1]),
+        },
+      ],
       competition: [{ min: competition[0], max: competition[1] }],
       potential: [{ min: potential[0], max: potential[1] }],
     }));
@@ -79,7 +110,15 @@ export default function CollectionsPage({
           </Button>
         }
       />
-      <p>No collections found</p>
+      {collections ? (
+        <div className={styles.collectionsWrapper}>
+          {collections.map((collection) => (
+            <CollectionCard key={collection.id} collection={collection} />
+          ))}
+        </div>
+      ) : (
+        <p>Loading...</p>
+      )}
       {popUpOpen && (
         <PopUpWrapper>
           <PopUp

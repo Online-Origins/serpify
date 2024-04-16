@@ -288,7 +288,6 @@ export default function KeywordSearching({
       {!loading ? (
         <div className={styles.outerTableWrapper}>
           <Table
-            small={false}
             shownKeywords={shownKeywords}
             sorting={sorting}
             setSorting={setSorting}
