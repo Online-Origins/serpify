@@ -1,0 +1,79 @@
+@import '@/styles/variables.scss';
+
+.smallTable {
+    width: max-content;
+    display: flex;
+    flex-flow: column;
+    height: 100%;
+
+    .row {
+        display: flex;
+        transition: .3s all ease-in-out;
+        border-bottom: solid 2px $purple_50;
+
+
+        .item {
+            padding: 1rem;
+            display: flex;
+            gap: 1rem;
+            text-wrap: nowrap;
+
+            &:not(:last-of-type) {
+                border-right: solid 2px $white;
+            }
+
+            &.keyword {
+                width: 5.9rem;
+
+                p {
+                    width: 100%;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+            }
+
+            &.searchVolume {
+                width: 6.6rem;
+            }
+
+            &.competition {
+                width: 5.5rem;
+            }
+
+            &.potential {
+                width: 4rem;
+            }
+
+            &.searchVolume,
+            &.competition,
+            &.potential {
+                justify-content: flex-end;
+            }
+        }
+
+
+    }
+}
+
+.topRow {
+    background-color: $purple_50;
+    cursor: pointer;
+    border-radius: .5rem .5rem 0 0;
+
+    .item {
+
+        &:not(:last-of-type) {
+            border-right: solid 2px $white;
+        }
+
+        p {
+            font-weight: 600;
+        }
+
+        svg {
+            font-size: 1rem;
+
+        }
+    }
+}

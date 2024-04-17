@@ -1,0 +1,9 @@
+@import '@/styles/variables';
+
+.wrapper{
+    display: flex;
+    width: 100%;
+    flex-flow: column;
+    gap: 1.5rem;
+    height: 100%;
+}

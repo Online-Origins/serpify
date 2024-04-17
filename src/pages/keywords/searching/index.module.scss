@@ -1,0 +1,60 @@
+@import '@/styles/variables.scss';
+
+.filterWrapper {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    gap: 1.5rem;
+    height: max-content !important;
+
+    .filterInput {
+        max-width: 800px;
+    }
+}
+
+.outerTableWrapper{
+    display: flex;
+    flex-flow: column;
+    gap: 1rem;
+    height: 100%;
+    overflow: hidden;
+
+    .buttonWrapper{
+        height: max-content;
+    }
+}
+
+.collection{
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    border-bottom: solid 2px $purple_50;
+}
+
+.newCollectionInput{
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    align-items: center;
+    border-bottom: solid 2px $purple_50;
+
+    .iconWrapper{
+        width: 18px;
+        aspect-ratio: 1 / 1;
+    }
+
+    svg {
+        color: $purple_primary;
+    }
+
+    input[type=text] {
+        width: 100%;
+        border: none;
+        font-size: 1rem;
+        line-height: 1.2;
+
+        &:focus {
+            outline: none;
+        }
+    }
+}

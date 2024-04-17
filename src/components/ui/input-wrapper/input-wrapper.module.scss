@@ -1,0 +1,114 @@
+@import '@/styles/variables.scss';
+
+.wrapper {
+    width: 100%;
+    display: flex;
+    flex-flow: column;
+    gap: .5rem;
+
+    .inputWrapper {
+        width: calc(100% - 1rem);
+        display: flex;
+        gap: .5rem;
+        align-items: center;
+        padding: .5rem;
+        background: $purple_50;
+        border-radius: .75rem;
+        outline: solid $white 2px;
+        transition: .3s all ease-in-out;
+
+        &:focus-within {
+            outline: solid rgba($color: $purple_primary, $alpha: .5) 2px;
+        }
+
+        svg {
+            cursor: pointer;
+        }
+    }
+
+    .titleWrapper {
+        display: flex;
+        gap: 1rem;
+        align-items: end;
+    }
+
+    .currentValues {
+        display: flex;
+        gap: .5rem;
+
+        .value {
+            background-color: $purple_primary;
+            color: $white;
+            padding: .5rem;
+            border-radius: .5rem;
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            text-wrap: nowrap;
+
+            svg {
+                font-size: 1rem;
+            }
+        }
+    }
+
+    input[type=text] {
+        width: 100%;
+        border: none;
+        font-size: 1rem;
+        line-height: 1.2;
+        background: $purple_50;
+
+        &:focus {
+            outline: none;
+        }
+    }
+
+    .multiSelect {
+        display: flex;
+        justify-content: space-between;
+
+        label {
+            width: 50%;
+            display: flex;
+            gap: 1rem;
+
+            input[type=checkbox] {
+                appearance: none;
+                width: 1rem;
+                height: 1rem;
+                background-color: $white;
+                border: solid 1px $purple_primary;
+                border-radius: .3rem;
+                cursor: pointer;
+                transition: .3s all ease-in-out;
+
+                &:checked {
+                    background-color: $purple_primary;
+                }
+            }
+        }
+    }
+
+    .dropdown{
+        background: $purple_50;
+        border-radius: .75rem;
+        outline: solid $white 2px;
+        transition: .3s all ease-in-out;
+        font-family: $roboto;
+        padding: 0.25rem .5rem;
+        cursor: pointer;
+
+        &::before, &::after{
+            display: none;
+        }
+
+        &:focus{
+            background-color: none;
+        }
+
+        &:hover{
+            outline: solid rgba($color: $purple_primary, $alpha: .5) 2px;
+        }
+    }
+}

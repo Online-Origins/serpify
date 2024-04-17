@@ -57,7 +57,12 @@ h5{
     line-height: 1.2;
 }
 
-p{
+p, input[type=text]{
+    font-size: 1rem;
     font-family: $roboto;
     line-height: 1.1;
+}
+
+.css-1rxz5jq-MuiSelect-select-MuiInputBase-input-MuiInput-input:focus{
+    background-color: rgba($color: #000000, $alpha: 0) ;
 }

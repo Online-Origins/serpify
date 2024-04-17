@@ -1,0 +1,111 @@
+@import '@/styles/variables.scss';
+
+.row {
+    display: flex;
+    transition: .3s all ease-in-out;
+    border-bottom: solid 2px $purple_50;
+
+
+    .item {
+        padding: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        text-wrap: nowrap;
+    }
+}
+
+.keywordsTable {
+    display: flex;
+    flex-flow: column;
+    width: 100%;
+    overflow: hidden;
+
+    .row {
+        width: 100%;
+
+        &:hover {
+            background: $purple_50;
+        }
+
+        .item {
+            &.select {
+                min-width: 3rem;
+            }
+
+            &.keyword {
+                min-width: 40%;
+            }
+
+            &.searchVolume,
+            &.competition,
+            &.potential {
+                width: 100%;
+                justify-content: flex-end;
+            }
+
+            svg {
+                transition: .3s all ease-in-out;
+                opacity: 0;
+            }
+
+            &.activeSort {
+                svg {
+                    opacity: 1;
+                }
+            }
+
+            &:not(:last-of-type) {
+                border-right: solid 2px $white;
+            }
+        }
+
+        &:not(.topRow) {
+
+            .potential {
+                padding-right: .5rem;
+            }
+        }
+    }
+
+    .tableContent {
+        display: flex;
+        flex-flow: column;
+        overflow-y: overlay;
+        position: relative;
+
+        &::-webkit-scrollbar {
+            width: .5rem;
+            position: absolute;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background-color: $purple_secundary;
+            border-radius: 1rem;
+        }
+    }
+
+}
+
+.topRow {
+    background-color: $purple_50;
+    cursor: pointer;
+    border-radius: .5rem .5rem 0 0;
+
+    .item {
+        align-items: center;
+
+        &:not(:last-of-type) {
+            border-right: solid 2px $white;
+        }
+
+        p {
+            font-weight: 600;
+        }
+
+        svg {
+            font-size: 1rem;
+
+        }
+    }
+}

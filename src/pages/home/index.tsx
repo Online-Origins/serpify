@@ -1,14 +1,10 @@
+import InnerWrapper from '@/components/inner-wrapper/inner-wrapper.component';
 import styles from './index.module.scss';
 
 export default function Home() {
   return (
-    <div className={styles.wrapper}>
-      <h1>Header 1</h1>
-      <h2>Header 2</h2>
-      <h3>Header 3</h3>
-      <h4>Header 4</h4>
-      <h5>Header 5</h5>
-      <p>Paragraph</p>
-    </div>
+    <InnerWrapper>
+      <h1>Welcome [user]!</h1>
+    </InnerWrapper>
   );
 }
