@@ -98,7 +98,7 @@ export default function InputWrapper({
         >
           {options.map((option: any) => (
             <MenuItem key={option.criterionId} value={option.criterionId}>
-              {option.languageName}
+              {option.value}
             </MenuItem>
           ))}
         </Select>

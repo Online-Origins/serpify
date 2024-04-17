@@ -13,10 +13,11 @@ import PopUpWrapper from "@/components/ui/popup-wrapper/popup-wrapper.component"
 import PopUp from "@/components/ui/popup/popup.component";
 import InnerWrapper from "@/components/inner-wrapper/inner-wrapper.component";
 import InputWrapper from "@/components/ui/input-wrapper/input-wrapper.component";
+import CollectionsWrapper from "@/components/collections-wrapper/collections-wrapper.component";
 
 import languageCodes from "@/json/language-codes.json";
+import countryCodes from "@/json/country-codes.json";
 import { supabase } from "@/app/api/supabaseClient/route";
-import CollectionCard from "@/components/collection-card/collection-card.component";
 
 export default function CollectionsPage({
   setPages,
@@ -34,6 +35,9 @@ export default function CollectionsPage({
   const [keywordsLanguage, setKeywordsLanguage] = useState(
     languageCodes[0].criterionId
   );
+  const [keywordsCountry, setKeywordsCountry] = useState(
+    countryCodes[0].criterionId
+  );
   const [keywordLength, setKeywordLength] = useState(["shorttail", "longtail"]);
   const [searchVolume, setSearchVolume] = useState<number[]>([0, 100]);
   const [competition, setCompetition] = useState<number[]>([0, 100]);
@@ -44,6 +48,8 @@ export default function CollectionsPage({
     id: number;
     collection_name: string;
     keywords: [];
+    language: string;
+    country: string;
     // other properties
   }
   const [collections, setCollections] = useState<Collection[]>([]);
@@ -69,6 +75,7 @@ export default function CollectionsPage({
       ...prevState,
       subjects: subjectArray,
       language: keywordsLanguage,
+      country: keywordsCountry,
       keywordLength: keywordLength,
       volume: [
         {
@@ -111,11 +118,7 @@ export default function CollectionsPage({
         }
       />
       {collections ? (
-        <div className={styles.collectionsWrapper}>
-          {collections.map((collection) => (
-            <CollectionCard key={collection.id} collection={collection} />
-          ))}
-        </div>
+        <CollectionsWrapper collections={collections} />
       ) : (
         <p>Loading...</p>
       )}
@@ -149,15 +152,26 @@ export default function CollectionsPage({
             />
             {moreFilters && (
               <div className={styles.filters}>
-                <InputWrapper
-                  type="dropdown"
-                  title="Language:"
-                  required={false}
-                  value={keywordsLanguage}
-                  options={languageCodes}
-                  onChange={(value: any) => setKeywordsLanguage(value)}
-                  placeholder="In what language should the keywords be?"
-                />
+                <div className={styles.multiDropdown}>
+                  <InputWrapper
+                    type="dropdown"
+                    title="Country:"
+                    required={false}
+                    value={keywordsCountry}
+                    options={countryCodes}
+                    onChange={(value: any) => setKeywordsCountry(value)}
+                    placeholder="Which country do you want to target?"
+                  />
+                  <InputWrapper
+                    type="dropdown"
+                    title="Language:"
+                    required={false}
+                    value={keywordsLanguage}
+                    options={languageCodes}
+                    onChange={(value: any) => setKeywordsLanguage(value)}
+                    placeholder="In what language should the keywords be?"
+                  />
+                </div>
                 <InputWrapper
                   type="multiSelect"
                   title="Length of the keywords:"

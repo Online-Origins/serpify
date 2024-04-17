@@ -1,3 +1,5 @@
+import { Language } from "@mui/icons-material";
+
 const tokenRequestData = {
     grant_type: "refresh_token",
     client_id: process.env.CLIENT_ID,
@@ -9,7 +11,7 @@ const tokenRequestData = {
     "Content-Type": "application/x-www-form-urlencoded",
   };
   
-  export async function getKeywordMetrics(keywords) {
+  export async function getKeywordMetrics(keywords, language, country) {
     try {
       const response = await fetch(
         "https://www.googleapis.com/oauth2/v3/token",
@@ -30,7 +32,9 @@ const tokenRequestData = {
       // Now that you have the access token, you can use it to get the keyword metrics.
       const googleAdsMetrics = await getGoogleKeywordsMetrics(
         accessToken,
-        keywords
+        keywords,
+        language,
+        country
       );
   
       return googleAdsMetrics;
@@ -40,18 +44,12 @@ const tokenRequestData = {
     }
   }
   
-  async function getGoogleKeywordsMetrics(accessToken, keywords) {
+  async function getGoogleKeywordsMetrics(accessToken, keywords, language, country) {
     const googleAdsRequestData = {
       keywords: keywords,
-      historicalMetricsOptions: {
-        yearMonthRange: {
-          start: { year: 2023, month: "OCTOBER" },
-          end: { year: 2024, month: "MARCH" },
-        },
-        includeAverageCpc: false,
-      },
       keywordPlanNetwork: "GOOGLE_SEARCH_AND_PARTNERS",
-      geo_target_constants: ["geoTargetConstants/20765"], // Netherlands GEO Location
+      language: `languageConstants/${language}`,
+      geoTargetConstants: [`geoTargetConstants/${country}`]
     };
   
     const googleAdsRequestHeaders = {

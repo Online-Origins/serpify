@@ -9,8 +9,6 @@ import Information from "@/components/information/information.component";
 import IndicationIcon from "../indication-icon/indication-icon.component";
 import Selector from "../ui/selector/selector.component";
 
-import {getKeywordMetrics} from '@/app/api/keywordMetrics/route';
-
 export default function Table({
   shownKeywords,
   sorting,

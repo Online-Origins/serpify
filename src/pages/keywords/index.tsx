@@ -28,6 +28,7 @@ export default function Keywords() {
       },
     ],
     language: "",
+    country: "",
     keywordLength: [],
   });
 

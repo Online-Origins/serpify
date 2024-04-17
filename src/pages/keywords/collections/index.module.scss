@@ -16,6 +16,11 @@
     display: flex;
     flex-flow: column;
     gap: 1rem;
+
+    .multiDropdown{
+        display: flex;
+        gap: 1rem;
+    }
 }
 
 .sliderWrapper {
@@ -28,10 +33,4 @@
         color: $purple_primary;
         margin-left: 1rem;
     }
-}
-
-.collectionsWrapper{
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
 }

@@ -1,256 +1,256 @@
 [
     {
-        "languageName": "English",
+        "value": "English",
         "languageCode": "en",
         "criterionId": 1000
     },
     {
-        "languageName": "Dutch",
+        "value": "Dutch",
         "languageCode": "nl",
         "criterionId": 1010
     },
     {
-        "languageName": "Arabic",
+        "value": "Arabic",
         "languageCode": "ar",
         "criterionId": 1019
     },
     {
-        "languageName": "Bengali",
+        "value": "Bengali",
         "languageCode": "bn",
         "criterionId": 1056
     },
     {
-        "languageName": "Bulgarian",
+        "value": "Bulgarian",
         "languageCode": "bg",
         "criterionId": 1020
     },
     {
-        "languageName": "Catalan",
+        "value": "Catalan",
         "languageCode": "ca",
         "criterionId": 1038
     },
     {
-        "languageName": "Chinese (simplified)",
+        "value": "Chinese (simplified)",
         "languageCode": "zh_CN",
         "criterionId": 1017
     },
     {
-        "languageName": "Chinese (traditional)",
+        "value": "Chinese (traditional)",
         "languageCode": "zh_TW",
         "criterionId": 1018
     },
     {
-        "languageName": "Croatian",
+        "value": "Croatian",
         "languageCode": "hr",
         "criterionId": 1039
     },
     {
-        "languageName": "Czech",
+        "value": "Czech",
         "languageCode": "cs",
         "criterionId": 1021
     },
     {
-        "languageName": "Danish",
+        "value": "Danish",
         "languageCode": "da",
         "criterionId": 1009
     },
     {
-        "languageName": "Estonian",
+        "value": "Estonian",
         "languageCode": "et",
         "criterionId": 1043
     },
     {
-        "languageName": "Filipino",
+        "value": "Filipino",
         "languageCode": "tl",
         "criterionId": 1042
     },
     {
-        "languageName": "Finnish",
+        "value": "Finnish",
         "languageCode": "fi",
         "criterionId": 1011
     },
     {
-        "languageName": "French",
+        "value": "French",
         "languageCode": "fr",
         "criterionId": 1002
     },
     {
-        "languageName": "German",
+        "value": "German",
         "languageCode": "de",
         "criterionId": 1001
     },
     {
-        "languageName": "Greek",
+        "value": "Greek",
         "languageCode": "el",
         "criterionId": 1022
     },
     {
-        "languageName": "Gujarati",
+        "value": "Gujarati",
         "languageCode": "gu",
         "criterionId": 1072
     },
     {
-        "languageName": "Hebrew",
+        "value": "Hebrew",
         "languageCode": "iw",
         "criterionId": 1027
     },
     {
-        "languageName": "Hindi",
+        "value": "Hindi",
         "languageCode": "hi",
         "criterionId": 1023
     },
     {
-        "languageName": "Hungarian",
+        "value": "Hungarian",
         "languageCode": "hu",
         "criterionId": 1024
     },
     {
-        "languageName": "Icelandic",
+        "value": "Icelandic",
         "languageCode": "is",
         "criterionId": 1026
     },
     {
-        "languageName": "Indonesian",
+        "value": "Indonesian",
         "languageCode": "id",
         "criterionId": 1025
     },
     {
-        "languageName": "Italian",
+        "value": "Italian",
         "languageCode": "it",
         "criterionId": 1004
     },
     {
-        "languageName": "Japanese",
+        "value": "Japanese",
         "languageCode": "ja",
         "criterionId": 1005
     },
     {
-        "languageName": "Kannada",
+        "value": "Kannada",
         "languageCode": "kn",
         "criterionId": 1086
     },
     {
-        "languageName": "Korean",
+        "value": "Korean",
         "languageCode": "ko",
         "criterionId": 1012
     },
     {
-        "languageName": "Latvian",
+        "value": "Latvian",
         "languageCode": "lv",
         "criterionId": 1028
     },
     {
-        "languageName": "Lithuanian",
+        "value": "Lithuanian",
         "languageCode": "lt",
         "criterionId": 1029
     },
     {
-        "languageName": "Malay",
+        "value": "Malay",
         "languageCode": "ms",
         "criterionId": 1102
     },
     {
-        "languageName": "Malayalam",
+        "value": "Malayalam",
         "languageCode": "ml",
         "criterionId": 1098
     },
     {
-        "languageName": "Marathi",
+        "value": "Marathi",
         "languageCode": "mr",
         "criterionId": 1101
     },
     {
-        "languageName": "Norwegian",
+        "value": "Norwegian",
         "languageCode": "no",
         "criterionId": 1013
     },
     {
-        "languageName": "Persian",
+        "value": "Persian",
         "languageCode": "fa",
         "criterionId": 1064
     },
     {
-        "languageName": "Polish",
+        "value": "Polish",
         "languageCode": "pl",
         "criterionId": 1030
     },
     {
-        "languageName": "Portuguese",
+        "value": "Portuguese",
         "languageCode": "pt",
         "criterionId": 1014
     },
     {
-        "languageName": "Punjabi",
+        "value": "Punjabi",
         "languageCode": "pa",
         "criterionId": 1110
     },
     {
-        "languageName": "Romanian",
+        "value": "Romanian",
         "languageCode": "ro",
         "criterionId": 1032
     },
     {
-        "languageName": "Russian",
+        "value": "Russian",
         "languageCode": "ru",
         "criterionId": 1031
     },
     {
-        "languageName": "Serbian",
+        "value": "Serbian",
         "languageCode": "sr",
         "criterionId": 1035
     },
     {
-        "languageName": "Slovak",
+        "value": "Slovak",
         "languageCode": "sk",
         "criterionId": 1033
     },
     {
-        "languageName": "Slovenian",
+        "value": "Slovenian",
         "languageCode": "sl",
         "criterionId": 1034
     },
     {
-        "languageName": "Spanish",
+        "value": "Spanish",
         "languageCode": "es",
         "criterionId": 1003
     },
     {
-        "languageName": "Swedish",
+        "value": "Swedish",
         "languageCode": "sv",
         "criterionId": 1015
     },
     {
-        "languageName": "Tamil",
+        "value": "Tamil",
         "languageCode": "ta",
         "criterionId": 1130
     },
     {
-        "languageName": "Telugu",
+        "value": "Telugu",
         "languageCode": "te",
         "criterionId": 1131
     },
     {
-        "languageName": "Thai",
+        "value": "Thai",
         "languageCode": "th",
         "criterionId": 1044
     },
     {
-        "languageName": "Turkish",
+        "value": "Turkish",
         "languageCode": "tr",
         "criterionId": 1037
     },
     {
-        "languageName": "Ukrainian",
+        "value": "Ukrainian",
         "languageCode": "uk",
         "criterionId": 1036
     },
     {
-        "languageName": "Urdu",
+        "value": "Urdu",
         "languageCode": "ur",
         "criterionId": 1041
     },
     {
-        "languageName": "Vietnamese",
+        "value": "Vietnamese",
         "languageCode": "vi",
         "criterionId": 1040
     }

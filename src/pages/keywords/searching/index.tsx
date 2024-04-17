@@ -84,7 +84,8 @@ export default function KeywordSearching({
 
       const GoogleGeneratedKeywords = await getGoogleKeywords(
         [...filters.subjects, ...data.generatedKeywordsList],
-        filters.language
+        filters.language,
+        filters.country
       );
 
       // Filter the keywords with data
@@ -239,7 +240,7 @@ export default function KeywordSearching({
     const { error } = await supabase
       .from("collections")
       .insert([
-        { collection_name: collectionToSave, keywords: selectedKeywords },
+        { collection_name: collectionToSave, keywords: selectedKeywords, language: filters.language, country: filters.country },
       ]);
     if (error) {
       console.log(error);
