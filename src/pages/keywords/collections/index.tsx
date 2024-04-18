@@ -23,10 +23,12 @@ export default function CollectionsPage({
   setPages,
   filters,
   setFilters,
+  setActiveCollection,
 }: {
   setPages: any;
   filters: any;
   setFilters: any;
+  setActiveCollection: any;
 }) {
   const [popUpOpen, setPopUpOpen] = useState(false);
   const [moreFilters, setMoreFilters] = useState(false);
@@ -118,7 +120,7 @@ export default function CollectionsPage({
         }
       />
       {collections ? (
-        <CollectionsWrapper collections={collections} />
+        <CollectionsWrapper collections={collections} setActiveCollection={setActiveCollection} setPages={(value:any) => setPages((prevState: any) => [...prevState, value])} />
       ) : (
         <p>Loading...</p>
       )}

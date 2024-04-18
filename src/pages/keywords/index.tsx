@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import styles from "./index.module.scss";
 import CollectionsPage from "./collections";
 import KeywordSearching from "./searching";
+import Collection from "./collection";
 
 export default function Keywords() {
   const [pages, setPages] = useState(["collections"]);
   const page = pages[pages.length - 1];
+  const [activeCollection, setActiveCollection] = useState("");
 
   const [searching, setSearching] = useState({
     subjects: [],
@@ -38,6 +40,7 @@ export default function Keywords() {
         setPages={setPages}
         filters={searching}
         setFilters={setSearching}
+        setActiveCollection={setActiveCollection}
       />
     );
   } else if (page == "search") {
@@ -46,6 +49,13 @@ export default function Keywords() {
         filters={searching}
         setPages={setPages}
         setFilters={setSearching}
+      />
+    );
+  }  else if (page == "collection") {
+    return (
+      <Collection
+        collectionId={activeCollection}
+        setPages={setPages}
       />
     );
   } else {

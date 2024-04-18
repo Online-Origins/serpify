@@ -114,18 +114,24 @@ export default function KeywordSearching({
         return keywordData;
       });
 
-      const filterWithUserValue = keywordsWithData.filter(
+      // Map the array to rename keywordIdeaMetrics property
+      const keywordsWithRenamedMetrics = keywordsWithData.map((keyword:any) => ({
+        ...keyword,
+        keywordMetrics: keyword.keywordIdeaMetrics,
+      }));
+
+      const filterWithUserValue = keywordsWithRenamedMetrics.filter(
         (keyword: any) =>
-          keyword.keywordIdeaMetrics.avgMonthlySearches >=
+          keyword.keywordMetrics.avgMonthlySearches >=
             filters.volume[0].min &&
-          keyword.keywordIdeaMetrics.avgMonthlySearches <=
+          keyword.keywordMetrics.avgMonthlySearches <=
             filters.volume[0].max &&
-          keyword.keywordIdeaMetrics.competitionIndex >=
+          keyword.keywordMetrics.competitionIndex >=
             filters.competition[0].min &&
-          keyword.keywordIdeaMetrics.competitionIndex <=
+          keyword.keywordMetrics.competitionIndex <=
             filters.competition[0].max &&
-          keyword.keywordIdeaMetrics.potential >= filters.potential[0].min &&
-          keyword.keywordIdeaMetrics.potential <= filters.potential[0].max
+          keyword.keywordMetrics.potential >= filters.potential[0].min &&
+          keyword.keywordMetrics.potential <= filters.potential[0].max
       );
 
       setGeneratedKeywords(filterWithUserValue);
@@ -141,7 +147,6 @@ export default function KeywordSearching({
 
   useEffect(() => {
     if (generatedKeywords.length > 0) {
-      sortKeywords();
       showKeywords();
     }
   }, [generatedKeywords]);
@@ -162,19 +167,19 @@ export default function KeywordSearching({
     if (sorting == "potential") {
       generatedKeywords.sort(
         (a, b) =>
-          b.keywordIdeaMetrics.potential - a.keywordIdeaMetrics.potential
+          b.keywordMetrics.potential - a.keywordMetrics.potential
       );
     } else if (sorting == "competition") {
       generatedKeywords.sort(
         (a, b) =>
-          a.keywordIdeaMetrics.competitionIndex -
-          b.keywordIdeaMetrics.competitionIndex
+          a.keywordMetrics.competitionIndex -
+          b.keywordMetrics.competitionIndex
       );
     } else if (sorting == "searchVolume") {
       generatedKeywords.sort(
         (a, b) =>
-          b.keywordIdeaMetrics.avgMonthlySearches -
-          a.keywordIdeaMetrics.avgMonthlySearches
+          b.keywordMetrics.avgMonthlySearches -
+          a.keywordMetrics.avgMonthlySearches
       );
     } else {
       generatedKeywords.sort((a, b) => {
@@ -240,11 +245,16 @@ export default function KeywordSearching({
     const { error } = await supabase
       .from("collections")
       .insert([
-        { collection_name: collectionToSave, keywords: selectedKeywords, language: filters.language, country: filters.country },
+        {
+          collection_name: collectionToSave,
+          keywords: selectedKeywords,
+          language: filters.language,
+          country: filters.country,
+        },
       ]);
     if (error) {
       console.log(error);
-    } else{
+    } else {
       setPopUpOpen(false);
       setPages((prevState: any) => [...prevState, "collections"]);
     }
@@ -340,7 +350,7 @@ export default function KeywordSearching({
                   <Selector
                     group={collectionToSave}
                     item={collection.collection_name}
-                    selecting={(value:any) => setCollectionToSave(value)}
+                    selecting={(value: any) => setCollectionToSave(value)}
                   />
                   <p>{collection.collection_name}</p>
                 </div>

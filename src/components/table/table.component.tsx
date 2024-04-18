@@ -26,7 +26,6 @@ export default function Table({
   searchVolume?: any;
   potentialIndex?: any;
 }) {
-
   function selecting(clickedKeyword: string) {
     if (!selectedKeywords.includes(clickedKeyword)) {
       setSelectedKeywords([...selectedKeywords, clickedKeyword]);
@@ -122,7 +121,7 @@ export default function Table({
           </div>
         </div>
         <div className={styles.tableContent}>
-          {shownKeywords.length > 0 ? (
+          {shownKeywords.length > 0 ? 
             shownKeywords.map((keyword: any) => (
               <div className={styles.row} key={keyword.text}>
                 <div className={classNames(styles.item, styles.select)}>
@@ -138,20 +137,20 @@ export default function Table({
                 <div className={classNames(styles.item, styles.searchVolume)}>
                   <p>
                     {searchVolume(
-                      keyword.keywordIdeaMetrics.avgMonthlySearches
+                      keyword.keywordMetrics.avgMonthlySearches
                     )}
                   </p>
                   <IndicationIcon
                     indication={searchVolumeIndication(
-                      keyword.keywordIdeaMetrics.avgMonthlySearches
+                      keyword.keywordMetrics.avgMonthlySearches
                     )}
                   />
                 </div>
                 <div className={classNames(styles.item, styles.competition)}>
-                  <p>{keyword.keywordIdeaMetrics.competitionIndex}</p>
+                  <p>{keyword.keywordMetrics.competitionIndex}</p>
                   <IndicationIcon
                     indication={Indexation(
-                      100 - keyword.keywordIdeaMetrics.competitionIndex
+                      100 - keyword.keywordMetrics.competitionIndex
                     )}
                   />
                 </div>
@@ -159,8 +158,8 @@ export default function Table({
                   <p>
                     {Math.ceil(
                       potentialIndex(
-                        keyword.keywordIdeaMetrics.avgMonthlySearches,
-                        keyword.keywordIdeaMetrics.competitionIndex
+                        keyword.keywordMetrics.avgMonthlySearches,
+                        keyword.keywordMetrics.competitionIndex
                       )
                     ).toString()}
                   </p>
@@ -169,8 +168,8 @@ export default function Table({
                       100 -
                         Math.ceil(
                           potentialIndex(
-                            keyword.keywordIdeaMetrics.avgMonthlySearches,
-                            keyword.keywordIdeaMetrics.competitionIndex
+                            keyword.keywordMetrics.avgMonthlySearches,
+                            keyword.keywordMetrics.competitionIndex
                           )
                         )
                     )}
@@ -178,9 +177,8 @@ export default function Table({
                 </div>
               </div>
             ))
-          ) : (
-            <p>Couldn't find any matching keywords. please try again.</p>
-          )}
+           : <p>Couldn't find any matching keywords. please try again.</p>
+          }
         </div>
       </div>
     );
