@@ -28,7 +28,23 @@ export default function SmallTable({
   useEffect(() => {
     if (!isGettingData.current) {
       getKeywordsData().then((data) => {
-        setKeywordsData(data);
+        const newData = data.map((keyword: any) => ({
+          ...keyword,
+          keywordMetrics: {
+            ...keyword.keywordMetrics,
+            potentialIndex: Math.ceil(
+              potentialIndex(
+                keyword.keywordMetrics.avgMonthlySearches,
+                keyword.keywordMetrics.competitionIndex
+              )
+            ),
+          },
+        }));
+        newData.sort(
+          (a: any, b:any) =>
+            b.keywordMetrics.potentialIndex - a.keywordMetrics.potentialIndex
+        );
+        setKeywordsData(newData);
       });
       isGettingData.current = true;
     }
@@ -140,25 +156,10 @@ export default function SmallTable({
                 />
               </div>
               <div className={classNames(styles.item, styles.potential)}>
-                <p>
-                  {Math.ceil(
-                    potentialIndex(
-                      keyword.keywordMetrics.avgMonthlySearches,
-                      keyword.keywordMetrics.competitionIndex
-                    )
-                  ).toString()}
-                </p>
+                <p>{keyword.keywordMetrics.potentialIndex.toString()}</p>
 
                 <IndicationIcon
-                  indication={Indexation(
-                    100 -
-                      Math.ceil(
-                        potentialIndex(
-                          keyword.keywordMetrics.avgMonthlySearches,
-                          keyword.keywordMetrics.competitionIndex
-                        )
-                      )
-                  )}
+                  indication={Indexation(100 - keyword.keywordMetrics.potentialIndex)}
                 />
               </div>
             </div>
