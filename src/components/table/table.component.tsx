@@ -1,6 +1,5 @@
 import styles from "./table.module.scss";
 import classNames from "classnames";
-import { useEffect, useState } from "react";
 
 import ArrowDownwardRoundedIcon from "@mui/icons-material/ArrowDownwardRounded";
 import ArrowUpwardRoundedIcon from "@mui/icons-material/ArrowUpwardRounded";

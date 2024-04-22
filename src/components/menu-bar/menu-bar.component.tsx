@@ -54,8 +54,8 @@ export default function MenuBar({
               <h4>Keyword search</h4>
             </li>
             <li
-              className={active == "content" ? styles.active : ""}
-              onClick={() => setActive("content")}
+              className={active == "contentWriting" ? styles.active : ""}
+              onClick={() => setActive("contentWriting")}
             >
               <TextFieldsRoundedIcon />
               <h4>Content writer</h4>

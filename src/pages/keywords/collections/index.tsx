@@ -32,7 +32,6 @@ export default function CollectionsPage({
 }) {
   const [popUpOpen, setPopUpOpen] = useState(false);
   const [moreFilters, setMoreFilters] = useState(false);
-
   const [subjectsInput, setSubjectsInput] = useState("");
   const [keywordsLanguage, setKeywordsLanguage] = useState(
     languageCodes[0].criterionId
@@ -52,7 +51,6 @@ export default function CollectionsPage({
     keywords: [];
     language: string;
     country: string;
-    // other properties
   }
   const [collections, setCollections] = useState<Collection[]>([]);
 

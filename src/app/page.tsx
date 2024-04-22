@@ -8,6 +8,7 @@ import styles from "./index.module.scss";
 
 import { useEffect, useState } from "react";
 import classNames from "classnames";
+import ContentWriting from "@/pages/content-writing";
 
 export default function Page() {
   const [active, setActive] = useState("home");
@@ -36,6 +37,7 @@ export default function Page() {
         <div className={styles.innerWrapper}>
           {active == "home" && <Home />}
           {active == "keyword" && <Keywords />}
+          {active == "contentWriting" && <ContentWriting />}
         </div>
       </ComponentWrapper>
     </main>
