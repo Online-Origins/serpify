@@ -1,4 +1,4 @@
-import styles from "./index.module.scss";
+import styles from "./page.module.scss";
 
 import { useEffect, useRef, useState } from "react";
 

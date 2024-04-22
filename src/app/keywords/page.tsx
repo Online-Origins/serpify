@@ -1,8 +1,8 @@
+'use client';
 import { useEffect, useState } from "react";
-import styles from "./index.module.scss";
-import CollectionsPage from "./collections";
-import KeywordSearching from "./searching";
-import Collection from "./collection";
+import CollectionsPage from "./collections/page";
+import KeywordSearching from "./searching/page";
+import Collection from "./collection/page";
 
 export default function Keywords() {
   const [pages, setPages] = useState(["collections"]);

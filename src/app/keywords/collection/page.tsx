@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import styles from "./index.module.scss";
+import styles from "./page.module.scss";
 
 import { supabase } from "@/app/api/supabaseClient/route";
 import { getKeywordMetrics } from "@/app/api/keywordMetrics/route";

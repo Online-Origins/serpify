@@ -4,7 +4,7 @@ import InputWrapper from "@/components/ui/input-wrapper/input-wrapper.component"
 import InnerWrapper from "@/components/inner-wrapper/inner-wrapper.component";
 import { useEffect, useRef, useState } from "react";
 import classNames from "classnames";
-import styles from "./index.module.scss";
+import styles from "./page.module.scss";
 
 import { getGoogleKeywords } from "@/app/api/googleKeywords/route";
 import { supabase } from "@/app/api/supabaseClient/route";

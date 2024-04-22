@@ -9,18 +9,20 @@ import TextFieldsRoundedIcon from "@mui/icons-material/TextFieldsRounded";
 import AssessmentOutlinedIcon from "@mui/icons-material/AssessmentOutlined";
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { usePathname } from 'next/navigation';
 
-export default function MenuBar({
-  active,
-  setActive,
-  smallNav,
-  setSmallNav,
-}: {
-  active: string;
-  setActive: any;
-  smallNav: boolean;
-  setSmallNav: any;
-}) {
+export default function MenuBar() {
+  const pathname = usePathname();
+  const [smallNav, setSmallNav] = useState(false);
+
+  useEffect(() => {
+    if(pathname != "/") {
+      setSmallNav(true)
+    }
+  }, [pathname])
+
   return (
     <ComponentWrapper
       className={classNames(
@@ -39,33 +41,29 @@ export default function MenuBar({
         <div className={styles.mainMenu}>
           <h3>Tools</h3>
           <ul>
-            <li
-              className={active == "home" ? styles.active : ""}
-              onClick={() => setActive("home")}
-            >
-              <HomeOutlinedIcon />
-              <h4>Home</h4>
+            <li>
+              <Link href="/" className={pathname == "/" ? styles.active : ""}>
+                <HomeOutlinedIcon />
+                <h4>Home</h4>
+              </Link>
             </li>
-            <li
-              className={active == "keyword" ? styles.active : ""}
-              onClick={() => setActive("keyword")}
-            >
-              <GridViewOutlinedIcon />
-              <h4>Keyword search</h4>
+            <li>
+              <Link className={pathname == "/keywords" ? styles.active : ""} href="/keywords">
+                <GridViewOutlinedIcon />
+                <h4>Keyword search</h4>
+              </Link>
             </li>
-            <li
-              className={active == "contentWriting" ? styles.active : ""}
-              onClick={() => setActive("contentWriting")}
-            >
-              <TextFieldsRoundedIcon />
-              <h4>Content writer</h4>
+            <li>
+              <Link className={pathname == "/content" ? styles.active : ""} href="/content">
+                <TextFieldsRoundedIcon />
+                <h4>Content writer</h4>
+              </Link>
             </li>
-            <li
-              className={active == "analytics" ? styles.active : ""}
-              onClick={() => setActive("analytics")}
-            >
-              <AssessmentOutlinedIcon />
-              <h4>Website analytics</h4>
+            <li>
+              <Link className={pathname == "/analytics" ? styles.active : ""} href="/">
+                <AssessmentOutlinedIcon />
+                <h4>Website analytics</h4>
+              </Link>
             </li>
           </ul>
         </div>
@@ -74,17 +72,18 @@ export default function MenuBar({
       <div className={styles.bottomNav}>
         <ul>
           <li onClick={() => setSmallNav(!smallNav)}>
-            <ArrowForwardRoundedIcon
-              className={!smallNav ? styles.arrowRotate : ""}
-            />
-            <h4>Close menu</h4>
+            <a>
+              <ArrowForwardRoundedIcon
+                className={!smallNav ? styles.arrowRotate : ""}
+              />
+              <h4>Close menu</h4>
+            </a>
           </li>
-          <li
-            className={active == "settings" ? styles.active : ""}
-            onClick={() => setActive("settings")}
-          >
-            <SettingsOutlinedIcon />
-            <h4>Settings</h4>
+          <li className={pathname == "/settings" ? styles.active : ""}>
+            <a>
+              <SettingsOutlinedIcon />
+              <h4>Settings</h4>
+            </a>
           </li>
         </ul>
       </div>
