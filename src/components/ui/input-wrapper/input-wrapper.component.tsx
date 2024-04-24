@@ -5,7 +5,7 @@ import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import Information from "@/components/information/information.component";
 import { MenuItem, Select } from "@mui/material";
 
-import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 
 export default function InputWrapper({
   title,
@@ -21,6 +21,8 @@ export default function InputWrapper({
   placeholder,
   options,
   generateTitle,
+  changeCurrentValues,
+  onKeyDown,
 }: {
   title?: string;
   required?: boolean;
@@ -35,6 +37,8 @@ export default function InputWrapper({
   placeholder?: string;
   options?: any;
   generateTitle?: any;
+  changeCurrentValues?: any;
+  onKeyDown?: any;
 }) {
   const handleChange = (value: string) => {
     if (defValue.includes(value)) {
@@ -60,9 +64,14 @@ export default function InputWrapper({
           {currentValues && (
             <div className={styles.currentValues}>
               {currentValues.map((value: string) => (
-                <p className={styles.value} key={value}>
-                  {value} <CloseRoundedIcon />{" "}
-                </p>
+                <div key={value} className={styles.value}>
+                  <p>
+                    {value}
+                  </p>
+                  <div onClick={() => changeCurrentValues(value)}>
+                    <CloseRoundedIcon />
+                  </div>
+                </div>
               ))}
             </div>
           )}
@@ -71,6 +80,7 @@ export default function InputWrapper({
             value={value}
             onChange={(event) => onChange(event.target.value)}
             placeholder={placeholder}
+            onKeyDown={(e) => onKeyDown(e)}
           />
           {icon && icon}
         </div>
@@ -101,7 +111,10 @@ export default function InputWrapper({
           variant="standard"
         >
           {options.map((option: any) => (
-            <MenuItem key={option.id ? option.id : option} value={option.id ? option.id : option}>
+            <MenuItem
+              key={option.id ? option.id : option}
+              value={option.id ? option.id : option}
+            >
               {option.value ? option.value : option}
             </MenuItem>
           ))}

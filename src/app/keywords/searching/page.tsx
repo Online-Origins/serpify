@@ -3,7 +3,6 @@ import Information from "@/components/information/information.component";
 import InputWrapper from "@/components/ui/input-wrapper/input-wrapper.component";
 import InnerWrapper from "@/components/inner-wrapper/inner-wrapper.component";
 import { useEffect, useRef, useState } from "react";
-import classNames from "classnames";
 import styles from "./page.module.scss";
 
 import { getGoogleKeywords } from "@/app/api/googleKeywords/route";
@@ -13,6 +12,8 @@ import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
+import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
+import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 
 import Table from "@/components/table/table.component";
 import Button from "@/components/ui/button/button.component";
@@ -37,12 +38,12 @@ export default function KeywordSearching({
   const isKeywordsGenerated = useRef(false);
   const [loading, setLoading] = useState(false);
   const [popUpOpen, setPopUpOpen] = useState(false);
-
   const [collections, setCollections] = useState<{ collection_name: string }[]>(
     []
   );
   const [collectionToSave, setCollectionToSave] = useState("");
   const [newCollection, setNewCollection] = useState("");
+  const [keywordAmount, setKeywordAmount] = useState([0, 20]);
 
   useEffect(() => {
     getCollections();
@@ -65,9 +66,11 @@ export default function KeywordSearching({
     }
   }, [filters.subjects, generateKeywords]);
 
+  // Generate keywords
   async function generateKeywords() {
     setLoading(true);
     try {
+      // Connect with GPT api
       const response = await fetch("/api/generateKeywords", {
         method: "POST",
         headers: {
@@ -82,6 +85,7 @@ export default function KeywordSearching({
 
       const data = await response.json();
 
+      // Generate keywords and data with the Google Ads api
       const GoogleGeneratedKeywords = await getGoogleKeywords(
         [...filters.subjects, ...data.generatedKeywordsList],
         filters.language,
@@ -98,6 +102,7 @@ export default function KeywordSearching({
           keyword.keywordIdeaMetrics.competitionIndex !== null
       );
 
+      // Add the potential to the keywords
       const keywordsWithData = filteredKeywords.map((keywordData: any) => {
         let potential = null; // default value if keywordIdeaMetrics doesn't exist
 
@@ -122,8 +127,7 @@ export default function KeywordSearching({
         })
       );
 
-      console.log(filters.keywordLength);
-
+      // Filter the keywords to only get keywords with metrics
       const filterWithUserValue = keywordsWithRenamedMetrics.filter(
         (keyword: any) =>
           keyword.keywordMetrics.avgMonthlySearches >= filters.volume[0].min &&
@@ -136,6 +140,7 @@ export default function KeywordSearching({
           keyword.keywordMetrics.potential <= filters.potential[0].max
       );
 
+      // Filter the keywords according to the length og the keywords
       const filterkeywordLength = filterWithUserValue.filter((keyword: any) => {
         const wordCount = keyword.text.split(" ").length;
         const isShortTail = filters.keywordLength.includes("shorttail");
@@ -150,9 +155,9 @@ export default function KeywordSearching({
         }
       });
 
-
       setGeneratedKeywords(filterkeywordLength);
       setLoading(false);
+
     } catch (error: any) {
       alert("Something went wrong. Please try again");
       setPages((prevPages: any) => {
@@ -162,6 +167,7 @@ export default function KeywordSearching({
     }
   }
 
+  // Sort and show the keywords when there are keywords generated
   useEffect(() => {
     if (generatedKeywords.length > 0) {
       sortKeywords();
@@ -169,18 +175,30 @@ export default function KeywordSearching({
     }
   }, [generatedKeywords]);
 
+  // Sort the keywords if the sorting type changes
   useEffect(() => {
     sortKeywords();
   }, [sorting]);
 
+  // Show keywords when keywordAmount changes
+  useEffect(() => {
+    showKeywords();
+  }, [keywordAmount]);
+
+  // Show an amount of keywords according to the "page"
   function showKeywords() {
     let array: any[] = [];
-    for (let x = 0; x < 20 && x < generatedKeywords.length; x++) {
+    for (
+      let x = keywordAmount[0];
+      x < keywordAmount[1] && x < generatedKeywords.length;
+      x++
+    ) {
       array.push(generatedKeywords[x]);
     }
     setShownKeywords(array);
   }
 
+  // Sort the keywords on the sorting type
   function sortKeywords() {
     if (sorting == "potential") {
       generatedKeywords.sort(
@@ -212,6 +230,7 @@ export default function KeywordSearching({
     showKeywords();
   }
 
+  // Translate search volume to understandable text
   function searchVolume(googleVolume: number) {
     switch (true) {
       case googleVolume >= 10 && googleVolume < 100:
@@ -227,6 +246,7 @@ export default function KeywordSearching({
     }
   }
 
+  // Calculate the potential
   function potentialIndex(googleVolume: number, competition: number) {
     const search = searchVolume(googleVolume);
 
@@ -243,7 +263,8 @@ export default function KeywordSearching({
         return 0;
     }
   }
-
+  
+  // Add new subjects to the filters with user input
   function addNewSubjects() {
     if (subjectInput != "") {
       const subjectArray = subjectInput.split(",");
@@ -257,6 +278,7 @@ export default function KeywordSearching({
     }
   }
 
+  // Create a new collection with selected keywords
   async function createKeywordCollection() {
     const { error } = await supabase.from("collections").insert([
       {
@@ -274,6 +296,7 @@ export default function KeywordSearching({
     }
   }
 
+  // Add a new collection to the list of collections when an user creates a new one
   function addNewCollection() {
     setCollections((prevState: any) => [
       ...prevState,
@@ -283,13 +306,27 @@ export default function KeywordSearching({
     setNewCollection("");
   }
 
+  // Update the subject filters when the user deletes a subject
+  function updateSubjectFilters(value: string) {
+    if (filters.subjects.length > 1) {
+      setFilters((prevState: any) => ({
+        ...prevState,
+        subjects: [
+          ...prevState.subjects.filter((subject: string) => subject != value),
+        ],
+      }));
+      isKeywordsGenerated.current = false;
+    } else {
+      alert("You need at least one subject to search");
+    }
+  }
+
   return (
     <InnerWrapper>
       <PageTitle
         title={"Search keywords"}
         goBack={() =>
           setPages((prevPages: any) => {
-            // Create a new array with all elements except the last one
             return prevPages.slice(0, -1);
           })
         }
@@ -301,6 +338,12 @@ export default function KeywordSearching({
           onChange={(value: any) => setSubjectInput(value)}
           className={styles.filterInput}
           currentValues={filters.subjects}
+          changeCurrentValues={(value: string) => updateSubjectFilters(value)}
+          onKeyDown={(e: any) => {
+            if (e.key == "Enter" && subjectInput != "") {
+              addNewSubjects();
+            }
+          }}
           placeholder="Search more subjects..."
           icon={
             <div onClick={() => addNewSubjects()}>
@@ -329,6 +372,33 @@ export default function KeywordSearching({
             >
               <p>Save to</p> <AddRoundedIcon />
             </Button>
+            <div className={styles.amountButtons}>
+              {keywordAmount[0] > 0 && (
+                <Button
+                  type={"textOnly"}
+                  onClick={() =>
+                    setKeywordAmount([
+                      keywordAmount[0] - 20,
+                      keywordAmount[1] - 20,
+                    ])
+                  }
+                >
+                  <ArrowBackRoundedIcon />
+                  <p>Previous</p>
+                </Button>
+              )}
+              {keywordAmount[1] < generatedKeywords.length && (
+                <Button
+                  type={"textOnly"}
+                  onClick={() =>
+                    setKeywordAmount([keywordAmount[1], keywordAmount[1] + 20])
+                  }
+                >
+                  <p>Next</p>
+                  <ArrowForwardRoundedIcon />
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       ) : (
