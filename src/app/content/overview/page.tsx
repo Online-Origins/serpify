@@ -28,7 +28,7 @@ export default function ContentOverview({ setPages }: { setPages: any }) {
   const [keywordOptions, setKeywordOptions] = useState([]);
   const [chosenKeywords, setChosenKeywords] = useState([]);
   const [chosenLanguage, setChosenLanguage] = useState(languageCodes[0].id);
-  const [toneOfVoice, setToneOfVoice] = useState(toneOfVoices[0]);
+  const [toneOfVoice, setToneOfVoice] = useState(toneOfVoices[0].id);
   const [targetAudience, setTargetAudience] = useState("");
   const [contentTitle, setcontentTitle] = useState("");
 
@@ -144,7 +144,7 @@ export default function ContentOverview({ setPages }: { setPages: any }) {
         }
       />
       <div className={styles.contentItemsWrapper}>
-        {contents.map((content) => (
+        {contents.length > 0 ? contents.map((content) => (
           <div key={content.id} className={styles.content}>
             <div className={styles.titleWrapper}>
               <h4>{content.content_title}</h4>
@@ -160,7 +160,7 @@ export default function ContentOverview({ setPages }: { setPages: any }) {
               <p>{formatDate(content.date_edited)}</p>
             </div>
           </div>
-        ))}
+        )) : <h5>No content found. Start creating one</h5>}
       </div>
       {popUpOpen && (
         <PopUpWrapper>
@@ -220,7 +220,7 @@ export default function ContentOverview({ setPages }: { setPages: any }) {
             {popUpStep == 2 && (
               <div className={styles.contentSettings}>
                 <InputWrapper
-                  type="dropdown"
+                  type="autocomplete"
                   title="Language:"
                   required={false}
                   value={chosenLanguage}
@@ -229,7 +229,7 @@ export default function ContentOverview({ setPages }: { setPages: any }) {
                   placeholder="In what language should the keywords be?"
                 />
                 <InputWrapper
-                  type="dropdown"
+                  type="autocomplete"
                   title="Tone of voice:"
                   required={false}
                   value={toneOfVoice}

@@ -1,25 +1,11 @@
 @import '@/styles/variables.scss';
 
-.informationWrapper {
-    position: relative;
-    width: max-content;
+.info{
+    font-size: 14px;
+    font-weight: 400;
+}
 
-    img {
-        height: .9rem;
-    }
-
-    .textWrapper {
-        z-index: 100;
-        background-color: $white;
-        border: solid 2px $purple_primary;
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-        border-radius: .5rem;
-        margin-top: 1rem;
-        display: none;
-        overflow: hidden;
-        opacity: 0;
-        transition: .3s opacity ease-in-out;
-    }
+.icon{
+    aspect-ratio: 1 / 1;
+    height: 1rem;
 }

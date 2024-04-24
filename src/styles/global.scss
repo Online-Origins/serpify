@@ -70,3 +70,9 @@ a{
 .css-1rxz5jq-MuiSelect-select-MuiInputBase-input-MuiInput-input:focus {
     background-color: rgba($color: #000000, $alpha: 0);
 }
+
+.MuiInputBase-root{
+    &::before, &::after{
+        display: none;
+    }
+}

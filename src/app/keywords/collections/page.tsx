@@ -33,12 +33,8 @@ export default function CollectionsPage({
   const [popUpOpen, setPopUpOpen] = useState(false);
   const [moreFilters, setMoreFilters] = useState(false);
   const [subjectsInput, setSubjectsInput] = useState("");
-  const [keywordsLanguage, setKeywordsLanguage] = useState(
-    languageCodes[0].id
-  );
-  const [keywordsCountry, setKeywordsCountry] = useState(
-    countryCodes[0].id
-  );
+  const [keywordsLanguage, setKeywordsLanguage] = useState(languageCodes[0].id);
+  const [keywordsCountry, setKeywordsCountry] = useState(countryCodes[0].id);
   const [keywordLength, setKeywordLength] = useState(["shorttail", "longtail"]);
   const [searchVolume, setSearchVolume] = useState<number[]>([0, 100]);
   const [competition, setCompetition] = useState<number[]>([0, 100]);
@@ -111,7 +107,13 @@ export default function CollectionsPage({
         }
       />
       {collections ? (
-        <CollectionsWrapper collections={collections} setActiveCollection={setActiveCollection} setPages={(value:any) => setPages((prevState: any) => [...prevState, value])} />
+        <CollectionsWrapper
+          collections={collections}
+          setActiveCollection={setActiveCollection}
+          setPages={(value: any) =>
+            setPages((prevState: any) => [...prevState, value])
+          }
+        />
       ) : (
         <p>Loading...</p>
       )}
@@ -147,7 +149,7 @@ export default function CollectionsPage({
               <div className={styles.filters}>
                 <div className={styles.multiDropdown}>
                   <InputWrapper
-                    type="dropdown"
+                    type="autocomplete"
                     title="Country:"
                     required={false}
                     value={keywordsCountry}
@@ -156,7 +158,7 @@ export default function CollectionsPage({
                     placeholder="Which country do you want to target?"
                   />
                   <InputWrapper
-                    type="dropdown"
+                    type="autocomplete"
                     title="Language:"
                     required={false}
                     value={keywordsLanguage}
@@ -171,108 +173,98 @@ export default function CollectionsPage({
                   required={false}
                   onChange={(value: any) => setKeywordLength(value)}
                   defValue={keywordLength}
-                  information="Search volume is the number of times, on average, that users enter a particular search query into a search engine each month."
+                  information="Short-tail keywords are broad, general, and popular terms with high search volume and competition. Longtail keywords are more specific, niche, and targeted multi-word terms with lower search volume and lower competition."
                 />
-                <div className={styles.sliderWrapper}>
-                  <h4>Search volume:</h4>
-                  <Slider
-                    defaultValue={[0, 100]}
-                    onChange={(value: any) =>
-                      setSearchVolume(value.target.value)
-                    }
-                    step={25}
-                    disableSwap
-                    marks={[
-                      {
-                        value: 0,
-                        label: "10",
-                      },
-                      {
-                        value: 25,
-                        label: "100",
-                      },
-                      {
-                        value: 50,
-                        label: "1K",
-                      },
-                      {
-                        value: 75,
-                        label: "10K",
-                      },
-                      {
-                        value: 100,
-                        label: "100K",
-                      },
-                    ]}
-                    className={styles.slider}
-                  />
-                </div>
-                <div className={styles.sliderWrapper}>
-                  <h4>Competition:</h4>
-                  <Slider
-                    defaultValue={[0, 100]}
-                    onChange={(value: any) =>
-                      setCompetition(value.target.value)
-                    }
-                    step={25}
-                    disableSwap
-                    marks={[
-                      {
-                        value: 0,
-                        label: "0",
-                      },
-                      {
-                        value: 25,
-                        label: "25",
-                      },
-                      {
-                        value: 50,
-                        label: "50",
-                      },
-                      {
-                        value: 75,
-                        label: "75",
-                      },
-                      {
-                        value: 100,
-                        label: "100",
-                      },
-                    ]}
-                    className={styles.slider}
-                  />
-                </div>
-                <div className={styles.sliderWrapper}>
-                  <h4>Potential:</h4>
-                  <Slider
-                    defaultValue={[0, 100]}
-                    onChange={(value: any) => setPotential(value.target.value)}
-                    step={25}
-                    disableSwap
-                    marks={[
-                      {
-                        value: 0,
-                        label: "0",
-                      },
-                      {
-                        value: 25,
-                        label: "25",
-                      },
-                      {
-                        value: 50,
-                        label: "50",
-                      },
-                      {
-                        value: 75,
-                        label: "75",
-                      },
-                      {
-                        value: 100,
-                        label: "100",
-                      },
-                    ]}
-                    className={styles.slider}
-                  />
-                </div>
+                <InputWrapper
+                  type="slider"
+                  title="Search volume:"
+                  information="Search volume is the number of times, on average, that users enter a particular search query into a search engine each month."
+                  defValue={[0, 100]}
+                  onChange={(value: any) => setSearchVolume(value)}
+                  step={25}
+                  marks={[
+                    {
+                      value: 0,
+                      label: "10",
+                    },
+                    {
+                      value: 25,
+                      label: "100",
+                    },
+                    {
+                      value: 50,
+                      label: "1K",
+                    },
+                    {
+                      value: 75,
+                      label: "10K",
+                    },
+                    {
+                      value: 100,
+                      label: "100K",
+                    },
+                  ]}
+                />
+                <InputWrapper
+                  type="slider"
+                  title="Competition:"
+                  information="The degree of competition of the position for a keyword."
+                  defValue={[0, 100]}
+                  onChange={(value: any) => setSearchVolume(value)}
+                  step={25}
+                  marks={[
+                    {
+                      value: 0,
+                      label: "0",
+                    },
+                    {
+                      value: 25,
+                      label: "25",
+                    },
+                    {
+                      value: 50,
+                      label: "50",
+                    },
+                    {
+                      value: 75,
+                      label: "75",
+                    },
+                    {
+                      value: 100,
+                      label: "100",
+                    },
+                  ]}
+                />
+                <InputWrapper
+                  type="slider"
+                  title="Potential:"
+                  information="The ability of a particular keyword or key phrase to drive traffic, engagement, or conversions."
+                  defValue={[0, 100]}
+                  onChange={(value: any) => setSearchVolume(value)}
+                  step={25}
+                  marks={[
+                    {
+                      value: 0,
+                      label: "0",
+                    },
+                    {
+                      value: 25,
+                      label: "25",
+                    },
+                    {
+                      value: 50,
+                      label: "50",
+                    },
+                    {
+                      value: 75,
+                      label: "75",
+                    },
+                    {
+                      value: 100,
+                      label: "100",
+                    },
+                  ]}
+                />
               </div>
             )}
             <Button
