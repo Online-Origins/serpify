@@ -115,17 +115,19 @@ export default function KeywordSearching({
       });
 
       // Map the array to rename keywordIdeaMetrics property
-      const keywordsWithRenamedMetrics = keywordsWithData.map((keyword:any) => ({
-        ...keyword,
-        keywordMetrics: keyword.keywordIdeaMetrics,
-      }));
+      const keywordsWithRenamedMetrics = keywordsWithData.map(
+        (keyword: any) => ({
+          ...keyword,
+          keywordMetrics: keyword.keywordIdeaMetrics,
+        })
+      );
+
+      console.log(filters.keywordLength);
 
       const filterWithUserValue = keywordsWithRenamedMetrics.filter(
         (keyword: any) =>
-          keyword.keywordMetrics.avgMonthlySearches >=
-            filters.volume[0].min &&
-          keyword.keywordMetrics.avgMonthlySearches <=
-            filters.volume[0].max &&
+          keyword.keywordMetrics.avgMonthlySearches >= filters.volume[0].min &&
+          keyword.keywordMetrics.avgMonthlySearches <= filters.volume[0].max &&
           keyword.keywordMetrics.competitionIndex >=
             filters.competition[0].min &&
           keyword.keywordMetrics.competitionIndex <=
@@ -134,7 +136,22 @@ export default function KeywordSearching({
           keyword.keywordMetrics.potential <= filters.potential[0].max
       );
 
-      setGeneratedKeywords(filterWithUserValue);
+      const filterkeywordLength = filterWithUserValue.filter((keyword: any) => {
+        const wordCount = keyword.text.split(" ").length;
+        const isShortTail = filters.keywordLength.includes("shorttail");
+        const isLongTail = filters.keywordLength.includes("longtail");
+
+        if (isShortTail && !isLongTail) {
+          return wordCount <= 3;
+        } else if (!isShortTail && isLongTail) {
+          return wordCount > 3;
+        } else {
+          return keyword;
+        }
+      });
+
+
+      setGeneratedKeywords(filterkeywordLength);
       setLoading(false);
     } catch (error: any) {
       alert("Something went wrong. Please try again");
@@ -147,6 +164,7 @@ export default function KeywordSearching({
 
   useEffect(() => {
     if (generatedKeywords.length > 0) {
+      sortKeywords();
       showKeywords();
     }
   }, [generatedKeywords]);
@@ -166,14 +184,12 @@ export default function KeywordSearching({
   function sortKeywords() {
     if (sorting == "potential") {
       generatedKeywords.sort(
-        (a, b) =>
-          b.keywordMetrics.potential - a.keywordMetrics.potential
+        (a, b) => b.keywordMetrics.potential - a.keywordMetrics.potential
       );
     } else if (sorting == "competition") {
       generatedKeywords.sort(
         (a, b) =>
-          a.keywordMetrics.competitionIndex -
-          b.keywordMetrics.competitionIndex
+          a.keywordMetrics.competitionIndex - b.keywordMetrics.competitionIndex
       );
     } else if (sorting == "searchVolume") {
       generatedKeywords.sort(
@@ -242,16 +258,14 @@ export default function KeywordSearching({
   }
 
   async function createKeywordCollection() {
-    const { error } = await supabase
-      .from("collections")
-      .insert([
-        {
-          collection_name: collectionToSave,
-          keywords: selectedKeywords,
-          language: filters.language,
-          country: filters.country,
-        },
-      ]);
+    const { error } = await supabase.from("collections").insert([
+      {
+        collection_name: collectionToSave,
+        keywords: selectedKeywords,
+        language: filters.language,
+        country: filters.country,
+      },
+    ]);
     if (error) {
       console.log(error);
     } else {

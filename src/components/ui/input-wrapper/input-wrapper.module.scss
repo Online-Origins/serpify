@@ -21,8 +21,20 @@
             outline: solid rgba($color: $purple_primary, $alpha: .5) 2px;
         }
 
+        div{
+            display: flex;
+            align-items: center;
+        }
+
         svg {
             cursor: pointer;
+        }
+
+        .generateIcon{
+            transition: .3s all ease-in-out;
+            &:hover{
+                color: $purple_primary;
+            }
         }
     }
 
@@ -85,6 +97,23 @@
 
                 &:checked {
                     background-color: $purple_primary;
+                }
+            }
+        }
+
+        &.vertMultiSelect{
+            flex-flow: column;
+            width: calc(100% - 1rem);
+
+            label{
+                cursor: pointer;
+                width: 100%;
+                padding: 1rem .5rem;
+                border-bottom: solid $purple_50 2px;
+                transition: .3s all ease-in-out;
+
+                &:hover{
+                    background-color: $purple_50;
                 }
             }
         }

@@ -34,10 +34,10 @@ export default function CollectionsPage({
   const [moreFilters, setMoreFilters] = useState(false);
   const [subjectsInput, setSubjectsInput] = useState("");
   const [keywordsLanguage, setKeywordsLanguage] = useState(
-    languageCodes[0].criterionId
+    languageCodes[0].id
   );
   const [keywordsCountry, setKeywordsCountry] = useState(
-    countryCodes[0].criterionId
+    countryCodes[0].id
   );
   const [keywordLength, setKeywordLength] = useState(["shorttail", "longtail"]);
   const [searchVolume, setSearchVolume] = useState<number[]>([0, 100]);
@@ -45,14 +45,7 @@ export default function CollectionsPage({
   const [potential, setPotential] = useState<number[]>([0, 100]);
 
   const getCollectionsRef = useRef(false);
-  interface Collection {
-    id: number;
-    collection_name: string;
-    keywords: [];
-    language: string;
-    country: string;
-  }
-  const [collections, setCollections] = useState<Collection[]>([]);
+  const [collections, setCollections] = useState<any[]>([]);
 
   useEffect(() => {
     if (!getCollectionsRef.current) {

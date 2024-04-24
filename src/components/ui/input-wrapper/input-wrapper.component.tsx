@@ -5,6 +5,8 @@ import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import Information from "@/components/information/information.component";
 import { MenuItem, Select } from "@mui/material";
 
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+
 export default function InputWrapper({
   title,
   required,
@@ -18,6 +20,7 @@ export default function InputWrapper({
   information,
   placeholder,
   options,
+  generateTitle,
 }: {
   title?: string;
   required?: boolean;
@@ -31,12 +34,13 @@ export default function InputWrapper({
   information?: string;
   placeholder?: string;
   options?: any;
+  generateTitle?: any;
 }) {
-  const handleChange = (length: string) => {
-    if (defValue.includes(length)) {
-      onChange(defValue.filter((item: string) => item !== length));
+  const handleChange = (value: string) => {
+    if (defValue.includes(value)) {
+      onChange(defValue.filter((item: string) => item !== value));
     } else {
-      onChange([...defValue, length]);
+      onChange([...defValue, value]);
     }
   };
 
@@ -97,11 +101,36 @@ export default function InputWrapper({
           variant="standard"
         >
           {options.map((option: any) => (
-            <MenuItem key={option.criterionId} value={option.criterionId}>
-              {option.value}
+            <MenuItem key={option.id ? option.id : option} value={option.id ? option.id : option}>
+              {option.value ? option.value : option}
             </MenuItem>
           ))}
         </Select>
+      ) : type == "vertMultiSelect" && options ? (
+        <div className={classNames(styles.multiSelect, styles.vertMultiSelect)}>
+          {options.map((option: string) => (
+            <label key={option}>
+              <input
+                type="checkbox"
+                checked={defValue.includes(option)}
+                onChange={() => handleChange(option)}
+              />
+              <p>{option}</p>
+            </label>
+          ))}
+        </div>
+      ) : type == "generate" ? (
+        <div className={styles.inputWrapper}>
+          <input
+            type="text"
+            value={value}
+            onChange={(event) => onChange(event.target.value)}
+            placeholder={placeholder}
+          />
+          <div onClick={() => generateTitle()} className={styles.generateIcon}>
+            <AutoAwesomeIcon />
+          </div>
+        </div>
       ) : null}
     </div>
   );
