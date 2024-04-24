@@ -1,14 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "./collections-wrapper.module.scss";
 
 import CollectionCard from "@/components/collection-card/collection-card.component";
 
 export default function CollectionsWrapper({collections, setActiveCollection, setPages, small} : {collections: any; setActiveCollection: any, setPages: any, small?: boolean}) {
   const [shownCollections, setShownCollections] = useState<any[]>([]);
+  const showingCollectionsRef = useRef(false)
 
   useEffect(() => {
-    if (collections.length > 0) {
+    if (collections.length > 0 && showingCollectionsRef.current == false) {
       settingCollections();
+      showingCollectionsRef.current = true;
     }
   }, [collections])
 

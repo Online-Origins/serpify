@@ -16,7 +16,8 @@ import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 
 import languageCodes from "@/json/language-codes.json";
 import toneOfVoices from "@/json/tone-of-voice.json";
-import classNames from "classnames";
+import ContentItem from "@/components/content-item/content-item.component";
+import ContentItemsWrapper from "@/components/content-items-wrapper/content-items-wrapper.component";
 
 export default function ContentOverview({ setPages }: { setPages: any }) {
   const [popUpOpen, setPopUpOpen] = useState(false);
@@ -110,28 +111,12 @@ export default function ContentOverview({ setPages }: { setPages: any }) {
     ]);
     if (error) {
       console.log(error);
+      alert("Something went wrong. Please try again!")
     } else {
       setPopUpOpen(false);
       getContentsRef.current = false;
     }
   }
-
-  const getCollectionTitle = (id: string) => {
-    const collection = collections.filter((collection) => collection.id === id);
-    if (collection.length > 0) {
-      return collection[0].collection_name;
-    } else {
-      return "";
-    }
-  };
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      month: "long",
-      day: "numeric",
-      year: "numeric",
-    });
-  };
 
   return (
     <InnerWrapper>
@@ -143,25 +128,7 @@ export default function ContentOverview({ setPages }: { setPages: any }) {
           </Button>
         }
       />
-      <div className={styles.contentItemsWrapper}>
-        {contents.length > 0 ? contents.map((content) => (
-          <div key={content.id} className={styles.content}>
-            <div className={styles.titleWrapper}>
-              <h4>{content.content_title}</h4>
-              <p>{getCollectionTitle(content.collection)}</p>
-            </div>
-            <div className={classNames(styles.contentInfo)}>
-              <h5>{content.content_score ? content.content_score : 0}</h5>
-            </div>
-            <div className={classNames(styles.contentInfo)}>
-              <p>{content.status}</p>
-            </div>
-            <div className={classNames(styles.contentInfo)}>
-              <p>{formatDate(content.date_edited)}</p>
-            </div>
-          </div>
-        )) : <h5>No content found. Start creating one</h5>}
-      </div>
+          <ContentItemsWrapper contents={contents} collections={collections} />
       {popUpOpen && (
         <PopUpWrapper>
           <PopUp
