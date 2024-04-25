@@ -198,10 +198,11 @@ export default function KeywordSearching({
       setLoading(false);
     } catch (error: any) {
       alert("Something went wrong. Please try again");
-      setPages((prevPages: any) => {
-        // Create a new array with all elements except the last one
-        return prevPages.slice(0, -1);
-      });
+      // setPages((prevPages: any) => {
+      //   // Create a new array with all elements except the last one
+      //   return prevPages.slice(0, -1);
+      // });
+      isKeywordsGenerated.current = false;
     }
   }
 
@@ -306,10 +307,11 @@ export default function KeywordSearching({
   function addNewSubjects() {
     if (subjectInput != "") {
       const subjectArray = subjectInput.split(",");
+      const cleanArray = subjectArray.map((subject) => subject.replace(/[&\/\\#+()$~%.'";:*?<>{}[\]]/g, ''))
 
       setFilters((prevState: any) => ({
         ...prevState,
-        subjects: [...prevState.subjects, ...subjectArray],
+        subjects: [...prevState.subjects, ...cleanArray],
       }));
       setSubjectInput("");
       isKeywordsGenerated.current = false;
@@ -587,7 +589,7 @@ export default function KeywordSearching({
       {filterPopUpOpen && (
         <PopUpWrapper>
           <PopUp
-            title={"filter"}
+            title={"Filter"}
             titleButtons={
               <Button
                 type={"textOnly"}

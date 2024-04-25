@@ -59,10 +59,11 @@ export default function CollectionsPage({
 
   const startSearching = () => {
     const subjectArray = subjectsInput.split(",");
+    const cleanArray = subjectArray.map((subject) => subject.replace(/[&\/\\#+()$~%.'";:*?<>{}[\]]/g, ''))
 
     setFilters((prevState: any) => ({
       ...prevState,
-      subjects: subjectArray,
+      subjects: cleanArray,
       language: keywordsLanguage,
       country: keywordsCountry,
       keywordLength: keywordLength,
