@@ -178,7 +178,7 @@ export default function InputWrapper({
           <div className={styles.sliderWrapper}>
             <Slider
               defaultValue={defValue}
-              onChange={(value: any) => handleChange(value.target.value)}
+              onChange={(event: Event, newValue: number | number[]) => onChange(newValue as number[])}
               step={step}
               disableSwap
               marks={marks}

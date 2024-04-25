@@ -42,7 +42,7 @@
     .titleWrapper {
         display: flex;
         gap: 1rem;
-        align-items: flex-end;
+        align-items: center;
     }
 
     .currentValues {
@@ -80,6 +80,7 @@
     .multiSelect {
         display: flex;
         justify-content: space-between;
+        gap: 1rem;
 
         label {
             width: 50%;

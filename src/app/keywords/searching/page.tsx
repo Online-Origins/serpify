@@ -1,5 +1,4 @@
 import PageTitle from "@/components/page-title/page-title.component";
-import Information from "@/components/information/information.component";
 import InputWrapper from "@/components/ui/input-wrapper/input-wrapper.component";
 import InnerWrapper from "@/components/inner-wrapper/inner-wrapper.component";
 import { useEffect, useRef, useState } from "react";
@@ -7,6 +6,8 @@ import styles from "./page.module.scss";
 
 import { getGoogleKeywords } from "@/app/api/googleKeywords/route";
 import { supabase } from "@/app/api/supabaseClient/route";
+import languageCodes from "@/json/language-codes.json";
+import countryCodes from "@/json/country-codes.json";
 
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
@@ -14,6 +15,7 @@ import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
+import TuneRoundedIcon from "@mui/icons-material/TuneRounded";
 
 import Table from "@/components/table/table.component";
 import Button from "@/components/ui/button/button.component";
@@ -37,13 +39,50 @@ export default function KeywordSearching({
   const [subjectInput, setSubjectInput] = useState("");
   const isKeywordsGenerated = useRef(false);
   const [loading, setLoading] = useState(false);
-  const [popUpOpen, setPopUpOpen] = useState(false);
+  const [collectionsPopUpOpen, setCollectionsPopUpOpen] = useState(false);
   const [collections, setCollections] = useState<{ collection_name: string }[]>(
     []
   );
   const [collectionToSave, setCollectionToSave] = useState("");
   const [newCollection, setNewCollection] = useState("");
   const [keywordAmount, setKeywordAmount] = useState([0, 20]);
+  const [filterPopUpOpen, setFilterPopUpOpen] = useState(false);
+
+  const [keywordsLanguage, setKeywordsLanguage] = useState(
+    filters.language ? filters.language : languageCodes[0].id
+  );
+  const [keywordsCountry, setKeywordsCountry] = useState(
+    filters.country ? filters.country : countryCodes[0].id
+  );
+  const [keywordLength, setKeywordLength] = useState(filters.keywordLength);
+  const [filterSearchVolume, setFilterSearchVolume] = useState<number[]>([
+    searchVolumeFiltering(filters.volume[0].min),
+    searchVolumeFiltering(filters.volume[0].max),
+  ]);
+  const [competition, setCompetition] = useState<number[]>([
+    filters.competition[0].min,
+    filters.competition[0].max,
+  ]);
+  const [potential, setPotential] = useState<number[]>([
+    filters.potential[0].min,
+    filters.potential[0].max,
+  ]);
+  function searchVolumeFiltering(volume: number) {
+    switch (true) {
+      case volume == 10:
+        return 0;
+      case volume == 100:
+        return 25;
+      case volume == 1000:
+        return 50;
+      case volume == 10000:
+        return 75;
+      case volume == 100000:
+        return 100;
+      default:
+        return 0;
+    }
+  }
 
   useEffect(() => {
     getCollections();
@@ -157,7 +196,6 @@ export default function KeywordSearching({
 
       setGeneratedKeywords(filterkeywordLength);
       setLoading(false);
-
     } catch (error: any) {
       alert("Something went wrong. Please try again");
       setPages((prevPages: any) => {
@@ -263,7 +301,7 @@ export default function KeywordSearching({
         return 0;
     }
   }
-  
+
   // Add new subjects to the filters with user input
   function addNewSubjects() {
     if (subjectInput != "") {
@@ -291,7 +329,7 @@ export default function KeywordSearching({
     if (error) {
       console.log(error);
     } else {
-      setPopUpOpen(false);
+      setCollectionsPopUpOpen(false);
       setPages((prevState: any) => [...prevState, "collections"]);
     }
   }
@@ -318,6 +356,89 @@ export default function KeywordSearching({
       isKeywordsGenerated.current = false;
     } else {
       alert("You need at least one subject to search");
+    }
+  }
+
+  function saveFilters() {
+    setFilters((prevState: any) => ({
+      ...prevState,
+      language: keywordsLanguage,
+      country: keywordsCountry,
+      keywordLength: keywordLength,
+      volume: [
+        {
+          min: searchVolumeTranslate(filterSearchVolume[0]),
+          max: searchVolumeTranslate(filterSearchVolume[1]),
+        },
+      ],
+      competition: [{ min: competition[0], max: competition[1] }],
+      potential: [{ min: potential[0], max: potential[1] }],
+    }));
+    isKeywordsGenerated.current = false;
+    setFilterPopUpOpen(false);
+  }
+
+  const [filtersChanged, setFiltersChanged] = useState(false)
+
+  //  Check if the filter values have changed in comparison to the default values
+  useEffect(() => {
+    if (
+      filters.competition[0].min != competition[0] ||
+      filters.competition[0].max != competition[1] ||
+      filters.potential[0].min != potential[0] ||
+      filters.potential[0].max != potential[1] ||
+      searchVolumeFiltering(filters.volume[0].min) != filterSearchVolume[0] ||
+      searchVolumeFiltering(filters.volume[0].max) != filterSearchVolume[1] ||
+      filters.language != keywordsLanguage ||
+      filters.country != keywordsCountry ||
+      !arraysContainSameValues(filters.keywordLength, keywordLength)
+    ) {
+      setFiltersChanged(true)
+    } else{
+      setFiltersChanged(false)
+    }
+  }, [
+    filterSearchVolume,
+    competition,
+    potential,
+    keywordLength,
+    keywordsCountry,
+    keywordsLanguage,
+  ]);
+
+  function arraysContainSameValues(arr1: string[], arr2: string[]) {
+    if (arr1.length !== arr2.length) {
+      return false; // If lengths are different, arrays can't contain the same values
+    }
+  
+    // Sort arrays
+    const sortedArr1 = arr1.slice().sort();
+    const sortedArr2 = arr2.slice().sort();
+  
+    // Check if the sorted arrays contain the same values
+    for (let i = 0; i < sortedArr1.length; i++) {
+      if (sortedArr1[i] !== sortedArr2[i]) {
+        return false;
+      }
+    }
+    
+    return true;
+  }
+
+  function searchVolumeTranslate(filterValue: number) {
+    switch (true) {
+      case filterValue == 0:
+        return 10;
+      case filterValue == 25:
+        return 100;
+      case filterValue == 50:
+        return 1000;
+      case filterValue == 75:
+        return 10000;
+      case filterValue == 100:
+        return 100000;
+      default:
+        return 0;
     }
   }
 
@@ -351,7 +472,10 @@ export default function KeywordSearching({
             </div>
           }
         />
-        <h2>Filter</h2>
+        <Button type={"solid"} onClick={() => setFilterPopUpOpen(true)}>
+          <p>Filter</p>
+          <TuneRoundedIcon />
+        </Button>
       </div>
       {!loading ? (
         <div className={styles.outerTableWrapper}>
@@ -367,7 +491,7 @@ export default function KeywordSearching({
           <div className={styles.buttonWrapper}>
             <Button
               type={"solid"}
-              onClick={() => setPopUpOpen(true)}
+              onClick={() => setCollectionsPopUpOpen(true)}
               disabled={selectedKeywords.length == 0}
             >
               <p>Save to</p> <AddRoundedIcon />
@@ -404,12 +528,15 @@ export default function KeywordSearching({
       ) : (
         <h5>Loading...</h5>
       )}
-      {popUpOpen && (
+      {collectionsPopUpOpen && (
         <PopUpWrapper>
           <PopUp
             title={"Keyword research"}
             titleButtons={
-              <Button type={"textOnly"} onClick={() => setPopUpOpen(false)}>
+              <Button
+                type={"textOnly"}
+                onClick={() => setCollectionsPopUpOpen(false)}
+              >
                 <p>Close</p>
                 <CloseRoundedIcon />
               </Button>
@@ -453,6 +580,154 @@ export default function KeywordSearching({
                   onChange={(event) => setNewCollection(event.target.value)}
                 />
               </div>
+            </div>
+          </PopUp>
+        </PopUpWrapper>
+      )}
+      {filterPopUpOpen && (
+        <PopUpWrapper>
+          <PopUp
+            title={"filter"}
+            titleButtons={
+              <Button
+                type={"textOnly"}
+                onClick={() => setFilterPopUpOpen(false)}
+              >
+                <p>Close</p>
+                <CloseRoundedIcon />
+              </Button>
+            }
+            buttons={
+              <Button type={"solid"} onClick={() => saveFilters()} disabled={!filtersChanged}>
+                <p>Save filters</p>
+              </Button>
+            }
+          >
+            <div className={styles.filters}>
+              <div className={styles.multiDropdown}>
+                <InputWrapper
+                  type="autocomplete"
+                  title="Country:"
+                  required={false}
+                  value={keywordsCountry}
+                  options={countryCodes}
+                  onChange={(value: any) => setKeywordsCountry(value != null ? value : countryCodes[0].id)}
+                  placeholder="Which country do you want to target?"
+                />
+                <InputWrapper
+                  type="autocomplete"
+                  title="Language:"
+                  required={false}
+                  value={keywordsLanguage}
+                  options={languageCodes}
+                  onChange={(value: any) => setKeywordsLanguage(value != null ? value : languageCodes[0].id)}
+                  placeholder="In what language should the keywords be?"
+                />
+              </div>
+              <InputWrapper
+                type="multiSelect"
+                title="Length of the keywords:"
+                required={false}
+                onChange={(value: any) => value.length == 0 ? alert("You need to select at least one") : setKeywordLength(value)}
+                defValue={keywordLength}
+                information="Short-tail keywords are broad, general, and popular terms with high search volume and competition. Longtail keywords are more specific, niche, and targeted multi-word terms with lower search volume and lower competition."
+              />
+              <InputWrapper
+                type="slider"
+                title="Search volume:"
+                information="Search volume is the number of times, on average, that users enter a particular search query into a search engine each month."
+                defValue={[
+                  searchVolumeFiltering(filters.volume[0].min),
+                  searchVolumeFiltering(filters.volume[0].max),
+                ]}
+                onChange={(value: any) => setFilterSearchVolume(value)}
+                step={25}
+                marks={[
+                  {
+                    value: 0,
+                    label: "10",
+                  },
+                  {
+                    value: 25,
+                    label: "100",
+                  },
+                  {
+                    value: 50,
+                    label: "1K",
+                  },
+                  {
+                    value: 75,
+                    label: "10K",
+                  },
+                  {
+                    value: 100,
+                    label: "100K",
+                  },
+                ]}
+              />
+              <InputWrapper
+                type="slider"
+                title="Competition:"
+                information="The degree of competition of the position for a keyword."
+                defValue={[
+                  filters.competition[0].min,
+                  filters.competition[0].max,
+                ]}
+                onChange={(value: any) => setCompetition(value)}
+                step={25}
+                marks={[
+                  {
+                    value: 0,
+                    label: "0",
+                  },
+                  {
+                    value: 25,
+                    label: "25",
+                  },
+                  {
+                    value: 50,
+                    label: "50",
+                  },
+                  {
+                    value: 75,
+                    label: "75",
+                  },
+                  {
+                    value: 100,
+                    label: "100",
+                  },
+                ]}
+              />
+              <InputWrapper
+                type="slider"
+                title="Potential:"
+                information="The ability of a particular keyword or key phrase to drive traffic, engagement, or conversions."
+                defValue={[filters.potential[0].min, filters.potential[0].max]}
+                onChange={(value: any) => setPotential(value)}
+                step={25}
+                marks={[
+                  {
+                    value: 0,
+                    label: "0",
+                  },
+                  {
+                    value: 25,
+                    label: "25",
+                  },
+                  {
+                    value: 50,
+                    label: "50",
+                  },
+                  {
+                    value: 75,
+                    label: "75",
+                  },
+                  {
+                    value: 100,
+                    label: "100",
+                  },
+                ]}
+              />
             </div>
           </PopUp>
         </PopUpWrapper>

@@ -154,7 +154,7 @@ export default function CollectionsPage({
                     required={false}
                     value={keywordsCountry}
                     options={countryCodes}
-                    onChange={(value: any) => setKeywordsCountry(value)}
+                    onChange={(value: any) => setKeywordsCountry(value != null ? value : countryCodes[0].id)}
                     placeholder="Which country do you want to target?"
                   />
                   <InputWrapper
@@ -163,7 +163,7 @@ export default function CollectionsPage({
                     required={false}
                     value={keywordsLanguage}
                     options={languageCodes}
-                    onChange={(value: any) => setKeywordsLanguage(value)}
+                    onChange={(value: any) => setKeywordsLanguage(value != null ? value : languageCodes[0].id)}
                     placeholder="In what language should the keywords be?"
                   />
                 </div>
@@ -171,7 +171,7 @@ export default function CollectionsPage({
                   type="multiSelect"
                   title="Length of the keywords:"
                   required={false}
-                  onChange={(value: any) => setKeywordLength(value)}
+                  onChange={(value: any) => value.length == 0 ? alert("You need to select at least one") : setKeywordLength(value)}
                   defValue={keywordLength}
                   information="Short-tail keywords are broad, general, and popular terms with high search volume and competition. Longtail keywords are more specific, niche, and targeted multi-word terms with lower search volume and lower competition."
                 />
@@ -210,7 +210,7 @@ export default function CollectionsPage({
                   title="Competition:"
                   information="The degree of competition of the position for a keyword."
                   defValue={[0, 100]}
-                  onChange={(value: any) => setSearchVolume(value)}
+                  onChange={(value: any) => setCompetition(value)}
                   step={25}
                   marks={[
                     {
@@ -240,7 +240,7 @@ export default function CollectionsPage({
                   title="Potential:"
                   information="The ability of a particular keyword or key phrase to drive traffic, engagement, or conversions."
                   defValue={[0, 100]}
-                  onChange={(value: any) => setSearchVolume(value)}
+                  onChange={(value: any) => setPotential(value)}
                   step={25}
                   marks={[
                     {
