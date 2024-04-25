@@ -13,9 +13,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from 'next/navigation';
 
-export default function MenuBar() {
+export default function MenuBar({setSmallNav, smallNav}: {setSmallNav: any, smallNav: boolean}) {
   const pathname = usePathname();
-  const [smallNav, setSmallNav] = useState(pathname != "/");
 
   useEffect(() => {
     if(pathname != "/") {

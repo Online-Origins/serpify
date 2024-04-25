@@ -20,4 +20,10 @@
     @media (max-width: 1750px){
         justify-content: start;
     }
+
+    &.smallerWrapper{
+        @media (max-width: 2000px){
+            justify-content: start;
+        }
+    }
 }
