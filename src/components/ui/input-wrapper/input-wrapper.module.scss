@@ -111,6 +111,16 @@
             overflow-x: hidden;
             overflow-y: scroll;
 
+            &::-webkit-scrollbar {
+                width: .5rem;
+                position: absolute;
+            }
+
+            &::-webkit-scrollbar-thumb {
+                background-color: $purple_secundary;
+                border-radius: 1rem;
+            }
+
             label {
                 cursor: pointer;
                 width: 100%;

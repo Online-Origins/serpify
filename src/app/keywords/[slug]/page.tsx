@@ -1,8 +1,10 @@
+"use client";
 import { useEffect, useRef, useState } from "react";
 import styles from "./page.module.scss";
 
 import { supabase } from "@/app/api/supabaseClient/route";
 import { getKeywordMetrics } from "@/app/api/keywordMetrics/route";
+import { useParams, useRouter } from "next/navigation";
 
 import PageTitle from "@/components/page-title/page-title.component";
 import Table from "@/components/table/table.component";
@@ -11,41 +13,37 @@ import Button from "@/components/ui/button/button.component";
 
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 
-export default function Collection({
-  collectionId,
-  setPages,
-}: {
-  collectionId: string;
-  setPages: any;
-}) {
+export default function Collection({ params }: { params: { slug: string } }) {
+  const activeCollection = params.slug;
+  const router = useRouter();
   const [keywordsData, setKeywordsData] = useState<any[]>([]);
   const [shownKeywords, setShownKeywords] = useState<any[]>([]);
   const [selectedCollection, setSelectedCollection] = useState<any>([]);
   const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
   const [sorting, setSorting] = useState("potential");
-  const getCollectionsRef = useRef(false);
+  const getSelectedCollectionRef = useRef(false);
   const isGettingData = useRef(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!getCollectionsRef.current) {
+    if (!getSelectedCollectionRef.current && activeCollection != undefined) {
       getSelectedCollection();
-      getCollectionsRef.current = true;
+      getSelectedCollectionRef.current = true;
     }
-  }, []);
+  }, [activeCollection]);
 
   async function getSelectedCollection() {
-    const { data } = await supabase.from("collections").select();
+    const { data } = await supabase
+      .from("collections")
+      .select()
+      .eq("id", activeCollection);
     if (data) {
-      // Find the collection with the matching ID
-      setSelectedCollection(
-        data.find((collection) => collection.id === collectionId)
-      );
+      setSelectedCollection(data);
     }
   }
 
   useEffect(() => {
-    if (selectedCollection.keywords && !isGettingData.current) {
+    if (selectedCollection.length > 0 && !isGettingData.current) {
       getKeywordsData();
       isGettingData.current = true;
     }
@@ -56,11 +54,11 @@ export default function Collection({
   }, [sorting]);
 
   useEffect(() => {
-    if(keywordsData.length > 0){
-        sortKeywords();
-        showKeywords();
+    if (keywordsData.length > 0) {
+      sortKeywords();
+      showKeywords();
     }
-  }, [keywordsData])
+  }, [keywordsData]);
 
   function showKeywords() {
     let array: any[] = [];
@@ -73,9 +71,9 @@ export default function Collection({
   async function getKeywordsData() {
     setLoading(true);
     const data = await getKeywordMetrics(
-      selectedCollection.keywords,
-      selectedCollection.language,
-      selectedCollection.country
+      selectedCollection[0].keywords,
+      selectedCollection[0].language,
+      selectedCollection[0].country
     );
 
     const updatedData = data.map((keyword: any) => ({
@@ -90,10 +88,10 @@ export default function Collection({
         ),
       },
     }));
-    setKeywordsData(updatedData)
-    
+    setKeywordsData(updatedData);
+
     setLoading(false);
-    
+
     let array: string[] = [];
     updatedData.map((keyword: any) => {
       array.push(keyword.text);
@@ -151,7 +149,7 @@ export default function Collection({
     const { error } = await supabase
       .from("collections")
       .update({ keywords: selectedKeywords })
-      .eq("id", collectionId);
+      .eq("id", activeCollection);
     if (error) {
       console.log(error);
     }
@@ -170,14 +168,12 @@ export default function Collection({
   function sortKeywords() {
     if (sorting == "potential") {
       keywordsData.sort(
-        (a, b) =>
-          b.keywordMetrics.potential - a.keywordMetrics.potential
+        (a, b) => b.keywordMetrics.potential - a.keywordMetrics.potential
       );
     } else if (sorting == "competition") {
       keywordsData.sort(
         (a, b) =>
-          a.keywordMetrics.competitionIndex -
-          b.keywordMetrics.competitionIndex
+          a.keywordMetrics.competitionIndex - b.keywordMetrics.competitionIndex
       );
     } else if (sorting == "searchVolume") {
       keywordsData.sort(
@@ -202,40 +198,38 @@ export default function Collection({
 
   return (
     <InnerWrapper>
-      <PageTitle
-        title={selectedCollection.collection_name}
-        goBack={() =>
-          // Go back one page
-          setPages((prevPages: any) => {
-            // Create a new array with all elements except the last one
-            return prevPages.slice(0, -1);
-          })
-        }
-      />
-      {!loading ? (
-      <div className={styles.outerTableWrapper}>
-        <Table
-          shownKeywords={shownKeywords}
-          sorting={sorting}
-          setSorting={setSorting}
-          selectedKeywords={selectedKeywords}
-          setSelectedKeywords={setSelectedKeywords}
-          searchVolume={searchVolume}
-          potentialIndex={potentialIndex}
-        />
-        <div className={styles.buttonWrapper}>
-          <Button
-            type={"solid"}
-            onClick={() => updateCollection()}
-            disabled={checkChangeKeywords()}
-          >
-            <p>Save</p>
-            <SaveOutlinedIcon />
-          </Button>
-        </div>
-      </div>
-      ) : (
-        <h5>Loading...</h5>
+      {selectedCollection && selectedCollection.length > 0 && (
+        <>
+          <PageTitle
+            title={selectedCollection[0].collection_name}
+            goBack={() => router.back()}
+          />
+          {!loading ? (
+            <div className={styles.outerTableWrapper}>
+              <Table
+                shownKeywords={shownKeywords}
+                sorting={sorting}
+                setSorting={setSorting}
+                selectedKeywords={selectedKeywords}
+                setSelectedKeywords={setSelectedKeywords}
+                searchVolume={searchVolume}
+                potentialIndex={potentialIndex}
+              />
+              <div className={styles.buttonWrapper}>
+                <Button
+                  type={"solid"}
+                  onClick={() => updateCollection()}
+                  disabled={checkChangeKeywords()}
+                >
+                  <p>Save</p>
+                  <SaveOutlinedIcon />
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <h5>Loading...</h5>
+          )}
+        </>
       )}
     </InnerWrapper>
   );

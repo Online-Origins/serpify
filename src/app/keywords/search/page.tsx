@@ -1,3 +1,4 @@
+'use client';
 import PageTitle from "@/components/page-title/page-title.component";
 import InputWrapper from "@/components/ui/input-wrapper/input-wrapper.component";
 import InnerWrapper from "@/components/inner-wrapper/inner-wrapper.component";
@@ -22,16 +23,14 @@ import Button from "@/components/ui/button/button.component";
 import PopUpWrapper from "@/components/ui/popup-wrapper/popup-wrapper.component";
 import PopUp from "@/components/ui/popup/popup.component";
 import Selector from "@/components/ui/selector/selector.component";
+import { useRouter } from "next/navigation";
 
-export default function KeywordSearching({
-  filters,
-  setPages,
-  setFilters,
-}: {
-  filters: any;
-  setPages: any;
-  setFilters: any;
-}) {
+export default function KeywordSearching() {
+  const router = useRouter();
+  const storedFilters = localStorage.getItem("filters");
+  const [filters, setFilters] = useState(
+    storedFilters ? JSON.parse(storedFilters) : null
+  );
   const [generatedKeywords, setGeneratedKeywords] = useState<any[]>([]);
   const [shownKeywords, setShownKeywords] = useState<any[]>([]);
   const [selectedKeywords, setSelectedKeywords] = useState<any[]>([]);
@@ -99,7 +98,7 @@ export default function KeywordSearching({
 
   // Generate keywords if the user filled in the subjects
   useEffect(() => {
-    if (filters.subjects.length > 0 && !isKeywordsGenerated.current) {
+    if (!isKeywordsGenerated.current && filters != null) {
       generateKeywords();
       isKeywordsGenerated.current = true;
     }
@@ -198,10 +197,6 @@ export default function KeywordSearching({
       setLoading(false);
     } catch (error: any) {
       alert("Something went wrong. Please try again");
-      // setPages((prevPages: any) => {
-      //   // Create a new array with all elements except the last one
-      //   return prevPages.slice(0, -1);
-      // });
       isKeywordsGenerated.current = false;
     }
   }
@@ -307,7 +302,9 @@ export default function KeywordSearching({
   function addNewSubjects() {
     if (subjectInput != "") {
       const subjectArray = subjectInput.split(",");
-      const cleanArray = subjectArray.map((subject) => subject.replace(/[&\/\\#+()$~%.";:*?<>{}[\]]/g, ''))
+      const cleanArray = subjectArray.map((subject) =>
+        subject.replace(/[&\/\\#+()$~%.";:*?<>{}[\]]/g, "")
+      );
 
       setFilters((prevState: any) => ({
         ...prevState,
@@ -332,7 +329,7 @@ export default function KeywordSearching({
       console.log(error);
     } else {
       setCollectionsPopUpOpen(false);
-      setPages((prevState: any) => [...prevState, "collections"]);
+      router.push("/collections")
     }
   }
 
@@ -380,7 +377,7 @@ export default function KeywordSearching({
     setFilterPopUpOpen(false);
   }
 
-  const [filtersChanged, setFiltersChanged] = useState(false)
+  const [filtersChanged, setFiltersChanged] = useState(false);
 
   //  Check if the filter values have changed in comparison to the default values
   useEffect(() => {
@@ -395,9 +392,9 @@ export default function KeywordSearching({
       filters.country != keywordsCountry ||
       !arraysContainSameValues(filters.keywordLength, keywordLength)
     ) {
-      setFiltersChanged(true)
-    } else{
-      setFiltersChanged(false)
+      setFiltersChanged(true);
+    } else {
+      setFiltersChanged(false);
     }
   }, [
     filterSearchVolume,
@@ -412,18 +409,18 @@ export default function KeywordSearching({
     if (arr1.length !== arr2.length) {
       return false; // If lengths are different, arrays can't contain the same values
     }
-  
+
     // Sort arrays
     const sortedArr1 = arr1.slice().sort();
     const sortedArr2 = arr2.slice().sort();
-  
+
     // Check if the sorted arrays contain the same values
     for (let i = 0; i < sortedArr1.length; i++) {
       if (sortedArr1[i] !== sortedArr2[i]) {
         return false;
       }
     }
-    
+
     return true;
   }
 
@@ -448,11 +445,7 @@ export default function KeywordSearching({
     <InnerWrapper>
       <PageTitle
         title={"Search keywords"}
-        goBack={() =>
-          setPages((prevPages: any) => {
-            return prevPages.slice(0, -1);
-          })
-        }
+        goBack={() => router.back()}
       />
       <div className={styles.filterWrapper}>
         <InputWrapper
@@ -600,7 +593,11 @@ export default function KeywordSearching({
               </Button>
             }
             buttons={
-              <Button type={"solid"} onClick={() => saveFilters()} disabled={!filtersChanged}>
+              <Button
+                type={"solid"}
+                onClick={() => saveFilters()}
+                disabled={!filtersChanged}
+              >
                 <p>Save filters</p>
               </Button>
             }
@@ -613,7 +610,11 @@ export default function KeywordSearching({
                   required={false}
                   value={keywordsCountry}
                   options={countryCodes}
-                  onChange={(value: any) => setKeywordsCountry(value != null ? value : countryCodes[0].id)}
+                  onChange={(value: any) =>
+                    setKeywordsCountry(
+                      value != null ? value : countryCodes[0].id
+                    )
+                  }
                   placeholder="Which country do you want to target?"
                 />
                 <InputWrapper
@@ -622,7 +623,11 @@ export default function KeywordSearching({
                   required={false}
                   value={keywordsLanguage}
                   options={languageCodes}
-                  onChange={(value: any) => setKeywordsLanguage(value != null ? value : languageCodes[0].id)}
+                  onChange={(value: any) =>
+                    setKeywordsLanguage(
+                      value != null ? value : languageCodes[0].id
+                    )
+                  }
                   placeholder="In what language should the keywords be?"
                 />
               </div>
@@ -630,7 +635,11 @@ export default function KeywordSearching({
                 type="multiSelect"
                 title="Length of the keywords:"
                 required={false}
-                onChange={(value: any) => value.length == 0 ? alert("You need to select at least one") : setKeywordLength(value)}
+                onChange={(value: any) =>
+                  value.length == 0
+                    ? alert("You need to select at least one")
+                    : setKeywordLength(value)
+                }
                 defValue={keywordLength}
                 information="Short-tail keywords are broad, general, and popular terms with high search volume and competition. Longtail keywords are more specific, niche, and targeted multi-word terms with lower search volume and lower competition."
               />
