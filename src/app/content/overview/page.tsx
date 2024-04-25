@@ -128,7 +128,7 @@ export default function ContentOverview({ setPages }: { setPages: any }) {
           </Button>
         }
       />
-          <ContentItemsWrapper contents={contents} collections={collections} />
+      {getContentsRef.current ? <ContentItemsWrapper contents={contents} collections={collections} /> : <h5>Loading...</h5>}
       {popUpOpen && (
         <PopUpWrapper>
           <PopUp
@@ -192,7 +192,7 @@ export default function ContentOverview({ setPages }: { setPages: any }) {
                   required={false}
                   value={chosenLanguage}
                   options={languageCodes}
-                  onChange={(value: any) => setChosenLanguage(value)}
+                  onChange={(value: any) => setChosenLanguage(value != null ? value : languageCodes[0].id)}
                   placeholder="In what language should the keywords be?"
                 />
                 <InputWrapper
@@ -201,7 +201,7 @@ export default function ContentOverview({ setPages }: { setPages: any }) {
                   required={false}
                   value={toneOfVoice}
                   options={toneOfVoices}
-                  onChange={(value: any) => setToneOfVoice(value)}
+                  onChange={(value: any) => setToneOfVoice(value != null ? value : toneOfVoices[0].id)}
                   placeholder="How do you want to tell the information?"
                 />
                 <InputWrapper

@@ -95,11 +95,7 @@ export default function ContentItemsWrapper({
             />
           ))
         ) : (
-          <h5>
-            {showingContentsRef.current
-              ? "No contents found. Create a new one"
-              : "Loading..."}
-          </h5>
+          <h5>No contents found. Create a new one</h5>
         )}
       </div>
     </div>

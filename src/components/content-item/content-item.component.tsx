@@ -18,7 +18,7 @@ export default function ContentItem({
     if (collection.length > 0) {
       return collection[0].collection_name;
     } else {
-      return "";
+      return "Collection not found";
     }
   };
   const formatDate = (dateString: string) => {

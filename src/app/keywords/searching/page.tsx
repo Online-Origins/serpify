@@ -307,7 +307,7 @@ export default function KeywordSearching({
   function addNewSubjects() {
     if (subjectInput != "") {
       const subjectArray = subjectInput.split(",");
-      const cleanArray = subjectArray.map((subject) => subject.replace(/[&\/\\#+()$~%.'";:*?<>{}[\]]/g, ''))
+      const cleanArray = subjectArray.map((subject) => subject.replace(/[&\/\\#+()$~%.";:*?<>{}[\]]/g, ''))
 
       setFilters((prevState: any) => ({
         ...prevState,

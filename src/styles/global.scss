@@ -76,3 +76,13 @@ a{
         display: none;
     }
 }
+
+::-webkit-scrollbar {
+    width: .5rem;
+    position: absolute;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: $purple_secundary;
+    border-radius: 1rem;
+}
