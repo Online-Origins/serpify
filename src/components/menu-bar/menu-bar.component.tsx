@@ -47,13 +47,13 @@ export default function MenuBar({setSmallNav, smallNav}: {setSmallNav: any, smal
               </Link>
             </li>
             <li>
-              <Link className={pathname == "/keywords" ? styles.active : ""} href="/keywords">
+              <Link className={pathname.includes("/keywords") ? styles.active : ""} href="/keywords">
                 <GridViewOutlinedIcon />
                 <h4>Keyword search</h4>
               </Link>
             </li>
             <li>
-              <Link className={pathname == "/content" ? styles.active : ""} href="/content">
+              <Link className={pathname.includes("/content") ? styles.active : ""} href="/content">
                 <TextFieldsRoundedIcon />
                 <h4>Content writer</h4>
               </Link>

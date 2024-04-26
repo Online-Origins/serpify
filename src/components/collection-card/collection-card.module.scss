@@ -9,16 +9,12 @@
     box-shadow: $shadow;
     border-radius: .5rem;
     gap: 1rem;
+    width: max-content;
 
     .cardTopWrapper{
         width: 100%;
         display: flex;
         justify-content: space-between;
-
-        .menu{
-            cursor: pointer;
-            height: 1.5rem;
-        }
     }
 
     .cardButtonWrapper{

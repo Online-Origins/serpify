@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import PageTitle from "@/components/page-title/page-title.component";
 import InputWrapper from "@/components/ui/input-wrapper/input-wrapper.component";
 import InnerWrapper from "@/components/inner-wrapper/inner-wrapper.component";
@@ -317,19 +317,39 @@ export default function KeywordSearching() {
 
   // Create a new collection with selected keywords
   async function createKeywordCollection() {
-    const { error } = await supabase.from("collections").insert([
-      {
-        collection_name: collectionToSave,
-        keywords: selectedKeywords,
-        language: filters.language,
-        country: filters.country,
-      },
-    ]);
-    if (error) {
-      console.log(error);
-    } else {
-      setCollectionsPopUpOpen(false);
-      router.push("/collections")
+    const { data } = await supabase
+      .from("collections")
+      .select()
+      .eq("collection_name", collectionToSave);
+    if (data != undefined) {
+      if (data?.length > 0) {
+        const { error } = await supabase
+          .from("collections")
+          .update({ keywords: selectedKeywords.concat(data[0].keywords) })
+          .eq("collection_name", collectionToSave);
+        if (error) {
+          console.log(error);
+        } else {
+          setCollectionsPopUpOpen(false);
+          router.push("/keywords");
+        }
+      } else {
+        const { error } = await supabase.from("collections").insert([
+          {
+            id: Math.floor(Math.random() * 100000000),
+            collection_name: collectionToSave,
+            keywords: selectedKeywords,
+            language: filters.language,
+            country: filters.country,
+          },
+        ]);
+        if (error) {
+          console.log(error);
+        } else {
+          setCollectionsPopUpOpen(false);
+          router.push("/keywords");
+        }
+      }
     }
   }
 
@@ -443,10 +463,7 @@ export default function KeywordSearching() {
 
   return (
     <InnerWrapper>
-      <PageTitle
-        title={"Search keywords"}
-        goBack={() => router.back()}
-      />
+      <PageTitle title={"Search keywords"} goBack={() => router.back()} />
       <div className={styles.filterWrapper}>
         <InputWrapper
           type="text"

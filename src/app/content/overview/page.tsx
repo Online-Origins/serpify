@@ -1,3 +1,4 @@
+'use client'
 import styles from "./page.module.scss";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/app/api/supabaseClient/route";
@@ -8,6 +9,7 @@ import Button from "@/components/ui/button/button.component";
 import PopUpWrapper from "@/components/ui/popup-wrapper/popup-wrapper.component";
 import PopUp from "@/components/ui/popup/popup.component";
 import InputWrapper from "@/components/ui/input-wrapper/input-wrapper.component";
+import ContentItemsWrapper from "@/components/content-items-wrapper/content-items-wrapper.component";
 
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
@@ -16,8 +18,6 @@ import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 
 import languageCodes from "@/json/language-codes.json";
 import toneOfVoices from "@/json/tone-of-voice.json";
-import ContentItem from "@/components/content-item/content-item.component";
-import ContentItemsWrapper from "@/components/content-items-wrapper/content-items-wrapper.component";
 
 export default function ContentOverview({ setPages }: { setPages: any }) {
   const [popUpOpen, setPopUpOpen] = useState(false);

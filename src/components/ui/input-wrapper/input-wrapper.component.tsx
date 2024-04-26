@@ -142,7 +142,7 @@ export default function InputWrapper({
       case type == "vertMultiSelect":
         return (
           <div
-            className={classNames(styles.multiSelect, styles.vertMultiSelect)}
+            className={classNames(styles.multiSelect, styles.vertMultiSelect, "scrollbar")}
           >
             {options.map((option: string) => (
               <label key={option}>

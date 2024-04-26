@@ -119,7 +119,7 @@ export default function Table({
             <Information information="The ability of a particular keyword or key phrase to drive traffic, engagement, or conversions." />
           </div>
         </div>
-        <div className={styles.tableContent}>
+        <div className={classNames(styles.tableContent, "scrollbar")}>
           {shownKeywords.length > 0 ? 
             shownKeywords.map((keyword: any) => (
               <div className={styles.row} key={keyword.text}>

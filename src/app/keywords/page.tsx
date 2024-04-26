@@ -28,18 +28,16 @@ export default function CollectionsPage() {
   const [searchVolume, setSearchVolume] = useState<number[]>([0, 100]);
   const [competition, setCompetition] = useState<number[]>([0, 100]);
   const [potential, setPotential] = useState<number[]>([0, 100]);
-
-  const router = useRouter();
-
-  const getCollectionsRef = useRef(false);
+  const getCollectionsRef = useRef(false)
   const [collections, setCollections] = useState<any[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
     if (!getCollectionsRef.current) {
       getCollections();
-      getCollectionsRef.current = true;
+      getCollectionsRef.current = true
     }
-  }, []);
+  }, [getCollectionsRef]);
 
   async function getCollections() {
     const { data } = await supabase.from("collections").select();
@@ -105,8 +103,8 @@ export default function CollectionsPage() {
           </Button>
         }
       />
-      {collections ? (
-        <CollectionsWrapper collections={collections} />
+      {collections.length > 0 ? (
+        <CollectionsWrapper collections={collections} setCollections={setCollections}/>
       ) : (
         <p>Loading...</p>
       )}

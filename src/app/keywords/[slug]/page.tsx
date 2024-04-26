@@ -10,8 +10,13 @@ import PageTitle from "@/components/page-title/page-title.component";
 import Table from "@/components/table/table.component";
 import InnerWrapper from "@/components/inner-wrapper/inner-wrapper.component";
 import Button from "@/components/ui/button/button.component";
+import PopUpWrapper from "@/components/ui/popup-wrapper/popup-wrapper.component";
+import PopUp from "@/components/ui/popup/popup.component";
 
+import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded";
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
+import InputWrapper from "@/components/ui/input-wrapper/input-wrapper.component";
 
 export default function Collection({ params }: { params: { slug: string } }) {
   const activeCollection = params.slug;
@@ -24,6 +29,8 @@ export default function Collection({ params }: { params: { slug: string } }) {
   const getSelectedCollectionRef = useRef(false);
   const isGettingData = useRef(false);
   const [loading, setLoading] = useState(true);
+  const [newCollectionName, setNewCollectionName] = useState("");
+  const [editPopUpOpen, setEditPopUpOpen] = useState(false);
 
   useEffect(() => {
     if (!getSelectedCollectionRef.current && activeCollection != undefined) {
@@ -45,6 +52,7 @@ export default function Collection({ params }: { params: { slug: string } }) {
   useEffect(() => {
     if (selectedCollection.length > 0 && !isGettingData.current) {
       getKeywordsData();
+      setNewCollectionName(selectedCollection[0].collection_name);
       isGettingData.current = true;
     }
   }, [selectedCollection]);
@@ -196,13 +204,44 @@ export default function Collection({ params }: { params: { slug: string } }) {
     showKeywords();
   }
 
+  async function deleteCollection(collectionId: number) {
+    const { error } = await supabase
+      .from("collections")
+      .delete()
+      .eq("id", collectionId);
+    if (!error) {
+      router.back();
+    }
+  }
+
+  async function editTitle() {
+    const { error } = await supabase
+      .from("collections")
+      .update({ collection_name: newCollectionName })
+      .eq("id", selectedCollection[0].id);
+    if (!error) {
+      getSelectedCollection();
+      setEditPopUpOpen(false)
+    }
+  }
+
   return (
     <InnerWrapper>
       {selectedCollection && selectedCollection.length > 0 && (
         <>
           <PageTitle
+            editing={() => setEditPopUpOpen(true)}
             title={selectedCollection[0].collection_name}
             goBack={() => router.back()}
+            buttons={
+              <Button
+                type={"outline"}
+                onClick={() => deleteCollection(selectedCollection[0].id)}
+              >
+                <p>Delete</p>
+                <DeleteOutlineRoundedIcon />
+              </Button>
+            }
           />
           {!loading ? (
             <div className={styles.outerTableWrapper}>
@@ -228,6 +267,39 @@ export default function Collection({ params }: { params: { slug: string } }) {
             </div>
           ) : (
             <h5>Loading...</h5>
+          )}
+          {editPopUpOpen && (
+            <PopUpWrapper>
+              <PopUp
+                title={"Edit collection title"}
+                titleButtons={
+                  <Button
+                    type={"textOnly"}
+                    onClick={() => setEditPopUpOpen(false)}
+                  >
+                    <p>Close</p>
+                    <CloseRoundedIcon />
+                  </Button>
+                }
+                buttons={
+                  <Button
+                    type={"solid"}
+                    onClick={editTitle}
+                    disabled={selectedCollection[0].collection_name == newCollectionName || newCollectionName == ""}
+                  >
+                    <p>Save</p>
+                    <SaveOutlinedIcon />
+                  </Button>
+                }
+              >
+                <InputWrapper
+                  type="text"
+                  value={newCollectionName}
+                  title="New title:"
+                  onChange={(value: string) => setNewCollectionName(value)}
+                />
+              </PopUp>
+            </PopUpWrapper>
           )}
         </>
       )}

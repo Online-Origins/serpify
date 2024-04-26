@@ -62,7 +62,7 @@ input[type=text] {
     line-height: 1.1;
 }
 
-a{
+a {
     text-decoration: none;
     color: $black;
 }
@@ -71,8 +71,22 @@ a{
     background-color: rgba($color: #000000, $alpha: 0);
 }
 
-.MuiInputBase-root{
-    &::before, &::after{
+.MuiInputBase-root {
+
+    &::before,
+    &::after {
         display: none;
+    }
+}
+
+.scrollbar {
+    &::-webkit-scrollbar {
+        width: .5rem;
+        position: absolute;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: $purple_secundary;
+        border-radius: 1rem;
     }
 }
