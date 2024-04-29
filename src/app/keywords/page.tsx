@@ -103,11 +103,8 @@ export default function CollectionsPage() {
           </Button>
         }
       />
-      {collections.length > 0 ? (
-        <CollectionsWrapper collections={collections} setCollections={setCollections}/>
-      ) : (
-        <p>Loading...</p>
-      )}
+      {collections.length > 0 &&
+        <CollectionsWrapper collections={collections} />}
       {popUpOpen && (
         <PopUpWrapper>
           <PopUp

@@ -45,19 +45,16 @@ export default function DotsMenu({
       .select()
       .eq("id", collection.id);
     if (data) {
-      const idNum = Math.floor(Math.random() * 100000000);
-      const { error } = await supabase.from("collections").insert([
+      const inserting = await supabase.from("collections").insert([
         {
-          id: idNum,
           collection_name: data[0].collection_name,
           keywords: data[0].keywords,
           language: data[0].language,
           country: data[0].country,
         },
-      ]);
-
-      if (!error) {
-        setShownCollections([...shownCollections, {...data[0], id: idNum}])
+      ]).select();
+      if (!inserting.error) {
+        setShownCollections([...shownCollections, {...data[0], id: inserting.data[0].id}])
       }
     }
   }

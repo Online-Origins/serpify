@@ -24,6 +24,7 @@ import PopUpWrapper from "@/components/ui/popup-wrapper/popup-wrapper.component"
 import PopUp from "@/components/ui/popup/popup.component";
 import Selector from "@/components/ui/selector/selector.component";
 import { useRouter } from "next/navigation";
+import { CircularProgress } from "@mui/material";
 
 export default function KeywordSearching() {
   const router = useRouter();
@@ -538,7 +539,9 @@ export default function KeywordSearching() {
           </div>
         </div>
       ) : (
-        <h5>Loading...</h5>
+        <PopUpWrapper>
+          <CircularProgress sx={{color: "#6210CC"}} />
+        </PopUpWrapper>
       )}
       {collectionsPopUpOpen && (
         <PopUpWrapper>

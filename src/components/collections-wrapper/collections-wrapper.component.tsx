@@ -3,18 +3,19 @@ import styles from "./collections-wrapper.module.scss";
 
 import CollectionCard from "@/components/collection-card/collection-card.component";
 import classNames from "classnames";
+import PopUpWrapper from "../ui/popup-wrapper/popup-wrapper.component";
+import { CircularProgress } from "@mui/material";
 
 export default function CollectionsWrapper({
   collections,
   small,
-  setCollections,
 }: {
   collections: any;
   small?: boolean;
-  setCollections: any;
 }) {
   const [shownCollections, setShownCollections] = useState<any[]>([]);
   const [counter, setCounter] = useState(0);
+  const loadingRef = useRef(true);
 
   useEffect(() => {
     if (collections.length > 0) {
@@ -26,6 +27,9 @@ export default function CollectionsWrapper({
         ) {
           array.push(collections[counter]);
           setShownCollections(array);
+          loadingRef.current = true;
+        } else if (array.length >= collections.length) {
+          loadingRef.current = false;
         }
         setCounter(counter + 1);
       }, 1000);
@@ -34,18 +38,22 @@ export default function CollectionsWrapper({
 
   return (
     <div className={classNames(styles.collectionsWrapper, "scrollbar")}>
-      {shownCollections.length > 0 ? (
-        shownCollections.map((collection: any) => (
-          <CollectionCard
-            key={collection.id ? collection.id : collection.collection_name}
-            collection={collection}
-            shownCollections={shownCollections}
-            setShownCollections={setShownCollections}
-          />
-        ))
-      ) : (
-        <h5>No collections found. Try creating one</h5>
-      )}
+      {shownCollections.length > 0 &&
+        shownCollections
+          .filter((collection) => collection) // Filter out undefined or null collections
+          .map((collection: any) => (
+            <CollectionCard
+              key={collection.id ? collection.id : collection.collection_name}
+              collection={collection}
+              shownCollections={shownCollections}
+              setShownCollections={setShownCollections}
+            />
+          ))}
+      {!small && loadingRef.current &&
+        <PopUpWrapper>
+          <CircularProgress sx={{color: "#6210CC"}} />
+        </PopUpWrapper>
+      }
     </div>
   );
 }
