@@ -3,6 +3,7 @@ import styles from "./content-item.module.scss";
 import { CircularProgressbar } from "react-circular-progressbar";
 import BorderColorRoundedIcon from "@mui/icons-material/BorderColorRounded";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { useRouter } from "next/navigation";
 
 export default function ContentItem({
   content,
@@ -11,6 +12,13 @@ export default function ContentItem({
   content: any;
   collections: any;
 }) {
+  const router = useRouter();
+
+  function onEditClick() {
+    localStorage.setItem("content_id", content.id);
+    router.push("/content/create")
+  }
+
   const getCollectionTitle = (id: string) => {
     const collection = collections.filter(
       (collection: any) => collection.id === id
@@ -60,7 +68,7 @@ export default function ContentItem({
         <p>{formatDate(content.date_edited)}</p>
       </div>
       <div className={styles.iconsWrapper}>
-        <div className={styles.editIcon}>
+        <div className={styles.editIcon} onClick={() => onEditClick()}>
           <BorderColorRoundedIcon />
         </div>
         <div>

@@ -2,6 +2,7 @@
 import styles from "./page.module.scss";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/app/api/supabaseClient/route";
+import { useRouter } from "next/navigation";
 
 import PageTitle from "@/components/page-title/page-title.component";
 import InnerWrapper from "@/components/inner-wrapper/inner-wrapper.component";
@@ -18,6 +19,7 @@ import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 
 import languageCodes from "@/json/language-codes.json";
 import toneOfVoices from "@/json/tone-of-voice.json";
+import CircularLoader from "@/components/circular-loader/circular-loader.component";
 
 export default function ContentOverview() {
   const [popUpOpen, setPopUpOpen] = useState(false);
@@ -32,6 +34,8 @@ export default function ContentOverview() {
   const [toneOfVoice, setToneOfVoice] = useState(toneOfVoices[0].id);
   const [targetAudience, setTargetAudience] = useState("");
   const [contentTitle, setcontentTitle] = useState("");
+  const [generating, setGenerating] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     if (!getContentsRef.current) {
@@ -76,6 +80,7 @@ export default function ContentOverview() {
   }
 
   async function generateTitle() {
+    setGenerating(true)
     try {
       const language = languageCodes.find((lang) => lang.id === chosenLanguage); // Get the language that is combined to the chosen language
 
@@ -92,14 +97,16 @@ export default function ContentOverview() {
       });
 
       const data = await response.json();
+      setGenerating(false);
       setcontentTitle(data.generatedTitle.split('"').join("")); //Remove the "" around the generated title
     } catch (error: any) {
       alert("Something went wrong. Please try again");
+      setGenerating(false);
     }
   }
 
   async function createContent() {
-    const { error } = await supabase.from("content-items").insert([
+    const inserting = await supabase.from("content-items").insert([
       {
         collection: chosenCollection,
         language: chosenLanguage,
@@ -108,12 +115,13 @@ export default function ContentOverview() {
         target_audience: targetAudience,
         content_title: contentTitle,
       },
-    ]);
-    if (error) {
-      console.log(error);
+    ]).select();
+    if (inserting.error) {
+      console.log(inserting.error);
       alert("Something went wrong. Please try again!")
     } else {
-      setPopUpOpen(false);
+      localStorage.setItem("content_id", inserting.data[0].id);
+      router.push("/content/create")
       getContentsRef.current = false;
     }
   }
@@ -222,6 +230,11 @@ export default function ContentOverview() {
                 />
               </div>
             )}
+            {generating &&
+            <div className={styles.loader}>
+              <CircularLoader />
+            </div>
+            }
           </PopUp>
         </PopUpWrapper>
       )}

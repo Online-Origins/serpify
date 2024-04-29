@@ -4,7 +4,7 @@ import styles from "./collections-wrapper.module.scss";
 import CollectionCard from "@/components/collection-card/collection-card.component";
 import classNames from "classnames";
 import PopUpWrapper from "../ui/popup-wrapper/popup-wrapper.component";
-import { CircularProgress } from "@mui/material";
+import CircularLoader from "../circular-loader/circular-loader.component";
 
 export default function CollectionsWrapper({
   collections,
@@ -51,7 +51,7 @@ export default function CollectionsWrapper({
           ))}
       {!small && loadingRef.current &&
         <PopUpWrapper>
-          <CircularProgress sx={{color: "#6210CC"}} />
+          <CircularLoader />
         </PopUpWrapper>
       }
     </div>
