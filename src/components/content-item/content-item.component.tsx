@@ -16,7 +16,7 @@ export default function ContentItem({
 
   function onEditClick() {
     localStorage.setItem("content_id", content.id);
-    router.push("/content/create")
+    router.push("/content/create") // Change this! Needs to be variable to the status of the content
   }
 
   const getCollectionTitle = (id: string) => {

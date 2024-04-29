@@ -9,7 +9,9 @@ export async function POST(request) {
     const body = await request.json();
     const keywords = body.keywords || '';
     const language = body.language || '';
+    const audience = body.audience || '';
     const toneOfVoice = body.toneOfVoice || '';
+    const title = body.title || '';
 
     const response = await openai.chat.completions.create({
         messages: [
@@ -19,12 +21,12 @@ export async function POST(request) {
             },
             {
                 "role": "user",
-                "content": `Generate a title for a blog with the following keywords: ${keywords.join(',')}. The tone of voice for the blog should be ${toneOfVoice}. Make sure the title is in ${language}. Only give back an string.`
+                "content": `Generate a list of subtitles for a blog with the title: ${title}. The blog needs to be in ${language}, needs to have a ${toneOfVoice} tone of voice ${audience != '' ? ", and needs to target" + audience : ""}. The following keywords are going to be used in the blog: ${keywords.join(',')}. Only give back an JSON object with the following structure: [{id: , type: (h2,h3 or h4), title:}], for coding purposes only.`
             }
         ],
         model: "gpt-3.5-turbo",
     });
 
-    const generatedTitle = response.choices[0].message.content;
-    return NextResponse.json({ generatedTitle });
+    const generatedOutlines = response.choices[0].message.content;
+    return NextResponse.json({ generatedOutlines });
 }

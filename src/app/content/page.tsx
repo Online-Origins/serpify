@@ -83,6 +83,9 @@ export default function ContentOverview() {
     setGenerating(true)
     try {
       const language = languageCodes.find((lang) => lang.id === chosenLanguage); // Get the language that is combined to the chosen language
+      const toneOfVoicebyId = toneOfVoices.find(
+        (item) => item.id === toneOfVoice
+      ); // Get the tone of voice that is combined to the chosen tone of voice
 
       const response = await fetch("/api/generateTitle", {
         method: "POST",
@@ -91,7 +94,7 @@ export default function ContentOverview() {
         },
         body: JSON.stringify({
           keywords: chosenKeywords,
-          toneofvoice: toneOfVoice,
+          toneofvoice: toneOfVoicebyId,
           language: language?.value,
         }),
       });
@@ -121,7 +124,7 @@ export default function ContentOverview() {
       alert("Something went wrong. Please try again!")
     } else {
       localStorage.setItem("content_id", inserting.data[0].id);
-      router.push("/content/create")
+      router.push("/content/create/outlines")
       getContentsRef.current = false;
     }
   }

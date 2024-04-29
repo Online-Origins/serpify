@@ -1,0 +1,41 @@
+@import '@/styles/variables';
+
+.subtitle {
+    display: flex;
+    gap: 1rem;
+    padding: .5rem 0;
+    align-items: center;
+
+    &.h3 {
+        margin-left: 3rem;
+    }
+
+    &.h4 {
+        margin-left: 6rem;
+    }
+
+    .type {
+        background-color: $purple_primary;
+        color: $white;
+        padding: .25rem .5rem;
+        text-transform: uppercase;
+        border-radius: .25rem;
+    }
+
+    .title {
+        width: 100%;
+        border: none;
+        font-size: 1.2rem;
+        font-family: $lexend_deca;
+        font-weight: 700;
+
+        &:focus {
+            outline: none;
+        }
+
+        &::selection{
+            background-color: $purple_primary;
+            color: $white;
+        }
+    }
+}

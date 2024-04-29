@@ -337,7 +337,6 @@ export default function KeywordSearching() {
       } else {
         const { error } = await supabase.from("collections").insert([
           {
-            id: Math.floor(Math.random() * 100000000),
             collection_name: collectionToSave,
             keywords: selectedKeywords,
             language: filters.language,
