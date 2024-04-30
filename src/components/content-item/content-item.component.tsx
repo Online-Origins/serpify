@@ -2,7 +2,7 @@ import classNames from "classnames";
 import styles from "./content-item.module.scss";
 import { CircularProgressbar } from "react-circular-progressbar";
 import BorderColorRoundedIcon from "@mui/icons-material/BorderColorRounded";
-import MoreVertIcon from '@mui/icons-material/MoreVert';
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useRouter } from "next/navigation";
 
 export default function ContentItem({
@@ -16,7 +16,7 @@ export default function ContentItem({
 
   function onEditClick() {
     localStorage.setItem("content_id", content.id);
-    router.push("/content/create") // Change this! Needs to be variable to the status of the content
+    router.push("/content/create"); // Change this! Needs to be variable to the status of the content
   }
 
   const getCollectionTitle = (id: string) => {
@@ -38,10 +38,15 @@ export default function ContentItem({
     });
   };
   return (
-    <div className={styles.content}>
+    <div className={styles.content} onClick={() => onEditClick()}>
       <div className={styles.titleWrapper}>
         <h4>{content.content_title}</h4>
-        <p>{getCollectionTitle(content.collection)}</p>
+        <p
+          className={styles.collectionLink}
+          onClick={() => router.push(`/keywords/${content.collection}`)}
+        >
+          {getCollectionTitle(content.collection)}
+        </p>
       </div>
       <div className={classNames(styles.contentInfo)}>
         <div className={styles.meterWrapper}>

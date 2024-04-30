@@ -90,3 +90,33 @@ a {
         border-radius: 1rem;
     }
 }
+
+.typeDropdown {
+    background-color: $white;
+    border: solid 1px $purple_primary;
+    border-radius: .5rem;
+    margin-bottom: .5rem;
+    overflow: hidden;
+
+    ul {
+        list-style-type: none;
+        display: flex;
+        flex-flow: row;
+
+        li {
+            display: flex;
+            
+            padding: .5rem;
+            cursor: pointer;
+            transition: .3s all ease-in-out;
+            &:hover {
+                background-color: $purple_primary;
+                color: $white;
+                outline: none;
+            }
+            &:focus-visible{
+                outline: none;
+            }
+        }
+    }
+}

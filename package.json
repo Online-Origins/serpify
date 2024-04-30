@@ -11,8 +11,10 @@
   "dependencies": {
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
+    "@hello-pangea/dnd": "^16.6.0",
     "@mui/icons-material": "^5.15.15",
     "@mui/material": "^5.15.15",
+    "@nextui-org/dropdown": "^2.1.23",
     "@supabase/supabase-js": "^2.42.4",
     "classnames": "^2.5.1",
     "dotenv": "^16.4.5",

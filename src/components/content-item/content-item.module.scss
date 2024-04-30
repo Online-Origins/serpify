@@ -7,6 +7,12 @@
     padding: 1.5rem 0rem;
     align-items: center;
     gap: 1rem;
+    transition: .3s all ease-in-out;
+    cursor: pointer;
+
+    &:hover{
+        background-color: $purple_50;
+    }
 
     .titleWrapper {
         display: flex;
@@ -19,6 +25,13 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+        }
+
+        .collectionLink{
+            width: max-content;
+            color: $purple_primary;
+            text-decoration: underline;
+            cursor: pointer;
         }
     }
 
