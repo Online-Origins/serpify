@@ -19,6 +19,7 @@ import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 
 import languageCodes from "@/json/language-codes.json";
 import toneOfVoices from "@/json/tone-of-voice.json";
@@ -26,6 +27,7 @@ import Subtitle from "@/components/subtitle/subtitle.component";
 import classNames from "classnames";
 import PopUpWrapper from "@/components/ui/popup-wrapper/popup-wrapper.component";
 import CircularLoader from "@/components/circular-loader/circular-loader.component";
+import DraggableSubtitle from "@/components/draggable-subtitle/draggable-subtitle.component";
 
 export default function CreateOutlines() {
   const router = useRouter();
@@ -36,8 +38,9 @@ export default function CreateOutlines() {
   const [currentContent, setCurrentContent] = useState<any[]>([]);
   interface OutlineItem {
     id: number;
-    type: string; // Assuming type can be 'h2', 'h3', or 'h4'
+    type: string;
     title: string;
+    subtitles: any[];
   }
   const [contentGeneratedOutlines, setContentGeneratedOutlines] = useState<
     OutlineItem[]
@@ -56,13 +59,46 @@ export default function CreateOutlines() {
   });
 
   useEffect(() => {
-    if (currentContent.length > 0 && !generateTitlesRef.current && currentContent[0].outlines == null) {
+    if (
+      currentContent.length > 0 &&
+      !generateTitlesRef.current &&
+      currentContent[0].outlines == null
+    ) {
       generateOutlines();
       generateTitlesRef.current = true;
-    } else if (currentContent.length > 0 && currentContent[0].outlines != null){ // If outlines are already existing then use these
-      setContentGeneratedOutlines(currentContent[0].outlines)
+    } else if (
+      currentContent.length > 0 &&
+      currentContent[0].outlines != null
+    ) {
+      setContentGeneratedOutlines(currentContent[0].outlines);
     }
   }, [currentContent, generateTitlesRef]);
+
+  function sortingOutlines(titles: any[]) {
+    let array: any[] = [];
+    titles.map((title: any, index: number) => {
+      if (title.type == "h2") {
+        array.push(title);
+      } else if (title.type == "h3") {
+        if (array.length > 0) {
+          let lastIndex = array.length - 1;
+          if (!array[lastIndex].subtitles) {
+            array[lastIndex].subtitles = [];
+          }
+          array[lastIndex].subtitles.push(title);
+        }
+      } else if (title.type === "h4") {
+        if (array.length > 0 && array[array.length - 1].subtitles) {
+          let lastH3Index = array[array.length - 1].subtitles.length - 1;
+          if (!array[array.length - 1].subtitles[lastH3Index].subtitles) {
+            array[array.length - 1].subtitles[lastH3Index].subtitles = [];
+          }
+          array[array.length - 1].subtitles[lastH3Index].subtitles.push(title);
+        }
+      }
+    });
+    setContentGeneratedOutlines(array);
+  }
 
   async function getContent() {
     const { data } = await supabase
@@ -102,7 +138,7 @@ export default function CreateOutlines() {
       const cleanOutlinesArray = JSON.parse(
         generatedOutlines.replace(/```json/g, "").replace(/[`]/g, "")
       );
-      setContentGeneratedOutlines(cleanOutlinesArray);
+      sortingOutlines(cleanOutlinesArray);
       setGenerating(false);
     } catch (error) {
       console.log(error);
@@ -130,21 +166,77 @@ export default function CreateOutlines() {
     if (!result.destination) {
       return;
     }
+    if (result.type == "titlesList") {
+      const items = Array.from(contentGeneratedOutlines);
+      const [reorderedItem] = items.splice(result.source.index, 1);
+      items.splice(result.destination.index, 0, reorderedItem);
 
-    const items = Array.from(contentGeneratedOutlines);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
+      setContentGeneratedOutlines(items);
+    } else if (result.type == "h2") {
+      const parentIndex = result.source.droppableId;
+      const updatedOutlines = contentGeneratedOutlines.map((outline) => {
+        if (outline.id == parentIndex) {
+          const items = Array.from(outline.subtitles);
+          const [reorderedItem] = items.splice(result.source.index, 1);
+          items.splice(result.destination.index, 0, reorderedItem);
+          return { ...outline, subtitles: items };
+        }
+        return outline;
+      });
 
-    setContentGeneratedOutlines(items); // Update the state with the new order
+      setContentGeneratedOutlines(updatedOutlines);
+    } else if (result.type == "h3") {
+      const parentIndex = result.source.droppableId;
+      const updatedOutlines = contentGeneratedOutlines.map((outline) => {
+        const updatedSubtitles = outline.subtitles.map((subtitle) => {
+          if (subtitle.id == parentIndex) {
+            const items = Array.from(subtitle.subtitles);
+            const [reorderedItem] = items.splice(result.source.index, 1);
+            items.splice(result.destination.index, 0, reorderedItem);
+            return { ...subtitle, subtitles: items };
+          }
+          return subtitle;
+        });
+        return { ...outline, subtitles: updatedSubtitles };
+      });
+      setContentGeneratedOutlines(updatedOutlines);
+    }
   };
 
   function addNewTitle() {
     if (customTitle != "") {
-      const newId = contentGeneratedOutlines.length + 1;
+      const generateUniqueId = (outlines: OutlineItem[]): number => {
+        let maxId = 0;
+        outlines.forEach((item) => {
+          if (item.id > maxId) {
+            maxId = item.id;
+          }
+          if (item.subtitles.length > 0) {
+            const subMaxId = Math.max(...item.subtitles.map((sub) => sub.id));
+            if (subMaxId > maxId) {
+              maxId = subMaxId;
+            }
+            item.subtitles.forEach((subItem) => {
+              if (subItem.subtitles && subItem.subtitles.length > 0) {
+                const subsubMaxId = Math.max(
+                  ...subItem.subtitles.map((subsub: any) => subsub.id)
+                );
+                if (subsubMaxId > maxId) {
+                  maxId = subsubMaxId;
+                }
+              }
+            });
+          }
+        });
+        return maxId + 1;
+      };
+
+      const newId = generateUniqueId(contentGeneratedOutlines);
       const newOutlineItem: OutlineItem = {
         id: newId,
         type: selectedTitleType,
         title: customTitle,
+        subtitles: [],
       };
       setContentGeneratedOutlines((prevOutlines) => [
         ...prevOutlines,
@@ -156,13 +248,20 @@ export default function CreateOutlines() {
   }
 
   async function saveOutline() {
+    const date = new Date();
+
+    let day = date.getDate();
+    let month = date.getMonth() + 1;
+    let year = date.getFullYear();
+
+    let currentDate = `${year}-${month}-${day}`;
     const { error } = await supabase
       .from("content-items")
-      .update({ outlines: contentGeneratedOutlines })
+      .update({ outlines: contentGeneratedOutlines, date_edited: currentDate })
       .eq("id", contentId);
-    
+
     if (!error) {
-      router.push("/content")
+      router.push("/content");
     }
   }
 
@@ -170,18 +269,27 @@ export default function CreateOutlines() {
     <InnerWrapper>
       <PageTitle
         title={"Content outlines"}
-        buttons={
+        buttons={[
+          <Button
+            type={"outline"}
+            onClick={() => {
+              alert("Progress won't be saved");
+              router.push("/content");
+            }}
+          >
+            <p>Close</p> <CloseRoundedIcon />
+          </Button>,
           <Button type={"solid"} onClick={() => saveOutline()}>
             <p>Save & close</p> <SaveOutlinedIcon />
-          </Button>
-        }
+          </Button>,
+        ]}
       />
       {currentContent.length > 0 ? (
         <div className={styles.fullWrapper}>
           <div className={classNames(styles.outlinesWrapper, "scrollbar")}>
             <h1>Title: {currentContent[0].content_title}</h1>
             <DragDropContext onDragEnd={onDragEnd}>
-              <Droppable droppableId="subtitles">
+              <Droppable droppableId="subtitlesList" type="titlesList">
                 {(provided) => (
                   <div
                     {...provided.droppableProps}
@@ -190,34 +298,16 @@ export default function CreateOutlines() {
                   >
                     {contentGeneratedOutlines.length > 0
                       ? contentGeneratedOutlines.map((title: any, index) => (
-                          <Draggable
+                          <DraggableSubtitle
                             key={title.id}
-                            draggableId={title.id.toString()}
+                            title={title}
                             index={index}
-                          >
-                            {(provided) => (
-                              <div
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                {...provided.dragHandleProps}
-                              >
-                                <Subtitle
-                                  key={title.id}
-                                  title={title}
-                                  onChange={(value: string, id: number) =>
-                                    handleTitleChange(id, value)
-                                  }
-                                  removeTitle={(e: number) =>
-                                    setContentGeneratedOutlines(
-                                      contentGeneratedOutlines.filter(
-                                        (title) => title.id !== e
-                                      )
-                                    )
-                                  }
-                                />
-                              </div>
-                            )}
-                          </Draggable>
+                            handleTitleChange={handleTitleChange}
+                            setContentGeneratedOutlines={
+                              setContentGeneratedOutlines
+                            }
+                            contentGeneratedOutlines={contentGeneratedOutlines}
+                          />
                         ))
                       : ""}
                     {provided.placeholder}
