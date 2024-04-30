@@ -38,4 +38,18 @@
             color: $white;
         }
     }
+
+    .delete{
+        transition: .3s all ease-in-out;
+        opacity: 0;
+        cursor: pointer;
+
+        color: red;
+    }
+
+    &:hover{
+        .delete{
+            opacity: 1;
+        }
+    }
 }

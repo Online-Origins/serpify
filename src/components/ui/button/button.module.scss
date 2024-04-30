@@ -25,6 +25,11 @@
     &.outline {
         border: 2px $purple_primary solid;
         color: $purple_primary;
+
+        &:hover{
+            background-color: $purple_primary;
+            color: $white;
+        }
     }
 
     &:hover {

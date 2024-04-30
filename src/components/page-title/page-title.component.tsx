@@ -18,7 +18,7 @@ export default function PageTitle({
     <div className={styles.topTitleWrapper}>
       <div className={styles.leftWrapper}>
         {goBack && (
-          <div className={styles.arrowWrapper} onClick={goBack}>
+          <div className={styles.arrowWrapper} onClick={() => goBack()}>
             <ArrowBackRoundedIcon />
           </div>
         )}

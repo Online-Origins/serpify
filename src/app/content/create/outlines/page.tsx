@@ -56,9 +56,11 @@ export default function CreateOutlines() {
   });
 
   useEffect(() => {
-    if (currentContent.length > 0 && !generateTitlesRef.current) {
+    if (currentContent.length > 0 && !generateTitlesRef.current && currentContent[0].outlines == null) {
       generateOutlines();
       generateTitlesRef.current = true;
+    } else if (currentContent.length > 0 && currentContent[0].outlines != null){ // If outlines are already existing then use these
+      setContentGeneratedOutlines(currentContent[0].outlines)
     }
   }, [currentContent, generateTitlesRef]);
 
@@ -153,14 +155,24 @@ export default function CreateOutlines() {
     }
   }
 
+  async function saveOutline() {
+    const { error } = await supabase
+      .from("content-items")
+      .update({ outlines: contentGeneratedOutlines })
+      .eq("id", contentId);
+    
+    if (!error) {
+      router.push("/content")
+    }
+  }
+
   return (
     <InnerWrapper>
       <PageTitle
         title={"Content outlines"}
-        goBack={() => router.back()}
         buttons={
-          <Button type={"solid"} onClick={() => console.log(true)} disabled>
-            <p>Save</p> <SaveOutlinedIcon />
+          <Button type={"solid"} onClick={() => saveOutline()}>
+            <p>Save & close</p> <SaveOutlinedIcon />
           </Button>
         }
       />
@@ -194,6 +206,13 @@ export default function CreateOutlines() {
                                   title={title}
                                   onChange={(value: string, id: number) =>
                                     handleTitleChange(id, value)
+                                  }
+                                  removeTitle={(e: number) =>
+                                    setContentGeneratedOutlines(
+                                      contentGeneratedOutlines.filter(
+                                        (title) => title.id !== e
+                                      )
+                                    )
                                   }
                                 />
                               </div>
