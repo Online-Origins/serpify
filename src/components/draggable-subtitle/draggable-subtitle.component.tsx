@@ -36,7 +36,7 @@ export default function DraggableSubtitle({
             }
           />
           {title.subtitles && (
-            <Droppable droppableId={title.id.toString()} type="h2">
+            <Droppable droppableId={title.id.toString()} type="h3">
               {(provided) => (
                 <div ref={provided.innerRef} {...provided.droppableProps}>
                   {title.subtitles.map((subtitle: any, index: any) => (

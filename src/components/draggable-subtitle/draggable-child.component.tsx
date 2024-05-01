@@ -1,5 +1,6 @@
 import { Draggable, Droppable } from "@hello-pangea/dnd";
 import Subtitle from "../subtitle/subtitle.component";
+import DraggableBaby from "./draggable-baby.component";
 
 export default function DraggableChild({
   title,
@@ -44,54 +45,25 @@ export default function DraggableChild({
               )
             }
           />
-          {title.subtitles && (
-            <Droppable droppableId={title.id.toString()} type="h3">
-              {(provided) => (
-                <div ref={provided.innerRef} {...provided.droppableProps}>
-                  {title.subtitles.map((subtitle: any, index: any) => (
-                    <Draggable
-                      key={index}
-                      draggableId={subtitle.id.toString()}
+          <Droppable droppableId={title.id.toString()} type="h4">
+            {(provided) => (
+              <div ref={provided.innerRef} {...provided.droppableProps}>
+                {title.subtitles &&
+                  title.subtitles.map((subtitle: any, index: any) => (
+                    <DraggableBaby
+                      key={subtitle.id}
+                      title={subtitle}
                       index={index}
-                    >
-                      {(provided) => (
-                        <div
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          ref={provided.innerRef}
-                        >
-                          <Subtitle
-                            key={subtitle.id}
-                            title={subtitle}
-                            onChange={(value: string, id: number) =>
-                              handleTitleChange(id, value)
-                            }
-                            removeTitle={(e: number) =>
-                                setContentGeneratedOutlines(
-                                    contentGeneratedOutlines.map((grandParent: any) => {
-                                      const updatedSubtitles = grandParent.subtitles.map((parent: any) => {
-                                        if (parent.id == title.id) {
-                                          const updatedSubtitles = parent.subtitles.filter(
-                                            (subtitle: any) => subtitle.id !== e
-                                          );
-                                          return { ...parent, subtitles: updatedSubtitles };
-                                        }
-                                        return parent;
-                                      });
-                                      return { ...grandParent, subtitles: updatedSubtitles };
-                                    })
-                                  )
-                            }
-                          />
-                        </div>
-                      )}
-                    </Draggable>
+                      grantParentId={title.id}
+                      handleTitleChange={handleTitleChange}
+                      setContentGeneratedOutlines={setContentGeneratedOutlines}
+                      contentGeneratedOutlines={contentGeneratedOutlines}
+                    />
                   ))}
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
-          )}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
         </div>
       )}
     </Draggable>

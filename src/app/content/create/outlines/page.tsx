@@ -87,7 +87,7 @@ export default function CreateOutlines() {
           }
           array[lastIndex].subtitles.push(title);
         }
-      } else if (title.type === "h4") {
+      } else if (title.type == "h4") {
         if (array.length > 0 && array[array.length - 1].subtitles) {
           let lastH3Index = array[array.length - 1].subtitles.length - 1;
           if (!array[array.length - 1].subtitles[lastH3Index].subtitles) {
@@ -114,10 +114,10 @@ export default function CreateOutlines() {
     setGenerating(true);
     try {
       const language = languageCodes.find(
-        (lang) => lang.id === currentContent[0].language
+        (lang) => lang.id == currentContent[0].language
       );
       const toneOfVoice = toneOfVoices.find(
-        (item) => item.id === currentContent[0].tone_of_voice
+        (item) => item.id == currentContent[0].tone_of_voice
       );
 
       const response = await fetch("/api/generateContentOutlines", {
@@ -153,7 +153,7 @@ export default function CreateOutlines() {
 
   const handleTitleChange = (id: number, newValue: string, outlines: any) => {
     return outlines.map((outline: any) => {
-      if (outline.id === id) {
+      if (outline.id == id) {
         return { ...outline, title: newValue };
       } else if (outline.subtitles && outline.subtitles.length > 0) {
         // If the outline has subtitles, recursively update them
@@ -176,34 +176,92 @@ export default function CreateOutlines() {
     if (!result.destination) {
       return;
     }
-    if (result.type == "titlesList") {
+    if (result.type == "h2") {
       const items = Array.from(contentGeneratedOutlines);
       const [reorderedItem] = items.splice(result.source.index, 1);
       items.splice(result.destination.index, 0, reorderedItem);
 
       setContentGeneratedOutlines(items);
-    } else if (result.type == "h2") {
+    } else if (result.type == "h3") {
       const parentIndex = result.source.droppableId;
+      const destinationParentIndex = result.destination.droppableId;
       const updatedOutlines = contentGeneratedOutlines.map((outline) => {
         if (outline.id == parentIndex) {
-          const items = Array.from(outline.subtitles);
-          const [reorderedItem] = items.splice(result.source.index, 1);
-          items.splice(result.destination.index, 0, reorderedItem);
-          return { ...outline, subtitles: items };
+          if (parentIndex == destinationParentIndex) {
+            const items = Array.from(outline.subtitles);
+            const [reorderedItem] = items.splice(result.source.index, 1);
+            items.splice(result.destination.index, 0, reorderedItem);
+            return { ...outline, subtitles: items };
+          } else {
+            const parentOutline = contentGeneratedOutlines.filter(
+              (outline) => outline.id == parentIndex
+            );
+            const updatedParent = parentOutline[0].subtitles.filter(
+              (subtitle) => subtitle.id != result.draggableId
+            );
+
+            return { ...outline, subtitles: updatedParent };
+          }
+        } else if (outline.id == destinationParentIndex) {
+          const destinationOutline = contentGeneratedOutlines.filter(
+            (outline) => outline.id == destinationParentIndex
+          );
+
+          const parentOutline = contentGeneratedOutlines.filter(
+            (outline) => outline.id == parentIndex
+          );
+          const draggable = parentOutline[0].subtitles.filter(
+            (subtitle) => subtitle.id == result.draggableId
+          );
+
+          const destinationSubtitles = destinationOutline[0].subtitles;
+          destinationSubtitles.splice(
+            result.destination.index,
+            0,
+            draggable[0]
+          );
+
+          return { ...outline, subtitles: destinationSubtitles };
         }
         return outline;
       });
 
       setContentGeneratedOutlines(updatedOutlines);
-    } else if (result.type == "h3") {
+    } else if (result.type == "h4") {
       const parentIndex = result.source.droppableId;
+      const destinationParentIndex = result.destination.droppableId;
       const updatedOutlines = contentGeneratedOutlines.map((outline) => {
         const updatedSubtitles = outline.subtitles.map((subtitle) => {
           if (subtitle.id == parentIndex) {
-            const items = Array.from(subtitle.subtitles);
-            const [reorderedItem] = items.splice(result.source.index, 1);
-            items.splice(result.destination.index, 0, reorderedItem);
-            return { ...subtitle, subtitles: items };
+            if (parentIndex == destinationParentIndex) {
+              const items = Array.from(subtitle.subtitles);
+              const [reorderedItem] = items.splice(result.source.index, 1);
+              items.splice(result.destination.index, 0, reorderedItem);
+              return { ...subtitle, subtitles: items };
+            } else {
+              return {
+                ...subtitle,
+                subtitles: subtitle.subtitles.filter(
+                  (child: any) => child.id != result.draggableId
+                ),
+              };
+            }
+          } else if (subtitle.id == destinationParentIndex) {
+            let parent: any = [];
+
+            contentGeneratedOutlines.forEach((item) => {
+              item.subtitles.forEach((subtitle) => {
+                if (subtitle.id == parentIndex) {
+                  parent = subtitle;
+                }
+              });
+            });
+            const draggable = parent.subtitles.filter(
+              (subtitle:any) => subtitle.id == result.draggableId
+            );
+            const destinationSubtitles = subtitle.subtitles;
+            destinationSubtitles.splice(result.destination.index, 0, draggable[0]);
+            return {...subtitle, subtitles: destinationSubtitles}
           }
           return subtitle;
         });
@@ -269,7 +327,7 @@ export default function CreateOutlines() {
         outlines: contentGeneratedOutlines,
         date_edited: currentDate,
         status: "Created outlines",
-        content_title: updateTitle
+        content_title: updateTitle,
       })
       .eq("id", contentId);
 
@@ -310,7 +368,7 @@ export default function CreateOutlines() {
               />
             </div>
             <DragDropContext onDragEnd={onDragEnd}>
-              <Droppable droppableId="subtitlesList" type="titlesList">
+              <Droppable droppableId="subtitlesList" type="h2">
                 {(provided) => (
                   <div
                     {...provided.droppableProps}
