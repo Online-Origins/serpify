@@ -259,7 +259,7 @@ export default function CreateOutlines() {
             const draggable = parent.subtitles.filter(
               (subtitle:any) => subtitle.id == result.draggableId
             );
-            const destinationSubtitles = subtitle.subtitles;
+            const destinationSubtitles = subtitle.subtitles || [];
             destinationSubtitles.splice(result.destination.index, 0, draggable[0]);
             return {...subtitle, subtitles: destinationSubtitles}
           }

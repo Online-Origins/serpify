@@ -120,3 +120,11 @@ a {
         }
     }
 }
+
+.dropPlace{
+    min-height: 1px;
+}
+
+.dropHover{
+    background-color: rgba($color: $purple_50, $alpha: .5);
+}

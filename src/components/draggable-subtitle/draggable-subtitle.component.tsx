@@ -1,6 +1,7 @@
 import { Draggable, Droppable } from "@hello-pangea/dnd";
 import Subtitle from "../subtitle/subtitle.component";
 import DraggableChild from "./draggable-child.component";
+import classNames from "classnames";
 
 export default function DraggableSubtitle({
   title,
@@ -37,19 +38,27 @@ export default function DraggableSubtitle({
           />
           {title.subtitles && (
             <Droppable droppableId={title.id.toString()} type="h3">
-              {(provided) => (
-                <div ref={provided.innerRef} {...provided.droppableProps}>
-                  {title.subtitles.map((subtitle: any, index: any) => (
-                    <DraggableChild
-                      key={subtitle.id}
-                      title={subtitle}
-                      index={index}
-                      grantParentId={title.id}
-                      handleTitleChange={handleTitleChange}
-                      setContentGeneratedOutlines={setContentGeneratedOutlines}
-                      contentGeneratedOutlines={contentGeneratedOutlines}
-                    />
-                  ))}
+              {(provided, snapshot) => (
+                <div
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                  className={classNames("dropPlace", snapshot.isDraggingOver && 'dropHover')}
+                >
+                  {title.subtitles && title.subtitles.length > 0
+                    ? title.subtitles.map((subtitle: any, index: any) => (
+                        <DraggableChild
+                          key={subtitle.id}
+                          title={subtitle}
+                          index={index}
+                          grantParentId={title.id}
+                          handleTitleChange={handleTitleChange}
+                          setContentGeneratedOutlines={
+                            setContentGeneratedOutlines
+                          }
+                          contentGeneratedOutlines={contentGeneratedOutlines}
+                        />
+                      ))
+                    : ""}
                   {provided.placeholder}
                 </div>
               )}
