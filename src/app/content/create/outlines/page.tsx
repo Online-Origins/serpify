@@ -11,7 +11,6 @@ import {
   Dropdown,
   DropdownTrigger,
   DropdownMenu,
-  DropdownSection,
   DropdownItem,
 } from "@nextui-org/dropdown";
 
@@ -23,7 +22,6 @@ import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 
 import languageCodes from "@/json/language-codes.json";
 import toneOfVoices from "@/json/tone-of-voice.json";
-import Subtitle from "@/components/subtitle/subtitle.component";
 import classNames from "classnames";
 import PopUpWrapper from "@/components/ui/popup-wrapper/popup-wrapper.component";
 import CircularLoader from "@/components/circular-loader/circular-loader.component";
@@ -47,6 +45,7 @@ export default function CreateOutlines() {
   >([]);
   const [selectedTitleType, setSelectedTitleType] = useState("h2");
   const [customTitle, setCustomTitle] = useState("");
+  const [updateTitle, setUpdateTitle] = useState("");
 
   useEffect(() => {
     if (contentId != "" && !getContentRef.current) {
@@ -71,6 +70,7 @@ export default function CreateOutlines() {
       currentContent[0].outlines != null
     ) {
       setContentGeneratedOutlines(currentContent[0].outlines);
+      setUpdateTitle(currentContent[0].content_title);
     }
   }, [currentContent, generateTitlesRef]);
 
@@ -151,14 +151,24 @@ export default function CreateOutlines() {
     }
   }
 
-  const handleTitleChange = (id: number, newValue: string) => {
+  const handleTitleChange = (id: number, newValue: string, outlines: any) => {
+    return outlines.map((outline: any) => {
+      if (outline.id === id) {
+        return { ...outline, title: newValue };
+      } else if (outline.subtitles && outline.subtitles.length > 0) {
+        // If the outline has subtitles, recursively update them
+        return {
+          ...outline,
+          subtitles: handleTitleChange(id, newValue, outline.subtitles),
+        };
+      }
+      return outline;
+    });
+  };
+
+  const handleTitleChangeRecursive = (id: number, newValue: string) => {
     setContentGeneratedOutlines((prevOutlines: any) => {
-      return prevOutlines.map((outline: any) => {
-        if (outline.id === id) {
-          return { ...outline, title: newValue };
-        }
-        return outline;
-      });
+      return handleTitleChange(id, newValue, prevOutlines);
     });
   };
 
@@ -238,10 +248,8 @@ export default function CreateOutlines() {
         title: customTitle,
         subtitles: [],
       };
-      setContentGeneratedOutlines((prevOutlines) => [
-        ...prevOutlines,
-        newOutlineItem,
-      ]);
+
+      sortingOutlines([...contentGeneratedOutlines, newOutlineItem]);
       setSelectedTitleType("h2");
       setCustomTitle("");
     }
@@ -257,7 +265,12 @@ export default function CreateOutlines() {
     let currentDate = `${year}-${month}-${day}`;
     const { error } = await supabase
       .from("content-items")
-      .update({ outlines: contentGeneratedOutlines, date_edited: currentDate })
+      .update({
+        outlines: contentGeneratedOutlines,
+        date_edited: currentDate,
+        status: "Created outlines",
+        content_title: updateTitle
+      })
       .eq("id", contentId);
 
     if (!error) {
@@ -271,6 +284,7 @@ export default function CreateOutlines() {
         title={"Content outlines"}
         buttons={[
           <Button
+            key={0}
             type={"outline"}
             onClick={() => {
               alert("Progress won't be saved");
@@ -279,7 +293,7 @@ export default function CreateOutlines() {
           >
             <p>Close</p> <CloseRoundedIcon />
           </Button>,
-          <Button type={"solid"} onClick={() => saveOutline()}>
+          <Button key={1} type={"solid"} onClick={() => saveOutline()}>
             <p>Save & close</p> <SaveOutlinedIcon />
           </Button>,
         ]}
@@ -287,7 +301,14 @@ export default function CreateOutlines() {
       {currentContent.length > 0 ? (
         <div className={styles.fullWrapper}>
           <div className={classNames(styles.outlinesWrapper, "scrollbar")}>
-            <h1>Title: {currentContent[0].content_title}</h1>
+            <div className={styles.mainTitle}>
+              <h1>Title:</h1>
+              <input
+                type="text"
+                value={updateTitle}
+                onChange={(event) => setUpdateTitle(event.target.value)}
+              />
+            </div>
             <DragDropContext onDragEnd={onDragEnd}>
               <Droppable droppableId="subtitlesList" type="titlesList">
                 {(provided) => (
@@ -302,7 +323,7 @@ export default function CreateOutlines() {
                             key={title.id}
                             title={title}
                             index={index}
-                            handleTitleChange={handleTitleChange}
+                            handleTitleChange={handleTitleChangeRecursive}
                             setContentGeneratedOutlines={
                               setContentGeneratedOutlines
                             }
