@@ -25,6 +25,7 @@ export default function DraggableBaby({
           ref={provided.innerRef}
         >
           <Subtitle
+            draggable
             key={title.id}
             title={title}
             onChange={(value: string, id: number) =>

@@ -50,6 +50,7 @@
     }
 
     &:hover{
+        cursor: grab;
         .title{
             background-color: $purple_50;
         }

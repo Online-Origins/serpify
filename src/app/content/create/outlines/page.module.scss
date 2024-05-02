@@ -28,18 +28,25 @@
 .mainTitle{
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: .5rem;
     width: 100%;
     
     input {
         border: none;
-        font-size: 2.5rem;
+        font-size: 2rem;
         font-weight: 700;
         font-family: $lexend_deca;
         width: 100%;
+        padding: .5rem;
+        border-radius: .5rem;
+        transition: .3s all ease-in-out;
 
         &:focus {
             outline: none;
+        }
+
+        &:hover{
+            background-color: $purple_50;
         }
     }
 }

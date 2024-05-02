@@ -25,6 +25,7 @@ export default function DraggableSubtitle({
           {...provided.dragHandleProps}
         >
           <Subtitle
+          draggable
             key={title.id}
             title={title}
             onChange={(value: string, id: number) =>

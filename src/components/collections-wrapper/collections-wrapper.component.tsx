@@ -52,6 +52,7 @@ export default function CollectionsWrapper({
       {!small && loadingRef.current &&
         <PopUpWrapper>
           <CircularLoader />
+          <p>Loading collections...</p>
         </PopUpWrapper>
       }
     </div>

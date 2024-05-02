@@ -64,6 +64,7 @@ export default function CreateOutlines() {
       currentContent[0].outlines == null
     ) {
       generateOutlines();
+      setUpdateTitle(currentContent[0].content_title);
       generateTitlesRef.current = true;
     } else if (
       currentContent.length > 0 &&
@@ -360,7 +361,7 @@ export default function CreateOutlines() {
         <div className={styles.fullWrapper}>
           <div className={classNames(styles.outlinesWrapper, "scrollbar")}>
             <div className={styles.mainTitle}>
-              <h1>Title:</h1>
+              <h2>Title:</h2>
               <input
                 type="text"
                 value={updateTitle}
@@ -451,6 +452,7 @@ export default function CreateOutlines() {
       {generating && (
         <PopUpWrapper>
           <CircularLoader />
+          <p>Generating outlines...</p>
         </PopUpWrapper>
       )}
     </InnerWrapper>

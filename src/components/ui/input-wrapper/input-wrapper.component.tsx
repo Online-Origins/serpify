@@ -5,19 +5,15 @@ import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import Information from "@/components/information/information.component";
 import {
   Autocomplete,
-  Fade,
   MenuItem,
   Select,
   Slider,
   TextField,
-  Tooltip,
-  TooltipProps,
-  styled,
-  tooltipClasses,
 } from "@mui/material";
 
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import { useState } from "react";
+import CustomizedTooltip from "../custom-tooltip/custom-tooltip.component";
 
 export default function InputWrapper({
   title,
@@ -65,29 +61,6 @@ export default function InputWrapper({
   };
 
   const [tooltipOpen, setTooltipOpen] = useState(true);
-  const CustomToolTip = styled(({ className, ...props }: TooltipProps) => (
-    <Tooltip {...props} classes={{ popper: className }} />
-  ))(({ theme }) => ({
-    [`& .${tooltipClasses.tooltip}`]: {
-      backgroundColor: theme.palette.common.white,
-      color: "#0E141C",
-      borderRadius: 8,
-      border: "solid 1px #8848E1",
-      padding: 8,
-      marginRight: 16,
-      boxShadow: "3px 6px 10px rgba(98, 16, 204, .05)",
-    },
-    [`& .${tooltipClasses.arrow}`]: {
-      fontSize: 20,
-      marginLeft: 8,
-
-      "&:before": {
-        backgroundColor: theme.palette.common.white,
-        fontSize: "large",
-        border: "solid 1px #8848E1",
-      },
-    },
-  }));
 
   const handleType = (type: string) => {
     switch (true) {
@@ -204,17 +177,14 @@ export default function InputWrapper({
               onClick={() => generateTitle()}
               className={styles.generateIcon}
             >
-              <CustomToolTip
+              <CustomizedTooltip
                 onClick={() => setTooltipOpen(false)}
                 open={tooltipOpen}
                 placement="top"
-                title={<p>Generate a title with AI</p>}
-                arrow
-                TransitionComponent={Fade}
-                TransitionProps={{ timeout: 600 }}
+                information="Generate a title with AI"
               >
                 <AutoAwesomeIcon />
-              </CustomToolTip>
+              </CustomizedTooltip>
             </div>
           </div>
         );

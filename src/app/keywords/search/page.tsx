@@ -540,6 +540,7 @@ export default function KeywordSearching() {
       ) : (
         <PopUpWrapper>
           <CircularLoader />
+          <p>Loading keywords...</p>
         </PopUpWrapper>
       )}
       {collectionsPopUpOpen && (
