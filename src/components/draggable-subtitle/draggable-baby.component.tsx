@@ -35,7 +35,7 @@ export default function DraggableBaby({
                 contentGeneratedOutlines.map((grandParent: any) => {
                   const updatedSubtitles = grandParent.subtitles.map(
                     (parent: any) => {
-                      if (parent.id == title.id) {
+                      if (parent.id == grantParentId) {
                         const updatedSubtitles = parent.subtitles.filter(
                           (subtitle: any) => subtitle.id !== e
                         );
