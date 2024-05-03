@@ -6,7 +6,7 @@ import PageTitle from "@/components/page-title/page-title.component";
 import Button from "@/components/ui/button/button.component";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/app/api/supabaseClient/route";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import { DragDropContext, Droppable } from "@hello-pangea/dnd";
 import {
   Dropdown,
   DropdownTrigger,
@@ -27,6 +27,7 @@ import PopUpWrapper from "@/components/ui/popup-wrapper/popup-wrapper.component"
 import CircularLoader from "@/components/circular-loader/circular-loader.component";
 import DraggableSubtitle from "@/components/draggable-subtitle/draggable-subtitle.component";
 import CustomizedTooltip from "@/components/ui/custom-tooltip/custom-tooltip.component";
+import { ArrowForwardRounded } from "@mui/icons-material";
 
 export default function CreateOutlines() {
   const router = useRouter();
@@ -40,6 +41,7 @@ export default function CreateOutlines() {
     type: string;
     title: string;
     subtitles: any[];
+    text: any[];
   }
   const [contentGeneratedOutlines, setContentGeneratedOutlines] = useState<
     OutlineItem[]
@@ -105,7 +107,7 @@ export default function CreateOutlines() {
 
   async function getContent() {
     const { data } = await supabase
-      .from("content-items")
+      .from("contentItems")
       .select()
       .eq("id", contentId);
     if (data) {
@@ -312,6 +314,7 @@ export default function CreateOutlines() {
         type: selectedTitleType,
         title: customTitle,
         subtitles: [],
+        text: [],
       };
 
       sortingOutlines([...contentGeneratedOutlines, newOutlineItem]);
@@ -320,20 +323,23 @@ export default function CreateOutlines() {
     }
   }
 
-  async function saveOutline() {
+  function currentDate() {
     const date = new Date();
 
     let day = date.getDate();
     let month = date.getMonth() + 1;
     let year = date.getFullYear();
 
-    let currentDate = `${year}-${month}-${day}`;
+    return `${year}-${month}-${day}`;
+  }
+
+  async function saveOutline() {
     const { error } = await supabase
-      .from("content-items")
+      .from("contentItems")
       .update({
         outlines: contentGeneratedOutlines,
         date_edited: currentDate,
-        status: "Created outlines",
+        status: "outlines",
         content_title: updateTitle,
       })
       .eq("id", contentId);
@@ -374,6 +380,21 @@ export default function CreateOutlines() {
     } catch (error: any) {
       alert("Something went wrong. Please try again");
       setGenerating(false);
+    }
+  }
+
+  async function nextContentStep() {
+    const { error } = await supabase
+      .from("contentItems")
+      .update({
+        status: "Creating content",
+        outlines: contentGeneratedOutlines,
+        date_edited: currentDate,
+        content_title: updateTitle,
+      })
+      .match({ id: currentContent[0].id });
+    if (!error) {
+      router.push("/content/create/writing");
     }
   }
 
@@ -491,10 +512,16 @@ export default function CreateOutlines() {
                 <AddRoundedIcon />
               </div>
             </div>
-            <Button type={"outline"} onClick={() => generateOutlines()}>
-              <p>Generate again</p>
-              <AutoAwesomeIcon />
-            </Button>
+            <div className={styles.buttonWrapper}>
+              <Button type={"outline"} onClick={() => generateOutlines()}>
+                <p>Generate again</p>
+                <AutoAwesomeIcon />
+              </Button>
+              <Button type={"solid"} onClick={() => nextContentStep()}>
+                <p>Next</p>
+                <ArrowForwardRounded />
+              </Button>
+            </div>
           </div>
         </div>
       ) : (

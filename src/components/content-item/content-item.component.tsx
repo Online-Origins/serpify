@@ -24,7 +24,7 @@ export default function ContentItem({
 
   function onEditClick() {
     localStorage.setItem("content_id", content.id);
-    router.push("/content/create"); // Change this! Needs to be variable to the status of the content
+    router.push(`/content/create/${content.status}`);
   }
 
   const getCollectionById = (id: string) => {
@@ -48,7 +48,7 @@ export default function ContentItem({
 
   async function deleteContent() {
     const { error } = await supabase
-      .from("content-items")
+      .from("contentItems")
       .delete()
       .eq("id", content.id);
     if (!error) {
@@ -65,17 +65,17 @@ export default function ContentItem({
 
     const currentDate = `${year}-${month}-${day}`;
     const { data } = await supabase
-      .from("content-items")
+      .from("contentItems")
       .select()
       .eq("id", content.id);
     if (data) {
       const inserting = await supabase
-        .from("content-items")
+        .from("contentItems")
         .insert([
           {
             content_score: data[0].content_score,
             status: data[0].status,
-            date_edited: currentDate,
+            edited_on: currentDate,
             collection: data[0].collection,
             language: data[0].language,
             tone_of_voice: data[0].tone_of_voice,
@@ -90,6 +90,15 @@ export default function ContentItem({
         setShownContents(sortContents([...shownContents, inserting.data[0]]));
       }
     }
+  }
+
+  function translateStatus(status: string){
+    if (status == "writing") {
+      return "Writing content";
+    } else if (status == "outlines") {
+      return "Creating outlines"
+    }
+    return status.charAt(0).toUpperCase() + status.slice(1);
   }
 
   return (
@@ -129,10 +138,10 @@ export default function ContentItem({
         </div>
       </div>
       <div className={classNames(styles.contentInfo)}>
-        <p>{content.status}</p>
+        <p>{translateStatus(content.status)}</p>
       </div>
       <div className={classNames(styles.contentInfo)}>
-        <p>{formatDate(content.date_edited)}</p>
+        <p>{formatDate(content.edited_on)}</p>
       </div>
       <div className={styles.iconsWrapper}>
         <div className={styles.editIcon} onClick={() => onEditClick()}>

@@ -62,7 +62,7 @@ export default function ContentOverview() {
   }, [chosenCollection]);
 
   async function getContents() {
-    const { data } = await supabase.from("content-items").select();
+    const { data } = await supabase.from("contentItems").select();
     if (data) {
       setContents(data);
     }
@@ -109,7 +109,7 @@ export default function ContentOverview() {
   }
 
   async function createContent() {
-    const inserting = await supabase.from("content-items").insert([
+    const inserting = await supabase.from("contentItems").insert([
       {
         collection: chosenCollection,
         language: chosenLanguage,
