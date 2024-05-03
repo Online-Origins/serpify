@@ -22,19 +22,19 @@ export default function ContentItem({
 }) {
   const router = useRouter();
 
-  function onEditClick(event:any) {
+  function onEditClick() {
     localStorage.setItem("content_id", content.id);
     router.push("/content/create"); // Change this! Needs to be variable to the status of the content
   }
 
-  const getCollectionTitle = (id: string) => {
+  const getCollectionById = (id: string) => {
     const collection = collections.filter(
       (collection: any) => collection.id === id
     );
     if (collection.length > 0) {
-      return collection[0].collection_name;
+      return collection[0];
     } else {
-      return "Collection not found";
+      return null;
     }
   };
   const formatDate = (dateString: string) => {
@@ -87,23 +87,27 @@ export default function ContentItem({
         ])
         .select();
       if (!inserting.error) {
-        setShownContents(sortContents([
-          ...shownContents,
-          inserting.data[0],
-        ]));
+        setShownContents(sortContents([...shownContents, inserting.data[0]]));
       }
     }
   }
 
   return (
-    <div className={styles.content} onClick={() => onEditClick(event)}>
+    <div className={styles.content} onClick={() => onEditClick()}>
       <div className={styles.titleWrapper}>
         <h4>{content.content_title}</h4>
         <p
-          className={styles.collectionLink}
-          onClick={() => router.push(`/keywords/${content.collection}`)}
+          className={classNames(getCollectionById(content.collection) != null && styles.collectionLink)}
+          onClick={(e) => {
+            e.stopPropagation();
+            if (getCollectionById(content.collection) != null) {
+              router.push(`/keywords/${content.collection}`);
+            }
+          }}
         >
-          {getCollectionTitle(content.collection)}
+          {getCollectionById(content.collection) != null
+            ? getCollectionById(content.collection).collection_name
+            : "Collection not found"}
         </p>
       </div>
       <div className={classNames(styles.contentInfo)}>
@@ -131,7 +135,7 @@ export default function ContentItem({
         <p>{formatDate(content.date_edited)}</p>
       </div>
       <div className={styles.iconsWrapper}>
-        <div className={styles.editIcon} onClick={() => onEditClick(event)}>
+        <div className={styles.editIcon} onClick={() => onEditClick()}>
           <BorderColorRoundedIcon />
         </div>
         <div id="dotsMenu">

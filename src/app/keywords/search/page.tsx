@@ -205,53 +205,47 @@ export default function KeywordSearching() {
   // Sort and show the keywords when there are keywords generated
   useEffect(() => {
     if (generatedKeywords.length > 0) {
-      sortKeywords();
-      showKeywords();
+      showKeywords(sortKeywords(generatedKeywords));
     }
-  }, [generatedKeywords]);
-
-  // Sort the keywords if the sorting type changes
-  useEffect(() => {
-    sortKeywords();
-  }, [sorting]);
+  }, [generatedKeywords, sorting]);
 
   // Show keywords when keywordAmount changes
   useEffect(() => {
-    showKeywords();
+    showKeywords(generatedKeywords);
   }, [keywordAmount]);
 
   // Show an amount of keywords according to the "page"
-  function showKeywords() {
+  function showKeywords(keywords:any) {
     let array: any[] = [];
     for (
       let x = keywordAmount[0];
-      x < keywordAmount[1] && x < generatedKeywords.length;
+      x < keywordAmount[1] && x < keywords.length;
       x++
     ) {
-      array.push(generatedKeywords[x]);
+      array.push(keywords[x]);
     }
     setShownKeywords(array);
   }
 
   // Sort the keywords on the sorting type
-  function sortKeywords() {
+  function sortKeywords(array:any) {
     if (sorting == "potential") {
-      generatedKeywords.sort(
-        (a, b) => b.keywordMetrics.potential - a.keywordMetrics.potential
+      return array.sort(
+        (a:any, b:any) => b.keywordMetrics.potential - a.keywordMetrics.potential
       );
     } else if (sorting == "competition") {
-      generatedKeywords.sort(
-        (a, b) =>
+      return array.sort(
+        (a:any, b:any) =>
           a.keywordMetrics.competitionIndex - b.keywordMetrics.competitionIndex
       );
     } else if (sorting == "searchVolume") {
-      generatedKeywords.sort(
-        (a, b) =>
+      return array.sort(
+        (a:any, b:any) =>
           b.keywordMetrics.avgMonthlySearches -
           a.keywordMetrics.avgMonthlySearches
       );
     } else {
-      generatedKeywords.sort((a, b) => {
+      return array.sort((a:any, b:any) => {
         // Compare the text values
         if (a.text < b.text) {
           return -1;
@@ -262,7 +256,6 @@ export default function KeywordSearching() {
         }
       });
     }
-    showKeywords();
   }
 
   // Translate search volume to understandable text

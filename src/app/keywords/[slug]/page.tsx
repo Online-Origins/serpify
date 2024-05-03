@@ -58,20 +58,15 @@ export default function Collection({ params }: { params: { slug: string } }) {
   }, [selectedCollection]);
 
   useEffect(() => {
-    sortKeywords();
-  }, [sorting]);
-
-  useEffect(() => {
     if (keywordsData.length > 0) {
-      sortKeywords();
-      showKeywords();
+      showKeywords(sortKeywords(keywordsData));
     }
-  }, [keywordsData]);
+  }, [keywordsData, sorting]);
 
-  function showKeywords() {
+  function showKeywords(keywords: any) {
     let array: any[] = [];
-    for (let x = 0; x < 20 && x < keywordsData.length; x++) {
-      array.push(keywordsData[x]);
+    for (let x = 0; x < 20 && x < keywords.length; x++) {
+      array.push(keywords[x]);
     }
     setShownKeywords(array);
   }
@@ -170,27 +165,28 @@ export default function Collection({ params }: { params: { slug: string } }) {
         }
       });
     });
-    setKeywordsData(array);
+    setKeywordsData(sortKeywords(array));
   }
 
-  function sortKeywords() {
+  // Sort the keywords on the sorting type
+  function sortKeywords(array:any) {
     if (sorting == "potential") {
-      keywordsData.sort(
-        (a, b) => b.keywordMetrics.potential - a.keywordMetrics.potential
+      return array.sort(
+        (a:any, b:any) => b.keywordMetrics.potential - a.keywordMetrics.potential
       );
     } else if (sorting == "competition") {
-      keywordsData.sort(
-        (a, b) =>
+      return array.sort(
+        (a:any, b:any) =>
           a.keywordMetrics.competitionIndex - b.keywordMetrics.competitionIndex
       );
     } else if (sorting == "searchVolume") {
-      keywordsData.sort(
-        (a, b) =>
+      return array.sort(
+        (a:any, b:any) =>
           b.keywordMetrics.avgMonthlySearches -
           a.keywordMetrics.avgMonthlySearches
       );
     } else {
-      keywordsData.sort((a, b) => {
+      return array.sort((a:any, b:any) => {
         // Compare the text values
         if (a.text < b.text) {
           return -1;
@@ -201,7 +197,6 @@ export default function Collection({ params }: { params: { slug: string } }) {
         }
       });
     }
-    showKeywords();
   }
 
   async function deleteCollection(collectionId: number) {

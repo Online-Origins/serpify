@@ -131,9 +131,9 @@ export default function CreateOutlines() {
         body: JSON.stringify({
           title: currentContent[0].content_title,
           keywords: currentContent[0].keywords,
-          language: language,
+          language: language?.value,
           audience: currentContent[0].target_audience,
-          toneOfVoice: toneOfVoice,
+          toneOfVoice: toneOfVoice?.value,
         }),
       });
 
