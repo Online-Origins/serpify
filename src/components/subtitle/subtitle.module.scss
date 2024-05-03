@@ -30,6 +30,7 @@
         font-weight: 700;
         padding: .5rem .25rem;
         border-radius: .5rem;
+        background-color: rgba($color: $purple_50, $alpha: 0);
 
         &:focus {
             outline: none;

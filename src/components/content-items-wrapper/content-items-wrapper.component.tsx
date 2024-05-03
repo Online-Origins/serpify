@@ -38,17 +38,16 @@ export default function ContentItemsWrapper({
     } else {
       array = contents;
     }
-    const { sorted } = sortContents(array);
-    setShownContents(sorted);
+    setShownContents(sortContents(array));
   }
 
-  function sortContents(array: any) {
+  function sortContents(array:any) {
     const sorted = array.sort((a: any, b: any) => {
       const dateA = new Date(a.date_edited);
       const dateB = new Date(b.date_edited);
       return dateB.getTime() - dateA.getTime(); // Sort descending, for ascending: dateA - dateB
     });
-    return { sorted };
+    return sorted;
   }
 
   useEffect(() => {
@@ -58,8 +57,7 @@ export default function ContentItemsWrapper({
           .toLocaleLowerCase()
           .includes(titleFilter.toLocaleLowerCase())
       );
-      const {sorted} = sortContents(filtered);
-      setShownContents(sorted);
+      setShownContents(sortContents(filtered));
     }
   }, [titleFilter]);
 
@@ -92,6 +90,9 @@ export default function ContentItemsWrapper({
               key={content.id}
               collections={collections}
               content={content}
+              shownContents={shownContents}
+              setShownContents={setShownContents}
+              sortContents={sortContents}
             />
           ))
         ) : (

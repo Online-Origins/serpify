@@ -104,7 +104,7 @@ export default function CollectionsPage() {
         }
       />
       {collections.length > 0 ?
-        <CollectionsWrapper collections={collections} /> : <h5>No collections found.</h5>}
+        <CollectionsWrapper collections={collections} /> : <h5>No collections found</h5>}
       {popUpOpen && (
         <PopUpWrapper>
           <PopUp

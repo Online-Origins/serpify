@@ -2,6 +2,7 @@ import Tooltip, { TooltipProps, tooltipClasses } from "@mui/material/Tooltip";
 import Fade from "@mui/material/Fade";
 import { styled } from "@mui/material/styles";
 import styles from "./custom-tooltip.module.scss";
+import { useState } from "react";
 
 const CustomToolTip = styled(({ className, ...props }: TooltipProps) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -40,10 +41,13 @@ export default function CustomizedTooltip({
   open?: boolean;
   placement?: any;
 }) {
+  const [hoverOpen, setHoverOpen] = useState(false);
   return (
     <CustomToolTip
       onClick={() => (onClick ? onClick() : "")}
-      open={open ? open : undefined}
+      open={open ? open : hoverOpen}
+      onOpen={() => setHoverOpen(open != undefined ? false : true)}
+      onClose={() => setHoverOpen(false)}
       title={<p className={styles.info}>{information}</p>}
       arrow
       TransitionComponent={Fade}

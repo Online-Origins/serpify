@@ -26,6 +26,7 @@ import classNames from "classnames";
 import PopUpWrapper from "@/components/ui/popup-wrapper/popup-wrapper.component";
 import CircularLoader from "@/components/circular-loader/circular-loader.component";
 import DraggableSubtitle from "@/components/draggable-subtitle/draggable-subtitle.component";
+import CustomizedTooltip from "@/components/ui/custom-tooltip/custom-tooltip.component";
 
 export default function CreateOutlines() {
   const router = useRouter();
@@ -46,6 +47,7 @@ export default function CreateOutlines() {
   const [selectedTitleType, setSelectedTitleType] = useState("h2");
   const [customTitle, setCustomTitle] = useState("");
   const [updateTitle, setUpdateTitle] = useState("");
+  const [generatingTitle, setGeneratingTitle] = useState(false);
 
   useEffect(() => {
     if (contentId != "" && !getContentRef.current) {
@@ -258,11 +260,15 @@ export default function CreateOutlines() {
               });
             });
             const draggable = parent.subtitles.filter(
-              (subtitle:any) => subtitle.id == result.draggableId
+              (subtitle: any) => subtitle.id == result.draggableId
             );
             const destinationSubtitles = subtitle.subtitles || [];
-            destinationSubtitles.splice(result.destination.index, 0, draggable[0]);
-            return {...subtitle, subtitles: destinationSubtitles}
+            destinationSubtitles.splice(
+              result.destination.index,
+              0,
+              draggable[0]
+            );
+            return { ...subtitle, subtitles: destinationSubtitles };
           }
           return subtitle;
         });
@@ -334,6 +340,40 @@ export default function CreateOutlines() {
 
     if (!error) {
       router.push("/content");
+    }
+  }
+
+  async function generateNewTitle() {
+    setGeneratingTitle(true);
+    try {
+      const language = languageCodes.find(
+        (lang) => lang.id.toString() === currentContent[0].language
+      ); // Get the language that is combined to the chosen language
+      const toneOfVoicebyId = toneOfVoices.find(
+        (item) => item.id.toString() === currentContent[0].tone_of_voice
+      ); // Get the tone of voice that is combined to the chosen tone of voice
+
+      const response = await fetch("/api/generateSubTitle", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          keywords: currentContent[0].keywords,
+          toneofvoice: toneOfVoicebyId?.value,
+          language: language?.value,
+          type: selectedTitleType,
+          title: currentContent[0].content_title,
+          subtitles: contentGeneratedOutlines,
+        }),
+      });
+
+      const data = await response.json();
+      setGenerating(false);
+      setCustomTitle(data.generatedTitle.split('"').join("")); //Remove the "" around the generated title
+    } catch (error: any) {
+      alert("Something went wrong. Please try again");
+      setGenerating(false);
     }
   }
 
@@ -436,6 +476,17 @@ export default function CreateOutlines() {
                   }}
                 />
               </div>
+              <CustomizedTooltip
+                information="Generate a title with AI"
+                placement={"top"}
+              >
+                <div
+                  className={styles.generateIcon}
+                  onClick={() => generateNewTitle()}
+                >
+                  <AutoAwesomeIcon />
+                </div>
+              </CustomizedTooltip>
               <div className={styles.addIcon} onClick={() => addNewTitle()}>
                 <AddRoundedIcon />
               </div>

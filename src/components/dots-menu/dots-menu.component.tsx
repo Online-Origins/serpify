@@ -7,13 +7,11 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { supabase } from "@/app/api/supabaseClient/route";
 
 export default function DotsMenu({
-  collection,
-  shownCollections,
-  setShownCollections,
+  deleteFunction,
+  copyFunction,
 }: {
-  collection: any;
-  shownCollections: any;
-  setShownCollections: any;
+  deleteFunction: any;
+  copyFunction: any;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menu = useRef<HTMLDivElement>(null);
@@ -29,49 +27,19 @@ export default function DotsMenu({
     return () => window.removeEventListener("click", handleClick);
   }, [menuOpen]);
 
-  async function deleteCollection() {
-    const { error } = await supabase
-      .from("collections")
-      .delete()
-      .eq("id", collection.id);
-    if (!error) {
-      setShownCollections(shownCollections.filter((item:any) => item != collection))
-    }
-  }
-
-  async function copyCollection() {
-    const { data } = await supabase
-      .from("collections")
-      .select()
-      .eq("id", collection.id);
-    if (data) {
-      const inserting = await supabase.from("collections").insert([
-        {
-          collection_name: data[0].collection_name,
-          keywords: data[0].keywords,
-          language: data[0].language,
-          country: data[0].country,
-        },
-      ]).select();
-      if (!inserting.error) {
-        setShownCollections([...shownCollections, {...data[0], id: inserting.data[0].id}])
-      }
-    }
-  }
-
   return (
     <div
       className={styles.menuWrapper}
-      onClick={() => setMenuOpen(!menuOpen)}
+      onClick={(e) => {e.stopPropagation() ;setMenuOpen(!menuOpen)}}
       ref={menu}
     >
       <MoreVertIcon />
       {menuOpen && (
         <div className={styles.menu}>
-          <p onClick={() => copyCollection()}>
+          <p onClick={() => copyFunction()}>
             Duplicate <ContentCopyIcon />
           </p>
-          <p onClick={() => deleteCollection()}>
+          <p onClick={() => deleteFunction()}>
             Delete <DeleteOutlineRoundedIcon />
           </p>
         </div>
