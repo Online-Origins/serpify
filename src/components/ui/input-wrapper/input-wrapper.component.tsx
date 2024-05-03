@@ -3,7 +3,17 @@ import styles from "./input-wrapper.module.scss";
 
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import Information from "@/components/information/information.component";
-import { MenuItem, Select } from "@mui/material";
+import {
+  Autocomplete,
+  MenuItem,
+  Select,
+  Slider,
+  TextField,
+} from "@mui/material";
+
+import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
+import { useState } from "react";
+import CustomizedTooltip from "../custom-tooltip/custom-tooltip.component";
 
 export default function InputWrapper({
   title,
@@ -18,6 +28,11 @@ export default function InputWrapper({
   information,
   placeholder,
   options,
+  generateTitle,
+  changeCurrentValues,
+  onKeyDown,
+  step,
+  marks,
 }: {
   title?: string;
   required?: boolean;
@@ -31,12 +46,165 @@ export default function InputWrapper({
   information?: string;
   placeholder?: string;
   options?: any;
+  generateTitle?: any;
+  changeCurrentValues?: any;
+  onKeyDown?: any;
+  step?: number;
+  marks?: any;
 }) {
-  const handleChange = (length: string) => {
-    if (defValue.includes(length)) {
-      onChange(defValue.filter((item: string) => item !== length));
+  const handleChange = (value: string) => {
+    if (defValue.includes(value)) {
+      onChange(defValue.filter((item: string) => item !== value));
     } else {
-      onChange([...defValue, length]);
+      onChange([...defValue, value]);
+    }
+  };
+
+  const [tooltipOpen, setTooltipOpen] = useState(true);
+
+  const handleType = (type: string) => {
+    switch (true) {
+      case type == "text":
+        return (
+          <div className={styles.inputWrapper}>
+            {currentValues && (
+              <div className={styles.currentValues}>
+                {currentValues.map((value: string) => (
+                  <div key={value} className={styles.value}>
+                    <p>{value}</p>
+                    <div onClick={() => changeCurrentValues(value)}>
+                      <CloseRoundedIcon />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            <input
+              type="text"
+              value={value}
+              onChange={(event) => onChange(event.target.value)}
+              placeholder={placeholder}
+              onKeyDown={(e) => (onKeyDown ? onKeyDown(e) : "")}
+            />
+            {icon && icon}
+          </div>
+        );
+      case type == "multiSelect":
+        return (
+          <div className={styles.multiSelect}>
+            <label>
+              <input
+                type="checkbox"
+                checked={defValue.includes("shorttail")}
+                onChange={() => handleChange("shorttail")}
+              />
+              <p>Short tail</p>
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                checked={defValue.includes("longtail")}
+                onChange={() => handleChange("longtail")}
+              />
+              <p>Long tail</p>
+            </label>
+          </div>
+        );
+      case type == "autocomplete":
+        return (
+          <Autocomplete
+            value={options.find((option: any) => option.id === value) || null}
+            onChange={(event, newValue) => {
+              onChange(newValue ? newValue.id : null);
+            }}
+            className={styles.autocomplete}
+            options={options}
+            getOptionLabel={(option) => option.value} // specify which property to use as the label
+            renderInput={(params) => (
+              <TextField {...params} variant="standard" />
+            )}
+          />
+        );
+      case type == "dropdown":
+        return (
+          <Select
+            value={value}
+            onChange={(event) => onChange(event.target.value)}
+            className={styles.dropdown}
+            variant="standard"
+          >
+            {options.map((option: any) => (
+              <MenuItem
+                key={option.id ? option.id : option}
+                value={option.id ? option.id : option}
+              >
+                {option.value ? option.value : option}
+              </MenuItem>
+            ))}
+          </Select>
+        );
+      case type == "vertMultiSelect":
+        return (
+          <div
+            className={classNames(
+              styles.multiSelect,
+              styles.vertMultiSelect,
+              "scrollbar"
+            )}
+          >
+            {options.map((option: string) => (
+              <label key={option}>
+                <input
+                  type="checkbox"
+                  checked={defValue.includes(option)}
+                  onChange={() => handleChange(option)}
+                />
+                <p>{option}</p>
+              </label>
+            ))}
+          </div>
+        );
+      case type == "generate":
+        return (
+          <div className={styles.inputWrapper}>
+            <input
+              type="text"
+              value={value}
+              onChange={(event) => onChange(event.target.value)}
+              placeholder={placeholder}
+            />
+            <div
+              onClick={() => generateTitle()}
+              className={styles.generateIcon}
+            >
+              <CustomizedTooltip
+                onClick={() => setTooltipOpen(false)}
+                open={tooltipOpen}
+                placement="top"
+                information="Generate a title with AI"
+              >
+                <AutoAwesomeIcon />
+              </CustomizedTooltip>
+            </div>
+          </div>
+        );
+      case type == "slider":
+        return (
+          <div className={styles.sliderWrapper}>
+            <Slider
+              defaultValue={defValue}
+              onChange={(event: Event, newValue: number | number[]) =>
+                onChange(newValue as number[])
+              }
+              step={step}
+              disableSwap
+              marks={marks}
+              className={styles.slider}
+            />
+          </div>
+        );
+      default:
+        return null;
     }
   };
 
@@ -51,58 +219,7 @@ export default function InputWrapper({
           {information && <Information information={information} />}
         </div>
       )}
-      {type == "text" ? (
-        <div className={styles.inputWrapper}>
-          {currentValues && (
-            <div className={styles.currentValues}>
-              {currentValues.map((value: string) => (
-                <p className={styles.value} key={value}>
-                  {value} <CloseRoundedIcon />{" "}
-                </p>
-              ))}
-            </div>
-          )}
-          <input
-            type="text"
-            value={value}
-            onChange={(event) => onChange(event.target.value)}
-            placeholder={placeholder}
-          />
-          {icon && icon}
-        </div>
-      ) : type == "multiSelect" ? (
-        <div className={styles.multiSelect}>
-          <label>
-            <input
-              type="checkbox"
-              checked={defValue.includes("shorttail")}
-              onChange={() => handleChange("shorttail")}
-            />
-            <p>Short tail</p>
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              checked={defValue.includes("longtail")}
-              onChange={() => handleChange("longtail")}
-            />
-            <p>Long tail</p>
-          </label>
-        </div>
-      ) : type == "dropdown" && options ? (
-        <Select
-          value={value}
-          onChange={(event) => onChange(event.target.value)}
-          className={styles.dropdown}
-          variant="standard"
-        >
-          {options.map((option: any) => (
-            <MenuItem key={option.criterionId} value={option.criterionId}>
-              {option.languageName}
-            </MenuItem>
-          ))}
-        </Select>
-      ) : null}
+      {handleType(type)}
     </div>
   );
 }

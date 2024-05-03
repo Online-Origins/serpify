@@ -1,0 +1,38 @@
+@import '@/styles/variables.scss';
+
+.menuWrapper{
+    cursor: pointer;
+    height: 1.5rem;
+    position: relative;
+
+    .menu{
+        background-color: $white;
+        border: solid 1px $purple_secundary;
+        border-radius: .5rem;
+        padding: .5rem;
+        position: absolute;
+        z-index: 100;
+        margin-top: .25rem;
+        right: 0;
+        display: flex;
+        flex-flow: column;
+        gap: .5rem;
+        align-items: flex-end;
+        box-shadow: $shadow;
+        
+        p {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: .3s all ease-in-out;
+            
+            svg{
+                font-size: 1.25rem;
+            }
+
+            &:hover{
+                color: $purple_primary;
+            }
+        }
+    }
+}

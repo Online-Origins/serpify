@@ -4,7 +4,15 @@ import classNames from "classnames";
 import { useEffect, useRef, useState } from "react";
 import IndicationIcon from "@/components/indication-icon/indication-icon.component";
 
-export default function SmallTable({ keywords }: { keywords: String[] }) {
+export default function SmallTable({
+  keywords,
+  country,
+  language,
+}: {
+  keywords: String[];
+  country: String;
+  language: String;
+}) {
   const smallTableKeywords = getSmallTableKeywords();
   const [keywordsData, setKeywordsData] = useState<any>([]);
   const isGettingData = useRef(false);
@@ -20,14 +28,30 @@ export default function SmallTable({ keywords }: { keywords: String[] }) {
   useEffect(() => {
     if (!isGettingData.current) {
       getKeywordsData().then((data) => {
-        setKeywordsData(data);
+        const newData = data.map((keyword: any) => ({
+          ...keyword,
+          keywordMetrics: {
+            ...keyword.keywordMetrics,
+            potentialIndex: Math.ceil(
+              potentialIndex(
+                keyword.keywordMetrics.avgMonthlySearches,
+                keyword.keywordMetrics.competitionIndex
+              )
+            ),
+          },
+        }));
+        newData.sort(
+          (a: any, b:any) =>
+            b.keywordMetrics.potentialIndex - a.keywordMetrics.potentialIndex
+        );
+        setKeywordsData(newData);
       });
       isGettingData.current = true;
     }
   }, []);
 
   async function getKeywordsData() {
-    const data = await getKeywordMetrics(smallTableKeywords);
+    const data = await getKeywordMetrics(smallTableKeywords, language, country);
     return data;
   }
 
@@ -39,7 +63,7 @@ export default function SmallTable({ keywords }: { keywords: String[] }) {
         return "100 - 1K";
       case googleVolume >= 1000 && googleVolume < 10000:
         return "1K - 10K";
-      case googleVolume >= 10000 && googleVolume < 100000:
+      case googleVolume >= 10000:
         return "10K - 100K";
       default:
         return googleVolume;
@@ -86,7 +110,7 @@ export default function SmallTable({ keywords }: { keywords: String[] }) {
         return "medium";
       case googleVolume >= 1000 && googleVolume < 10000:
         return "high";
-      case googleVolume >= 10000 && googleVolume < 100000:
+      case googleVolume >= 10000:
         return "extreme";
       default:
         return "low";
@@ -126,32 +150,17 @@ export default function SmallTable({ keywords }: { keywords: String[] }) {
               <div className={classNames(styles.item, styles.competition)}>
                 <p>{keyword.keywordMetrics.competitionIndex}</p>
                 <IndicationIcon
-                    indication={Indexation(
-                      100 - keyword.keywordMetrics.competitionIndex
-                    )}
-                  />
+                  indication={Indexation(
+                    100 - keyword.keywordMetrics.competitionIndex
+                  )}
+                />
               </div>
               <div className={classNames(styles.item, styles.potential)}>
-                <p>
-                  {Math.ceil(
-                    potentialIndex(
-                      keyword.keywordMetrics.avgMonthlySearches,
-                      keyword.keywordMetrics.competitionIndex
-                    )
-                  ).toString()}
-                </p>
-                
+                <p>{keyword.keywordMetrics.potentialIndex.toString()}</p>
+
                 <IndicationIcon
-                    indication={Indexation(
-                      100 -
-                        Math.ceil(
-                          potentialIndex(
-                            keyword.keywordMetrics.avgMonthlySearches,
-                            keyword.keywordMetrics.competitionIndex
-                          )
-                        )
-                    )}
-                  />
+                  indication={Indexation(100 - keyword.keywordMetrics.potentialIndex)}
+                />
               </div>
             </div>
           ))

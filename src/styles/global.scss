@@ -13,14 +13,12 @@ body {
     max-width: 100vw;
     overflow: hidden;
 
-    main {
-        height: calc(100vh - 2rem);
-        background-color: $purple_50;
-        display: flex;
-        flex-flow: row;
-        gap: 1rem;
-        padding: 1rem;
-    }
+    height: calc(100vh - 2rem);
+    background-color: $purple_50;
+    display: flex;
+    flex-flow: row;
+    gap: 1rem;
+    padding: 1rem;
 }
 
 h1,
@@ -32,37 +30,101 @@ h5 {
     font-weight: 700;
 }
 
-h1{
+h1 {
     font-size: 2.5rem;
     line-height: 1.2;
 }
 
-h2{
+h2 {
     font-size: 2rem;
     line-height: 1.2;
 }
 
-h3{
+h3 {
     font-size: 1.5rem;
     line-height: 1.2;
 }
 
-h4{
+h4 {
     font-size: 1.2rem;
     line-height: 1.2;
 }
 
-h5{
+h5 {
     font-size: 1rem;
     line-height: 1.2;
 }
 
-p, input[type=text]{
+p,
+input[type=text] {
     font-size: 1rem;
     font-family: $roboto;
     line-height: 1.1;
 }
 
-.css-1rxz5jq-MuiSelect-select-MuiInputBase-input-MuiInput-input:focus{
-    background-color: rgba($color: #000000, $alpha: 0) ;
+a {
+    text-decoration: none;
+    color: $black;
+}
+
+.css-1rxz5jq-MuiSelect-select-MuiInputBase-input-MuiInput-input:focus {
+    background-color: rgba($color: #000000, $alpha: 0);
+}
+
+.MuiInputBase-root {
+
+    &::before,
+    &::after {
+        display: none;
+    }
+}
+
+.scrollbar {
+    &::-webkit-scrollbar {
+        width: .5rem;
+        position: absolute;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: $purple_secundary;
+        border-radius: 1rem;
+    }
+}
+
+.typeDropdown {
+    background-color: $white;
+    border: solid 1px $purple_primary;
+    border-radius: .5rem;
+    margin-bottom: .5rem;
+    overflow: hidden;
+
+    ul {
+        list-style-type: none;
+        display: flex;
+        flex-flow: row;
+
+        li {
+            display: flex;
+            
+            padding: .5rem;
+            cursor: pointer;
+            transition: .3s all ease-in-out;
+            &:hover {
+                background-color: $purple_primary;
+                color: $white;
+                outline: none;
+            }
+            &:focus-visible{
+                outline: none;
+            }
+        }
+    }
+}
+
+.dropPlace{
+    min-height: 1px;
+}
+
+.dropHover{
+    background-color: rgba($color: $purple_50, $alpha: .5);
 }

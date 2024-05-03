@@ -4,6 +4,7 @@
     width: 100%;
     display: flex;
     justify-content: space-between;
+    align-items: flex-end;
     gap: 1.5rem;
     height: max-content !important;
 
@@ -56,5 +57,27 @@
         &:focus {
             outline: none;
         }
+    }
+}
+
+.buttonWrapper{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .amountButtons{
+        display: flex;
+        gap: 1rem;
+    }
+}
+
+.filters {
+    display: flex;
+    flex-flow: column;
+    gap: 1rem;
+
+    .multiDropdown{
+        display: flex;
+        gap: 1rem;
     }
 }

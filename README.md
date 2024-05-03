@@ -14,7 +14,11 @@ Next.js has been chosen as the foundation for our online platform due to its unp
     - Classnames
     - SASS
     - Proptypes
+- Material UI
+    - Icons
+    - Components 
 - OpenAI
+- Google Ads
 
 First, run the development server:
 

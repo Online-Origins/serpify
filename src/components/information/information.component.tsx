@@ -1,12 +1,12 @@
-import styles from "./information.module.scss";
+import styles from './information.module.scss'; 
+import CustomizedTooltip from '../ui/custom-tooltip/custom-tooltip.component';
 
-export default function Information({information} : {information: string}) {
+export default function Information({ information }: { information: string }) {
   return (
-    <div className={styles.informationWrapper}>
-      <img src="/info-icon.svg" alt="Information icon" />
-      <div className={styles.textWrapper}>
-        <p>{information}</p>
-      </div>
-    </div>
+    <CustomizedTooltip
+    information={information}
+    >
+      <img className={styles.icon} src="/info-icon.svg" alt="Information icon" />
+    </CustomizedTooltip>
   );
 }

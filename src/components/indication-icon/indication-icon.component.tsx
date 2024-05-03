@@ -6,7 +6,7 @@ export default function IndicationIcon({ indication }: { indication: any }) {
       return (
         <img
           className={styles.indicator}
-          src="./extreme-icon.svg"
+          src="/extreme-icon.svg"
           alt="extreme icon"
         />
       );
@@ -14,7 +14,7 @@ export default function IndicationIcon({ indication }: { indication: any }) {
       return (
         <img
           className={styles.indicator}
-          src="./high-icon.svg"
+          src="/high-icon.svg"
           alt="high icon"
         />
       );
@@ -22,7 +22,7 @@ export default function IndicationIcon({ indication }: { indication: any }) {
       return (
         <img
           className={styles.indicator}
-          src="./medium-icon.svg"
+          src="/medium-icon.svg"
           alt="medium icon"
         />
       );
@@ -30,7 +30,7 @@ export default function IndicationIcon({ indication }: { indication: any }) {
       return (
         <img
           className={styles.indicator}
-          src="./low-icon.svg"
+          src="/low-icon.svg"
           alt="low icon"
         />
       );

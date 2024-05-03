@@ -9,7 +9,7 @@ const tokenRequestHeaders = {
   "Content-Type": "application/x-www-form-urlencoded",
 };
 
-export async function getGoogleKeywords(keywords, language) {
+export async function getGoogleKeywords(keywords, language, country) {
   try {
     const response = await fetch(
       "https://www.googleapis.com/oauth2/v3/token",
@@ -31,7 +31,8 @@ export async function getGoogleKeywords(keywords, language) {
     const googleKeywords = await generateGoogleKeywords(
       accessToken,
       keywords,
-      language
+      language,
+      country
     );
 
     return googleKeywords;
@@ -41,7 +42,7 @@ export async function getGoogleKeywords(keywords, language) {
   }
 }
 
-async function generateGoogleKeywords(accessToken, keywords, language) {
+async function generateGoogleKeywords(accessToken, keywords, language, country) {
 
   const googleAdsRequestHeaders = {
     "Content-Type": "application/json",
@@ -56,6 +57,7 @@ async function generateGoogleKeywords(accessToken, keywords, language) {
         keywords: keywords,
       },
       language: `languageConstants/${language}`,
+      geoTargetConstants: [`geoTargetConstants/${country}`]
     };
 
     const response = await fetch(

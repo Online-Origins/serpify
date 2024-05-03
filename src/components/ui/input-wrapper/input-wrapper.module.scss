@@ -21,15 +21,28 @@
             outline: solid rgba($color: $purple_primary, $alpha: .5) 2px;
         }
 
+        div {
+            display: flex;
+            align-items: center;
+        }
+
         svg {
             cursor: pointer;
+        }
+
+        .generateIcon {
+            transition: .3s all ease-in-out;
+
+            &:hover {
+                color: $purple_primary;
+            }
         }
     }
 
     .titleWrapper {
         display: flex;
         gap: 1rem;
-        align-items: end;
+        align-items: center;
     }
 
     .currentValues {
@@ -67,6 +80,7 @@
     .multiSelect {
         display: flex;
         justify-content: space-between;
+        gap: 1rem;
 
         label {
             width: 50%;
@@ -88,9 +102,30 @@
                 }
             }
         }
+
+        &.vertMultiSelect {
+            flex-flow: column;
+            width: calc(100% - 1rem);
+            gap: 0;
+            height: 15rem;
+            overflow-x: hidden;
+            overflow-y: scroll;
+            
+            label {
+                cursor: pointer;
+                width: 100%;
+                padding: 1rem .5rem;
+                border-bottom: solid $purple_50 2px;
+                transition: .3s all ease-in-out;
+
+                &:hover {
+                    background-color: $purple_50;
+                }
+            }
+        }
     }
 
-    .dropdown{
+    .dropdown {
         background: $purple_50;
         border-radius: .75rem;
         outline: solid $white 2px;
@@ -99,16 +134,51 @@
         padding: 0.25rem .5rem;
         cursor: pointer;
 
-        &::before, &::after{
+        &::before,
+        &::after {
             display: none;
         }
 
-        &:focus{
+        &:focus {
             background-color: none;
         }
 
-        &:hover{
+        &:hover {
             outline: solid rgba($color: $purple_primary, $alpha: .5) 2px;
+        }
+    }
+
+    .autocomplete {
+        background: $purple_50;
+        padding: 0.25rem .5rem;
+        border-radius: .75rem;
+        outline: solid $white 2px;
+        transition: .3s all ease-in-out;
+        font-family: $roboto;
+
+        input {
+
+            &::before,
+            &::after {
+                display: none;
+            }
+
+            &:focus {
+                background-color: none;
+            }
+        }
+
+        &:hover {
+            outline: solid rgba($color: $purple_primary, $alpha: .5) 2px;
+        }
+    }
+
+    .sliderWrapper {
+        margin-right: 2rem;
+
+        .slider {
+            color: $purple_primary;
+            margin-left: 1rem;
         }
     }
 }

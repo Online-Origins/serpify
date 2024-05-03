@@ -3,7 +3,7 @@
 .topTitleWrapper {
     display: flex;
     justify-content: space-between;
-    align-items: baseline;
+    align-items: flex-end;
     width: 100%;
     padding-bottom: 1rem;
     border-bottom: solid 2px $black;
@@ -17,10 +17,37 @@
             height: max-content;
             display: flex;
             cursor: pointer;
+
             svg {
                 font-size: 2.5rem;
                 color: $purple_primary;
             }
         }
+
+        .titleWrapper {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+
+            svg {
+                margin-top: .5rem;
+                opacity: 0;
+            }
+
+            &.editing {
+                cursor: pointer;
+                &:hover {
+                    svg {
+                        opacity: 1;
+                    }
+                }
+            }
+
+        }
+    }
+
+    .buttonWrapper{
+        display: flex;
+        gap: 1rem;
     }
 }
