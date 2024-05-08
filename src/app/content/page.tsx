@@ -1,7 +1,7 @@
 'use client'
 import styles from "./page.module.scss";
 import { useEffect, useRef, useState } from "react";
-import { supabase } from "@/app/api/supabaseClient/route";
+import { supabase } from "@/app/utils/supabaseClient/server"
 import { useRouter } from "next/navigation";
 
 import PageTitle from "@/components/page-title/page-title.component";
@@ -62,7 +62,7 @@ export default function ContentOverview() {
   }, [chosenCollection]);
 
   async function getContents() {
-    const { data } = await supabase.from("content-items").select();
+    const { data } = await supabase.from("contentItems").select();
     if (data) {
       setContents(data);
     }
@@ -109,7 +109,7 @@ export default function ContentOverview() {
   }
 
   async function createContent() {
-    const inserting = await supabase.from("content-items").insert([
+    const inserting = await supabase.from("contentItems").insert([
       {
         collection: chosenCollection,
         language: chosenLanguage,

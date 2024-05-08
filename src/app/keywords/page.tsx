@@ -16,7 +16,7 @@ import CollectionsWrapper from "@/components/collections-wrapper/collections-wra
 
 import languageCodes from "@/json/language-codes.json";
 import countryCodes from "@/json/country-codes.json";
-import { supabase } from "@/app/api/supabaseClient/route";
+import { supabase } from "@/app/utils/supabaseClient/server"
 
 export default function CollectionsPage() {
   const [popUpOpen, setPopUpOpen] = useState(false);
@@ -53,29 +53,23 @@ export default function CollectionsPage() {
     );
 
     try {
-      if (typeof localStorage !== 'undefined') {
-        localStorage.setItem(
-          "filters",
-          JSON.stringify({
-            subjects: cleanArray,
-            language: keywordsLanguage,
-            country: keywordsCountry,
-            keywordLength: keywordLength,
-            volume: [
-              {
-                min: searchVolumeTranslate(searchVolume[0]),
-                max: searchVolumeTranslate(searchVolume[1]),
-              },
-            ],
-            competition: [{ min: competition[0], max: competition[1] }],
-            potential: [{ min: potential[0], max: potential[1] }],
-          })
-        );
-        router.push("/keywords/search");
-      } else {
-        // If neither localStorage nor sessionStorage is supported
-        console.log('Web Storage is not supported in this environment.');
-      }
+      localStorage.setItem(
+        "filters",
+        JSON.stringify({
+          subjects: cleanArray,
+          language: keywordsLanguage,
+          country: keywordsCountry,
+          keywordLength: keywordLength,
+          volume: 
+            {
+              min: searchVolumeTranslate(searchVolume[0]),
+              max: searchVolumeTranslate(searchVolume[1]),
+            },
+          competition: { min: competition[0], max: competition[1] },
+          potential: { min: potential[0], max: potential[1] },
+        })
+      );
+      router.push("/keywords/search");
     } catch (error) {
       console.log(error);
     }

@@ -44,17 +44,6 @@
                 justify-content: flex-end;
             }
 
-            svg {
-                transition: .3s all ease-in-out;
-                opacity: 0;
-            }
-
-            &.activeSort {
-                svg {
-                    opacity: 1;
-                }
-            }
-
             &:not(:last-of-type) {
                 border-right: solid 2px $white;
             }
@@ -96,6 +85,15 @@
         svg {
             font-size: 1rem;
 
+            transition: .3s all ease-in-out;
+            opacity: 0;
+
+        }
+
+        &.activeSort {
+            svg {
+                opacity: 1;
+            }
         }
     }
 }

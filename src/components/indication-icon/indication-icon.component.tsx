@@ -1,38 +1,21 @@
 import styles from "./indication-icon.module.scss";
 
-export default function IndicationIcon({ indication }: { indication: any }) {
+import KeyboardDoubleArrowUpRoundedIcon from "@mui/icons-material/KeyboardDoubleArrowUpRounded";
+import KeyboardArrowUpRoundedIcon from "@mui/icons-material/KeyboardArrowUpRounded";
+import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
+import HorizontalRuleRoundedIcon from "@mui/icons-material/HorizontalRuleRounded";
+import classNames from "classnames";
+
+export default function IndicationIcon({ indication, competition }: { indication: any; competition?: boolean }) {
   switch (true) {
     case indication == "extreme":
-      return (
-        <img
-          className={styles.indicator}
-          src="/extreme-icon.svg"
-          alt="extreme icon"
-        />
-      );
+      return <KeyboardDoubleArrowUpRoundedIcon className={classNames(styles.extreme, competition && styles.comp)} />;
     case indication == "high":
-      return (
-        <img
-          className={styles.indicator}
-          src="/high-icon.svg"
-          alt="high icon"
-        />
-      );
+      return <KeyboardArrowUpRoundedIcon className={classNames(styles.high, competition && styles.comp)}  />;
     case indication == "medium":
-      return (
-        <img
-          className={styles.indicator}
-          src="/medium-icon.svg"
-          alt="medium icon"
-        />
-      );
+      return <HorizontalRuleRoundedIcon className={classNames(styles.medium, competition && styles.comp)}  />;
     case indication == "low":
-      return (
-        <img
-          className={styles.indicator}
-          src="/low-icon.svg"
-          alt="low icon"
-        />
-      );
+      return <KeyboardArrowDownRoundedIcon className={classNames(styles.low, competition && styles.comp)}  />;
   }
 }
+ 

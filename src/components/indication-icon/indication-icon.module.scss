@@ -1,5 +1,30 @@
 @import '@/styles/variables.scss';
 
-.indicator{
-    width: .8rem;
+.extreme {
+    color: #10CC50;
+
+    &.comp{
+        color: #FF4D35;
+    }
+}
+.high {
+    color: #FFB800;
+
+    &.comp{
+        color: #FF9635;
+    }
+}
+.medium {
+    color: #FF9635;
+
+    &.comp{
+        color: #FFB800;
+    }
+}
+.low {
+    color: #FF4D35;
+
+    &.comp{
+        color: #10CC50;
+    }
 }

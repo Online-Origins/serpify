@@ -5,8 +5,7 @@ import InnerWrapper from "@/components/inner-wrapper/inner-wrapper.component";
 import { useEffect, useRef, useState } from "react";
 import styles from "./page.module.scss";
 
-import { getGoogleKeywords } from "@/app/api/googleKeywords/route";
-import { supabase } from "@/app/api/supabaseClient/route";
+import { supabase } from "@/app/utils/supabaseClient/server"
 import languageCodes from "@/json/language-codes.json";
 import countryCodes from "@/json/country-codes.json";
 
@@ -28,37 +27,29 @@ import CircularLoader from "@/components/circular-loader/circular-loader.compone
 
 export default function KeywordSearching() {
   const router = useRouter();
-  const [filters, setFilters] = useState({
-    subjects: ["vloeren leggen", "vloeren", "parket", "houten vloeren", "vloeren schuren", "houten vloeren schuren", "vloer oliën", "vloer behandelen", "vloer renovatie",  "houten vloer", "raamdecoratie", "muurdecoratie", "wanddecoratie", "vloer renovatie", "houten vloer renovatie", "traprenovatie", "wandbekleding leer", "Beton Ciré", "vloeren egaliseren", "egaliseren vloer"],
-    language: "Dutch",
-    country: "Netherlands",
-    keywordLength: ["40"],
-    volume: [
-      {
-        min: 10,
-        max: 100000,
-      },
-    ],
-    competition: [{ min: 10, max: 100000 }],
-    potential: [{ min: 0, max: 100}],
-  });
-  useEffect(() => {
-    const localStorageFilters = localStorage.getItem("filters") ? localStorage.getItem("filters") : null;
-    setFilters(localStorageFilters !== null ? JSON.parse(localStorageFilters) : {
-      subjects: ["vloeren leggen", "vloeren", "parket", "houten vloeren", "vloeren schuren", "houten vloeren schuren", "vloer oliën", "vloer behandelen", "vloer renovatie",  "houten vloer", "raamdecoratie", "muurdecoratie", "wanddecoratie", "vloer renovatie", "houten vloer renovatie", "traprenovatie", "wandbekleding leer", "Beton Ciré", "vloeren egaliseren", "egaliseren vloer"],
-      language: "Dutch",
-      country: "Netherlands",
-      keywordLength: ["40"],
-      volume: [
-        {
-          min: 10,
-          max: 100000,
-        },
-      ],
-      competition: [{ min: 10, max: 100000 }],
-      potential: [{ min: 0, max: 100}],
-    })
-  }, []);
+  const filterInterface = {
+    subjects: [""],
+    volume: {
+      min: 10,
+      max: 100000,
+    },
+
+    competition: {
+      min: 0,
+      max: 100,
+    },
+
+    potential: {
+      min: 0,
+      max: 100,
+    },
+
+    country: "",
+    language: "",
+    keywordLength: [""],
+  };
+  const [filters, setFilters] = useState(filterInterface);
+  const getFiltersRef = useRef(false);
   const [generatedKeywords, setGeneratedKeywords] = useState<any[]>([]);
   const [shownKeywords, setShownKeywords] = useState<any[]>([]);
   const [selectedKeywords, setSelectedKeywords] = useState<any[]>([]);
@@ -75,25 +66,16 @@ export default function KeywordSearching() {
   const [keywordAmount, setKeywordAmount] = useState([0, 20]);
   const [filterPopUpOpen, setFilterPopUpOpen] = useState(false);
 
-  const [keywordsLanguage, setKeywordsLanguage] = useState(
-    filters.language ? filters.language : languageCodes[0].id
-  );
-  const [keywordsCountry, setKeywordsCountry] = useState(
-    filters.country ? filters.country : countryCodes[0].id
-  );
-  const [keywordLength, setKeywordLength] = useState(filters.keywordLength);
-  const [filterSearchVolume, setFilterSearchVolume] = useState<number[]>([
-    searchVolumeFiltering(filters.volume[0].min),
-    searchVolumeFiltering(filters.volume[0].max),
-  ]);
-  const [competition, setCompetition] = useState<number[]>([
-    filters.competition[0].min,
-    filters.competition[0].max,
-  ]);
-  const [potential, setPotential] = useState<number[]>([
-    filters.potential[0].min,
-    filters.potential[0].max,
-  ]);
+  useEffect(() => {
+    if (!getFiltersRef.current) {
+      const filters = localStorage?.getItem("filters");
+      if (filters != null) {
+        setFilters(JSON.parse(filters));
+      }
+      getFiltersRef.current = true;
+    }
+  }, [getFiltersRef]);
+
   function searchVolumeFiltering(volume: number) {
     switch (true) {
       case volume == 10:
@@ -126,7 +108,7 @@ export default function KeywordSearching() {
 
   // Generate keywords if the user filled in the subjects
   useEffect(() => {
-    if (!isKeywordsGenerated.current && filters != null) {
+    if (!isKeywordsGenerated.current && filters.subjects[0] != "") {
       generateKeywords();
       isKeywordsGenerated.current = true;
     }
@@ -151,12 +133,18 @@ export default function KeywordSearching() {
 
       const data = await response.json();
 
-      // Generate keywords and data with the Google Ads api
-      const GoogleGeneratedKeywords = await getGoogleKeywords(
-        [...filters.subjects, ...data.generatedKeywordsList],
-        filters.language,
-        filters.country
-      );
+      const response2 = await fetch("/api/googleKeywords", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: JSON.stringify({
+          keywords: [...filters.subjects, ...data.generatedKeywordsList],
+          language: filters.language,
+          country: filters.country,
+        })
+      });
+      const GoogleGeneratedKeywords = await response2.json();
 
       // Filter the keywords with data
       const filteredKeywords = GoogleGeneratedKeywords.filter(
@@ -196,14 +184,12 @@ export default function KeywordSearching() {
       // Filter the keywords to only get keywords with metrics
       const filterWithUserValue = keywordsWithRenamedMetrics.filter(
         (keyword: any) =>
-          keyword.keywordMetrics.avgMonthlySearches >= filters.volume[0].min &&
-          keyword.keywordMetrics.avgMonthlySearches <= filters.volume[0].max &&
-          keyword.keywordMetrics.competitionIndex >=
-          filters.competition[0].min &&
-          keyword.keywordMetrics.competitionIndex <=
-          filters.competition[0].max &&
-          keyword.keywordMetrics.potential >= filters.potential[0].min &&
-          keyword.keywordMetrics.potential <= filters.potential[0].max
+          keyword.keywordMetrics.avgMonthlySearches >= filters.volume.min &&
+          keyword.keywordMetrics.avgMonthlySearches <= filters.volume.max &&
+          keyword.keywordMetrics.competitionIndex >= filters.competition.min &&
+          keyword.keywordMetrics.competitionIndex <= filters.competition.max &&
+          keyword.keywordMetrics.potential >= filters.potential.min &&
+          keyword.keywordMetrics.potential <= filters.potential.max
       );
 
       // Filter the keywords according to the length og the keywords
@@ -258,7 +244,8 @@ export default function KeywordSearching() {
   function sortKeywords(array: any) {
     if (sorting == "potential") {
       return array.sort(
-        (a: any, b: any) => b.keywordMetrics.potential - a.keywordMetrics.potential
+        (a: any, b: any) =>
+          b.keywordMetrics.potential - a.keywordMetrics.potential
       );
     } else if (sorting == "competition") {
       return array.sort(
@@ -401,67 +388,22 @@ export default function KeywordSearching() {
   function saveFilters() {
     setFilters((prevState: any) => ({
       ...prevState,
-      language: keywordsLanguage,
-      country: keywordsCountry,
-      keywordLength: keywordLength,
-      volume: [
-        {
-          min: searchVolumeTranslate(filterSearchVolume[0]),
-          max: searchVolumeTranslate(filterSearchVolume[1]),
-        },
-      ],
-      competition: [{ min: competition[0], max: competition[1] }],
-      potential: [{ min: potential[0], max: potential[1] }],
+      language: filters.language,
+      country: filters.country,
+      keywordLength: filters.keywordLength,
+      volume: {
+        min: filters.volume.min,
+        max: filters.volume.max,
+      },
+      competition: {
+        min: filters.competition.min,
+        max: filters.competition.max,
+      },
+
+      potential: { min: filters.potential.min, max: filters.potential.max },
     }));
     isKeywordsGenerated.current = false;
     setFilterPopUpOpen(false);
-  }
-
-  const [filtersChanged, setFiltersChanged] = useState(false);
-
-  //  Check if the filter values have changed in comparison to the default values
-  useEffect(() => {
-    if (
-      filters.competition[0].min != competition[0] ||
-      filters.competition[0].max != competition[1] ||
-      filters.potential[0].min != potential[0] ||
-      filters.potential[0].max != potential[1] ||
-      searchVolumeFiltering(filters.volume[0].min) != filterSearchVolume[0] ||
-      searchVolumeFiltering(filters.volume[0].max) != filterSearchVolume[1] ||
-      filters.language != keywordsLanguage ||
-      filters.country != keywordsCountry ||
-      !arraysContainSameValues(filters.keywordLength, keywordLength)
-    ) {
-      setFiltersChanged(true);
-    } else {
-      setFiltersChanged(false);
-    }
-  }, [
-    filterSearchVolume,
-    competition,
-    potential,
-    keywordLength,
-    keywordsCountry,
-    keywordsLanguage,
-  ]);
-
-  function arraysContainSameValues(arr1: string[], arr2: string[]) {
-    if (arr1.length !== arr2.length) {
-      return false; // If lengths are different, arrays can't contain the same values
-    }
-
-    // Sort arrays
-    const sortedArr1 = arr1.slice().sort();
-    const sortedArr2 = arr2.slice().sort();
-
-    // Check if the sorted arrays contain the same values
-    for (let i = 0; i < sortedArr1.length; i++) {
-      if (sortedArr1[i] !== sortedArr2[i]) {
-        return false;
-      }
-    }
-
-    return true;
   }
 
   function searchVolumeTranslate(filterValue: number) {
@@ -477,7 +419,7 @@ export default function KeywordSearching() {
       case filterValue == 100:
         return 100000;
       default:
-        return 0;
+        return 10;
     }
   }
 
@@ -633,11 +575,7 @@ export default function KeywordSearching() {
               </Button>
             }
             buttons={
-              <Button
-                type={"solid"}
-                onClick={() => saveFilters()}
-                disabled={!filtersChanged}
-              >
+              <Button type={"solid"} onClick={() => saveFilters()}>
                 <p>Save filters</p>
               </Button>
             }
@@ -648,26 +586,28 @@ export default function KeywordSearching() {
                   type="autocomplete"
                   title="Country:"
                   required={false}
-                  value={keywordsCountry}
+                  value={filters.country}
                   options={countryCodes}
-                  onChange={(value: any) =>
-                    setKeywordsCountry(
-                      value != null ? value : countryCodes[0].id
-                    )
-                  }
+                  onChange={(value: any) => {
+                    setFilters((prevFilters) => ({
+                      ...prevFilters,
+                      country: value != null ? value : countryCodes[0].id,
+                    }));
+                  }}
                   placeholder="Which country do you want to target?"
                 />
                 <InputWrapper
                   type="autocomplete"
                   title="Language:"
                   required={false}
-                  value={keywordsLanguage}
+                  value={filters.language}
                   options={languageCodes}
-                  onChange={(value: any) =>
-                    setKeywordsLanguage(
-                      value != null ? value : languageCodes[0].id
-                    )
-                  }
+                  onChange={(value: any) => {
+                    setFilters((prevFilters) => ({
+                      ...prevFilters,
+                      language: value != null ? value : languageCodes[0].id,
+                    }));
+                  }}
                   placeholder="In what language should the keywords be?"
                 />
               </div>
@@ -678,9 +618,13 @@ export default function KeywordSearching() {
                 onChange={(value: any) =>
                   value.length == 0
                     ? alert("You need to select at least one")
-                    : setKeywordLength(value)
+                    : setFilters((prevFilters) => ({
+                        ...prevFilters,
+                        keywordLength:
+                          value != null ? value : ["shorttail", "longtail"],
+                      }))
                 }
-                defValue={keywordLength}
+                defValue={filters.keywordLength}
                 information="Short-tail keywords are broad, general, and popular terms with high search volume and competition. Longtail keywords are more specific, niche, and targeted multi-word terms with lower search volume and lower competition."
               />
               <InputWrapper
@@ -688,10 +632,18 @@ export default function KeywordSearching() {
                 title="Search volume:"
                 information="Search volume is the number of times, on average, that users enter a particular search query into a search engine each month."
                 defValue={[
-                  searchVolumeFiltering(filters.volume[0].min),
-                  searchVolumeFiltering(filters.volume[0].max),
+                  searchVolumeFiltering(filters.volume.min),
+                  searchVolumeFiltering(filters.volume.max),
                 ]}
-                onChange={(value: any) => setFilterSearchVolume(value)}
+                onChange={(value: any) => {
+                  setFilters((prevFilters) => ({
+                    ...prevFilters,
+                    volume: {
+                      min: searchVolumeTranslate(value[0]),
+                      max: searchVolumeTranslate(value[1]),
+                    },
+                  }));
+                }}
                 step={25}
                 marks={[
                   {
@@ -720,11 +672,16 @@ export default function KeywordSearching() {
                 type="slider"
                 title="Competition:"
                 information="The degree of competition of the position for a keyword."
-                defValue={[
-                  filters.competition[0].min,
-                  filters.competition[0].max,
-                ]}
-                onChange={(value: any) => setCompetition(value)}
+                defValue={[filters.competition.min, filters.competition.max]}
+                onChange={(value: any) => {
+                  setFilters((prevFilters) => ({
+                    ...prevFilters,
+                    competition: {
+                      min: value[0],
+                      max: value[1],
+                    },
+                  }));
+                }}
                 step={25}
                 marks={[
                   {
@@ -753,8 +710,16 @@ export default function KeywordSearching() {
                 type="slider"
                 title="Potential:"
                 information="The ability of a particular keyword or key phrase to drive traffic, engagement, or conversions."
-                defValue={[filters.potential[0].min, filters.potential[0].max]}
-                onChange={(value: any) => setPotential(value)}
+                defValue={[filters.potential.min, filters.potential.max]}
+                onChange={(value: any) => {
+                  setFilters((prevFilters) => ({
+                    ...prevFilters,
+                    potential: {
+                      min: value[0],
+                      max: value[1],
+                    },
+                  }));
+                }}
                 step={25}
                 marks={[
                   {

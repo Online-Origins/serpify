@@ -1,4 +1,3 @@
-import { getKeywordMetrics } from "@/app/api/keywordMetrics/route";
 import styles from "./small-table.module.scss";
 import classNames from "classnames";
 import { useEffect, useRef, useState } from "react";
@@ -48,10 +47,22 @@ export default function SmallTable({
       });
       isGettingData.current = true;
     }
-  }, []);
+  }, [getKeywordsData, potentialIndex]);
 
   async function getKeywordsData() {
-    const data = await getKeywordMetrics(smallTableKeywords, language, country);
+    const response = await fetch("/api/keywordMetrics", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: JSON.stringify({
+        keywords: smallTableKeywords,
+        language: language,
+        country: country,
+      })
+    });
+
+    const data = await response.json();
     return data;
   }
 
@@ -153,6 +164,7 @@ export default function SmallTable({
                   indication={Indexation(
                     100 - keyword.keywordMetrics.competitionIndex
                   )}
+                  competition
                 />
               </div>
               <div className={classNames(styles.item, styles.potential)}>

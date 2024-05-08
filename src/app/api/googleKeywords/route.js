@@ -1,3 +1,5 @@
+import { NextResponse } from "next/server";
+
 const tokenRequestData = {
   grant_type: "refresh_token",
   client_id: process.env.CLIENT_ID,
@@ -9,7 +11,11 @@ const tokenRequestHeaders = {
   "Content-Type": "application/x-www-form-urlencoded",
 };
 
-export async function getGoogleKeywords(keywords, language, country) {
+export async function POST(request) {
+  const body = await request.json();
+  const keywords = body.keywords || '';
+  const language = body.language || '';
+  const country = body.country || '';
   try {
     const response = await fetch(
       "https://www.googleapis.com/oauth2/v3/token",
@@ -35,7 +41,7 @@ export async function getGoogleKeywords(keywords, language, country) {
       country
     );
 
-    return googleKeywords;
+    return NextResponse.json(googleKeywords);
   } catch (error) {
     console.error("Error obtaining access token:", error);
     throw error;

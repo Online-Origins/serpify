@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 import DotsMenu from "../dots-menu/dots-menu.component";
-import { supabase } from "@/app/api/supabaseClient/route";
+import { supabase } from "@/app/utils/supabaseClient/server"
 
 export default function CollectionCard({
   collection,

@@ -34,7 +34,7 @@ export default function CollectionsWrapper({
         setCounter(counter + 1);
       }, 1000);
     }
-  }, [counter]);
+  }, [counter, collections, shownCollections]);
 
   return (
     <div className={classNames(styles.collectionsWrapper, "scrollbar")}>
