@@ -28,10 +28,11 @@ import CircularLoader from "@/components/circular-loader/circular-loader.compone
 
 export default function KeywordSearching() {
   const router = useRouter();
-  const storedFilters = localStorage.getItem("filters")  || null;
-  const [filters, setFilters] = useState(
-    storedFilters ? JSON.parse(storedFilters) : null
-  );
+  const [filters, setFilters] = useState(null);
+  useEffect(() => {
+    const localStorageFilters = localStorage.getItem("filters") ? localStorage.getItem("filters") : null;
+    setFilters(localStorageFilters !== null ? JSON.parse(localStorageFilters) : null)
+  }, []);
   const [generatedKeywords, setGeneratedKeywords] = useState<any[]>([]);
   const [shownKeywords, setShownKeywords] = useState<any[]>([]);
   const [selectedKeywords, setSelectedKeywords] = useState<any[]>([]);
@@ -172,9 +173,9 @@ export default function KeywordSearching() {
           keyword.keywordMetrics.avgMonthlySearches >= filters.volume[0].min &&
           keyword.keywordMetrics.avgMonthlySearches <= filters.volume[0].max &&
           keyword.keywordMetrics.competitionIndex >=
-            filters.competition[0].min &&
+          filters.competition[0].min &&
           keyword.keywordMetrics.competitionIndex <=
-            filters.competition[0].max &&
+          filters.competition[0].max &&
           keyword.keywordMetrics.potential >= filters.potential[0].min &&
           keyword.keywordMetrics.potential <= filters.potential[0].max
       );
@@ -215,7 +216,7 @@ export default function KeywordSearching() {
   }, [keywordAmount]);
 
   // Show an amount of keywords according to the "page"
-  function showKeywords(keywords:any) {
+  function showKeywords(keywords: any) {
     let array: any[] = [];
     for (
       let x = keywordAmount[0];
@@ -228,24 +229,24 @@ export default function KeywordSearching() {
   }
 
   // Sort the keywords on the sorting type
-  function sortKeywords(array:any) {
+  function sortKeywords(array: any) {
     if (sorting == "potential") {
       return array.sort(
-        (a:any, b:any) => b.keywordMetrics.potential - a.keywordMetrics.potential
+        (a: any, b: any) => b.keywordMetrics.potential - a.keywordMetrics.potential
       );
     } else if (sorting == "competition") {
       return array.sort(
-        (a:any, b:any) =>
+        (a: any, b: any) =>
           a.keywordMetrics.competitionIndex - b.keywordMetrics.competitionIndex
       );
     } else if (sorting == "searchVolume") {
       return array.sort(
-        (a:any, b:any) =>
+        (a: any, b: any) =>
           b.keywordMetrics.avgMonthlySearches -
           a.keywordMetrics.avgMonthlySearches
       );
     } else {
-      return array.sort((a:any, b:any) => {
+      return array.sort((a: any, b: any) => {
         // Compare the text values
         if (a.text < b.text) {
           return -1;
