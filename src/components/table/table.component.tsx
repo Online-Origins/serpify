@@ -114,8 +114,9 @@ export default function Table({
                         keyword.keywordMetrics.competitionIndex
                       )
                     )
-                  )}
-                />
+                  }
+                  </p>
+                </div>
               </div>
             ))
            : <p>Could not find any matching keywords. please try again.</p>

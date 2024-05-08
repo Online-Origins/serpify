@@ -22,7 +22,7 @@ export default function ContentItem({
 }) {
   const router = useRouter();
 
-  function onEditClick() 
+  function onEditClick() { 
     localStorage.setItem("content_id", content.id);
     router.push(`/content/create/${content.status}`);
   }
