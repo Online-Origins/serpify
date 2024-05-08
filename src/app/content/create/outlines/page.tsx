@@ -1,4 +1,4 @@
-"use client";
+'use client'
 import { useEffect, useRef, useState } from "react";
 import styles from "./page.module.scss";
 import InnerWrapper from "@/components/inner-wrapper/inner-wrapper.component";
