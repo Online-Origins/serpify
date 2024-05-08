@@ -1,8 +1,8 @@
+'use client'
 import classNames from "classnames";
 import styles from "./content-item.module.scss";
 import { CircularProgressbar } from "react-circular-progressbar";
 import BorderColorRoundedIcon from "@mui/icons-material/BorderColorRounded";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useRouter } from "next/navigation";
 import DotsMenu from "../dots-menu/dots-menu.component";
 import { supabase } from "@/app/api/supabaseClient/route";
