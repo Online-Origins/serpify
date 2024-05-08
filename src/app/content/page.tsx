@@ -123,7 +123,12 @@ export default function ContentOverview() {
       console.log(inserting.error);
       alert("Something went wrong. Please try again!")
     } else {
-      localStorage.setItem("content_id", inserting.data[0].id);
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem("content_id", inserting.data[0].id);
+      } else {
+        // If neither localStorage nor sessionStorage is supported
+        console.log('Web Storage is not supported in this environment.');
+      }
       router.push("/content/create/outlines")
       getContentsRef.current = false;
     }

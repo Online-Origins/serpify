@@ -1,4 +1,4 @@
-"use client";
+'use client'
 import ComponentWrapper from "@/components/ui/component-wrapper/component-wrapper.component";
 import styles from "./menu-bar.module.scss";
 import classNames from "classnames";

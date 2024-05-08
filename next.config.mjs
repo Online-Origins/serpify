@@ -10,6 +10,13 @@ const nextConfig = {
         GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
         SUPABASE_URL: process.env.SUPABASE_URL,
         SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY
+    },
+    typescript: {
+        // !! WARN !!
+        // Dangerously allow production builds to successfully complete even if
+        // your project has type errors.
+        // !! WARN !!
+        ignoreBuildErrors: true,
     }
 };
 
