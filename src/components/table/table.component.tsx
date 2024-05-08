@@ -65,120 +65,121 @@ export default function Table({
     }
   }
 
-    return (
-      <div className={styles.keywordsTable}>
-        <div className={classNames(styles.row, styles.topRow)}>
-          <div className={classNames(styles.item, styles.select)}>
-            <p>Select</p>
-          </div>
-          <div
-            onClick={() => setSorting("keyword")}
-            className={classNames(
-              styles.item,
-              styles.keyword,
-              sorting == "keyword" && styles.activeSort
-            )}
-          >
-            <p>Keyword</p>
-            <ArrowDownwardRoundedIcon />
-          </div>
-          <div
-            onClick={() => setSorting("searchVolume")}
-            className={classNames(
-              styles.item,
-              styles.searchVolume,
-              sorting == "searchVolume" && styles.activeSort
-            )}
-          >
-            <ArrowDownwardRoundedIcon />
-            <p>Search volume</p>
-            <Information information="The number of times, on average, that users enter a particular search query into a search engine each month." />
-          </div>
-          <div
-            onClick={() => setSorting("competition")}
-            className={classNames(
-              styles.item,
-              styles.competition,
-              sorting == "competition" && styles.activeSort
-            )}
-          >
-            <ArrowUpwardRoundedIcon />
-            <p>Competition</p>
-            <Information information="A difficulty metric representing how easy or difficult it will be to rank on Google's organic search results for a specific keyword." />
-          </div>
-          <div
-            onClick={() => setSorting("potential")}
-            className={classNames(
-              styles.item,
-              styles.potential,
-              sorting == "potential" && styles.activeSort
-            )}
-          >
-            <ArrowDownwardRoundedIcon />
-            <p>Potential</p>
-            <Information information="The ability of a particular keyword or key phrase to drive traffic, engagement, or conversions." />
-          </div>
+  return (
+    <div className={styles.keywordsTable}>
+      <div className={classNames(styles.row, styles.topRow)}>
+        <div className={classNames(styles.item, styles.select)}>
+          <p>Select</p>
         </div>
-        <div className={classNames(styles.tableContent, "scrollbar")}>
-          {shownKeywords.length > 0 ? 
-            shownKeywords.map((keyword: any) => (
-              <div className={styles.row} key={keyword.text}>
-                <div className={classNames(styles.item, styles.select)}>
-                  <Selector
-                    group={selectedKeywords}
-                    item={keyword.text}
-                    selecting={(value: any) => selecting(value)}
-                  />
-                </div>
-                <div className={classNames(styles.item, styles.keyword)}>
-                  <p>{keyword.text}</p>
-                </div>
-                <div className={classNames(styles.item, styles.searchVolume)}>
-                  <p>
-                    {searchVolume(
-                      keyword.keywordMetrics.avgMonthlySearches
-                    )}
-                  </p>
-                  <IndicationIcon
-                    indication={searchVolumeIndication(
-                      keyword.keywordMetrics.avgMonthlySearches
-                    )}
-                  />
-                </div>
-                <div className={classNames(styles.item, styles.competition)}>
-                  <p>{keyword.keywordMetrics.competitionIndex}</p>
-                  <IndicationIcon
-                    indication={Indexation(
-                      100 - keyword.keywordMetrics.competitionIndex
-                    )}
-                  />
-                </div>
-                <div className={classNames(styles.item, styles.potential)}>
-                  <p>
-                    {Math.ceil(
+        <div
+          onClick={() => setSorting("keyword")}
+          className={classNames(
+            styles.item,
+            styles.keyword,
+            sorting == "keyword" && styles.activeSort
+          )}
+        >
+          <p>Keyword</p>
+          <ArrowDownwardRoundedIcon />
+        </div>
+        <div
+          onClick={() => setSorting("searchVolume")}
+          className={classNames(
+            styles.item,
+            styles.searchVolume,
+            sorting == "searchVolume" && styles.activeSort
+          )}
+        >
+          <ArrowDownwardRoundedIcon />
+          <p>Search volume</p>
+          <Information information="The number of times, on average, that users enter a particular search query into a search engine each month." />
+        </div>
+        <div
+          onClick={() => setSorting("competition")}
+          className={classNames(
+            styles.item,
+            styles.competition,
+            sorting == "competition" && styles.activeSort
+          )}
+        >
+          <ArrowUpwardRoundedIcon />
+          <p>Competition</p>
+          <Information information="A difficulty metric representing how easy or difficult it will be to rank on Google's organic search results for a specific keyword." />
+        </div>
+        <div
+          onClick={() => setSorting("potential")}
+          className={classNames(
+            styles.item,
+            styles.potential,
+            sorting == "potential" && styles.activeSort
+          )}
+        >
+          <ArrowDownwardRoundedIcon />
+          <p>Potential</p>
+          <Information information="The ability of a particular keyword or key phrase to drive traffic, engagement, or conversions." />
+        </div>
+      </div>
+      <div className={classNames(styles.tableContent, "scrollbar")}>
+        {shownKeywords.length > 0 ?
+          shownKeywords.map((keyword: any) => (
+            <div className={styles.row} key={keyword.text}>
+              <div className={classNames(styles.item, styles.select)}>
+                <Selector
+                  group={selectedKeywords}
+                  item={keyword.text}
+                  selecting={(value: any) => selecting(value)}
+                />
+              </div>
+              <div className={classNames(styles.item, styles.keyword)}>
+                <p>{keyword.text}</p>
+              </div>
+              <div className={classNames(styles.item, styles.searchVolume)}>
+                <p>
+                  {searchVolume(
+                    keyword.keywordMetrics.avgMonthlySearches
+                  )}
+                </p>
+                <IndicationIcon
+                  indication={searchVolumeIndication(
+                    keyword.keywordMetrics.avgMonthlySearches
+                  )}
+                />
+              </div>
+              <div className={classNames(styles.item, styles.competition)}>
+                <p>{keyword.keywordMetrics.competitionIndex}</p>
+                <IndicationIcon
+                  indication={Indexation(
+                    100 - keyword.keywordMetrics.competitionIndex
+                  )}
+                />
+              </div>
+              <div className={classNames(styles.item, styles.potential)}>
+                <p>
+                  {Math.ceil(
+                    potentialIndex(
+                      keyword.keywordMetrics.avgMonthlySearches,
+                      keyword.keywordMetrics.competitionIndex
+                    )
+                  ).toString()}
+                </p>
+                <IndicationIcon
+                  indication={Indexation(
+                    100 -
+                    Math.ceil(
                       potentialIndex(
                         keyword.keywordMetrics.avgMonthlySearches,
                         keyword.keywordMetrics.competitionIndex
                       )
-                    ).toString()}
-                  </p>
-                  <IndicationIcon
-                    indication={Indexation(
-                      100 -
-                        Math.ceil(
-                          potentialIndex(
-                            keyword.keywordMetrics.avgMonthlySearches,
-                            keyword.keywordMetrics.competitionIndex
-                          )
-                        )
-                    )}
-                  />
-                </div>
+                    )
+                  )}
+                />
               </div>
-            ))
-           : <p>Couldn't find any matching keywords. please try again.</p>
-          }
-        </div>
+            </div>
+          ))
+          :
+          <p>Could not find any matching keywords. please try again.</p>
+        }
       </div>
-    );
+    </div>
+  );
 }
