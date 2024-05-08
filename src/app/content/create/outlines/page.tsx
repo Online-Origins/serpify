@@ -59,7 +59,7 @@ export default function CreateOutlines() {
       const id = localStorage.getItem("content_id");
       setContentId(id);
     }
-  });
+  }, [getContentRef]);
 
   useEffect(() => {
     if (
@@ -77,7 +77,7 @@ export default function CreateOutlines() {
       setContentGeneratedOutlines(currentContent[0].outlines);
       setUpdateTitle(currentContent[0].content_title);
     }
-  }, [currentContent, generateTitlesRef]);
+  }, [currentContent, generateTitlesRef, generateOutlines]);
 
   function sortingOutlines(titles: any[]) {
     let array: any[] = [];

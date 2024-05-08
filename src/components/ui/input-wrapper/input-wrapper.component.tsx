@@ -192,7 +192,7 @@ export default function InputWrapper({
         return (
           <div className={styles.sliderWrapper}>
             <Slider
-              defaultValue={defValue}
+              value={defValue}
               onChange={(event: Event, newValue: number | number[]) =>
                 onChange(newValue as number[])
               }

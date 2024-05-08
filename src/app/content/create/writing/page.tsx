@@ -24,7 +24,7 @@ export default function Writing() {
       const id = localStorage.getItem("content_id");
       setContentId(id);
     }
-  });
+  }, [contentId, getContentRef]);
 
   useEffect(() => {
     if (currentContent.length > 0 && !getOutlines.current) {
@@ -37,7 +37,7 @@ export default function Writing() {
 
       getOutlines.current = true;
     }
-  }, [currentContent, getOutlines]);
+  }, [currentContent, getOutlines, editor]);
 
   async function getContent() {
     const { data } = await supabase

@@ -27,7 +27,7 @@ export default function ContentItemsWrapper({
       settingContents();
       showingContentsRef.current = true;
     }
-  }, [contents]);
+  }, [contents, settingContents, showingContentsRef]);
 
   function settingContents() {
     let array = [];
@@ -59,7 +59,7 @@ export default function ContentItemsWrapper({
       );
       setShownContents(sortContents(filtered));
     }
-  }, [titleFilter]);
+  }, [titleFilter, contents]);
 
   return (
     <div className={styles.pageWrapper}>

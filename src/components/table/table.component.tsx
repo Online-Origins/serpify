@@ -151,6 +151,7 @@ export default function Table({
                     indication={Indexation(
                       100 - keyword.keywordMetrics.competitionIndex
                     )}
+                    competition
                   />
                 </div>
                 <div className={classNames(styles.item, styles.potential)}>
@@ -176,7 +177,7 @@ export default function Table({
                 </div>
               </div>
             ))
-           : <p>Couldn't find any matching keywords. please try again.</p>
+           : <p>Could not find any matching keywords. please try again.</p>
           }
         </div>
       </div>

@@ -60,14 +60,13 @@ export default function CollectionsPage() {
           language: keywordsLanguage,
           country: keywordsCountry,
           keywordLength: keywordLength,
-          volume: [
+          volume: 
             {
               min: searchVolumeTranslate(searchVolume[0]),
               max: searchVolumeTranslate(searchVolume[1]),
             },
-          ],
-          competition: [{ min: competition[0], max: competition[1] }],
-          potential: [{ min: potential[0], max: potential[1] }],
+          competition: { min: competition[0], max: competition[1] },
+          potential: { min: potential[0], max: potential[1] },
         })
       );
       router.push("/keywords/search");

@@ -48,7 +48,7 @@ export default function SmallTable({
       });
       isGettingData.current = true;
     }
-  }, []);
+  }, [getKeywordsData, potentialIndex]);
 
   async function getKeywordsData() {
     const data = await getKeywordMetrics(smallTableKeywords, language, country);
@@ -153,6 +153,7 @@ export default function SmallTable({
                   indication={Indexation(
                     100 - keyword.keywordMetrics.competitionIndex
                   )}
+                  competition
                 />
               </div>
               <div className={classNames(styles.item, styles.potential)}>

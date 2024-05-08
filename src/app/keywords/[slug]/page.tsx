@@ -16,6 +16,8 @@ import PopUp from "@/components/ui/popup/popup.component";
 import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded";
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
+import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
+import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import InputWrapper from "@/components/ui/input-wrapper/input-wrapper.component";
 
 export default function Collection({ params }: { params: { slug: string } }) {
@@ -31,6 +33,7 @@ export default function Collection({ params }: { params: { slug: string } }) {
   const [loading, setLoading] = useState(true);
   const [newCollectionName, setNewCollectionName] = useState("");
   const [editPopUpOpen, setEditPopUpOpen] = useState(false);
+  const [keywordAmount, setKeywordAmount] = useState([0, 20]);
 
   useEffect(() => {
     if (!getSelectedCollectionRef.current && activeCollection != undefined) {
@@ -57,15 +60,26 @@ export default function Collection({ params }: { params: { slug: string } }) {
     }
   }, [selectedCollection]);
 
+  // Sort and show the keywords when there are keywords generated
   useEffect(() => {
     if (keywordsData.length > 0) {
       showKeywords(sortKeywords(keywordsData));
     }
   }, [keywordsData, sorting]);
 
+  // Show keywords when keywordAmount changes
+  useEffect(() => {
+    showKeywords(keywordsData);
+  }, [keywordAmount]);
+
+  // Show an amount of keywords according to the "page"
   function showKeywords(keywords: any) {
     let array: any[] = [];
-    for (let x = 0; x < 20 && x < keywords.length; x++) {
+    for (
+      let x = keywordAmount[0];
+      x < keywordAmount[1] && x < keywords.length;
+      x++
+    ) {
       array.push(keywords[x]);
     }
     setShownKeywords(array);
@@ -169,24 +183,25 @@ export default function Collection({ params }: { params: { slug: string } }) {
   }
 
   // Sort the keywords on the sorting type
-  function sortKeywords(array:any) {
+  function sortKeywords(array: any) {
     if (sorting == "potential") {
       return array.sort(
-        (a:any, b:any) => b.keywordMetrics.potential - a.keywordMetrics.potential
+        (a: any, b: any) =>
+          b.keywordMetrics.potential - a.keywordMetrics.potential
       );
     } else if (sorting == "competition") {
       return array.sort(
-        (a:any, b:any) =>
+        (a: any, b: any) =>
           a.keywordMetrics.competitionIndex - b.keywordMetrics.competitionIndex
       );
     } else if (sorting == "searchVolume") {
       return array.sort(
-        (a:any, b:any) =>
+        (a: any, b: any) =>
           b.keywordMetrics.avgMonthlySearches -
           a.keywordMetrics.avgMonthlySearches
       );
     } else {
-      return array.sort((a:any, b:any) => {
+      return array.sort((a: any, b: any) => {
         // Compare the text values
         if (a.text < b.text) {
           return -1;
@@ -216,7 +231,7 @@ export default function Collection({ params }: { params: { slug: string } }) {
       .eq("id", selectedCollection[0].id);
     if (!error) {
       getSelectedCollection();
-      setEditPopUpOpen(false)
+      setEditPopUpOpen(false);
     }
   }
 
@@ -258,6 +273,36 @@ export default function Collection({ params }: { params: { slug: string } }) {
                   <p>Save</p>
                   <SaveOutlinedIcon />
                 </Button>
+                <div className={styles.amountButtons}>
+                  {keywordAmount[0] > 0 && (
+                    <Button
+                      type={"textOnly"}
+                      onClick={() =>
+                        setKeywordAmount([
+                          keywordAmount[0] - 20,
+                          keywordAmount[1] - 20,
+                        ])
+                      }
+                    >
+                      <ArrowBackRoundedIcon />
+                      <p>Previous</p>
+                    </Button>
+                  )}
+                  {keywordAmount[1] < keywordsData.length && (
+                    <Button
+                      type={"textOnly"}
+                      onClick={() =>
+                        setKeywordAmount([
+                          keywordAmount[1],
+                          keywordAmount[1] + 20,
+                        ])
+                      }
+                    >
+                      <p>Next</p>
+                      <ArrowForwardRoundedIcon />
+                    </Button>
+                  )}
+                </div>
               </div>
             </div>
           ) : (
@@ -280,7 +325,10 @@ export default function Collection({ params }: { params: { slug: string } }) {
                   <Button
                     type={"solid"}
                     onClick={editTitle}
-                    disabled={selectedCollection[0].collection_name == newCollectionName || newCollectionName == ""}
+                    disabled={
+                      selectedCollection[0].collection_name ==
+                        newCollectionName || newCollectionName == ""
+                    }
                   >
                     <p>Save</p>
                     <SaveOutlinedIcon />

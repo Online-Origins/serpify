@@ -20,6 +20,10 @@
         border: 2px $purple_primary solid;
         background: $purple_primary;
         color: $white;
+
+        &:hover {
+            border: solid 2px $purple_secundary;
+        }
     }
 
     &.outline {
@@ -30,12 +34,12 @@
         &:hover {
             background-color: $purple_secundary;
             color: $white;
+            border: solid 2px $purple_secundary;
         }
     }
 
     &:hover {
         background: $purple_secundary;
-        border: solid 2px $purple_secundary;
     }
 
     &.textOnly {

@@ -20,7 +20,7 @@ export default function MenuBar({setSmallNav, smallNav}: {setSmallNav: any, smal
     if(pathname != "/") {
       setSmallNav(true)
     }
-  }, [pathname])
+  }, [pathname, setSmallNav])
 
   return (
     <ComponentWrapper
