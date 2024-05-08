@@ -29,34 +29,34 @@ import CircularLoader from "@/components/circular-loader/circular-loader.compone
 export default function KeywordSearching() {
   const router = useRouter();
   const [filters, setFilters] = useState({
-    subjects: [],
-    language: "",
-    country: "",
-    keywordLength: [""],
+    subjects: ["vloeren leggen", "vloeren", "parket", "houten vloeren", "vloeren schuren", "houten vloeren schuren", "vloer oliën", "vloer behandelen", "vloer renovatie",  "houten vloer", "raamdecoratie", "muurdecoratie", "wanddecoratie", "vloer renovatie", "houten vloer renovatie", "traprenovatie", "wandbekleding leer", "Beton Ciré", "vloeren egaliseren", "egaliseren vloer"],
+    language: "Dutch",
+    country: "Netherlands",
+    keywordLength: ["40"],
     volume: [
       {
-        min: 1,
-        max: 2,
+        min: 10,
+        max: 100000,
       },
     ],
-    competition: [{ min: 1, max: 2 }],
-    potential: [{ min: 1, max: 2}],
+    competition: [{ min: 10, max: 100000 }],
+    potential: [{ min: 0, max: 100}],
   });
   useEffect(() => {
     const localStorageFilters = localStorage.getItem("filters") ? localStorage.getItem("filters") : null;
     setFilters(localStorageFilters !== null ? JSON.parse(localStorageFilters) : {
-      subjects: [],
-      language: "",
-      country: "",
-      keywordLength: [""],
+      subjects: ["vloeren leggen", "vloeren", "parket", "houten vloeren", "vloeren schuren", "houten vloeren schuren", "vloer oliën", "vloer behandelen", "vloer renovatie",  "houten vloer", "raamdecoratie", "muurdecoratie", "wanddecoratie", "vloer renovatie", "houten vloer renovatie", "traprenovatie", "wandbekleding leer", "Beton Ciré", "vloeren egaliseren", "egaliseren vloer"],
+      language: "Dutch",
+      country: "Netherlands",
+      keywordLength: ["40"],
       volume: [
         {
-          min: 1,
-          max: 2,
+          min: 10,
+          max: 100000,
         },
       ],
-      competition: [{ min: 1, max: 2 }],
-      potential: [{ min: 1, max: 2 }],
+      competition: [{ min: 10, max: 100000 }],
+      potential: [{ min: 0, max: 100}],
     })
   }, []);
   const [generatedKeywords, setGeneratedKeywords] = useState<any[]>([]);
