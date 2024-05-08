@@ -28,7 +28,7 @@ import CircularLoader from "@/components/circular-loader/circular-loader.compone
 
 export default function KeywordSearching() {
   const router = useRouter();
-  const storedFilters = localStorage.getItem("filters");
+  const storedFilters = localStorage?.getItem("filters");
   const [filters, setFilters] = useState(
     storedFilters ? JSON.parse(storedFilters) : null
   );
