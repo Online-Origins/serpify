@@ -1,4 +1,4 @@
-"use client";
+'use client'
 import PageTitle from "@/components/page-title/page-title.component";
 import InputWrapper from "@/components/ui/input-wrapper/input-wrapper.component";
 import InnerWrapper from "@/components/inner-wrapper/inner-wrapper.component";
