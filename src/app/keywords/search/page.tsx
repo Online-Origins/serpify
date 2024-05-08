@@ -5,8 +5,7 @@ import InnerWrapper from "@/components/inner-wrapper/inner-wrapper.component";
 import { useEffect, useRef, useState } from "react";
 import styles from "./page.module.scss";
 
-import { getGoogleKeywords } from "@/app/api/googleKeywords/route";
-import { supabase } from "@/app/api/supabaseClient/route";
+import { supabase } from "@/app/utils/supabaseClient/server"
 import languageCodes from "@/json/language-codes.json";
 import countryCodes from "@/json/country-codes.json";
 
@@ -134,12 +133,18 @@ export default function KeywordSearching() {
 
       const data = await response.json();
 
-      // Generate keywords and data with the Google Ads api
-      const GoogleGeneratedKeywords = await getGoogleKeywords(
-        [...filters.subjects, ...data.generatedKeywordsList],
-        filters.language,
-        filters.country
-      );
+      const response2 = await fetch("/api/googleKeywords", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: JSON.stringify({
+          keywords: [...filters.subjects, ...data.generatedKeywordsList],
+          language: filters.language,
+          country: filters.country,
+        })
+      });
+      const GoogleGeneratedKeywords = await response2.json();
 
       // Filter the keywords with data
       const filteredKeywords = GoogleGeneratedKeywords.filter(

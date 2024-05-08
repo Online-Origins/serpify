@@ -2,8 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import styles from "./page.module.scss";
 
-import { supabase } from "@/app/api/supabaseClient/route";
-import { getKeywordMetrics } from "@/app/api/keywordMetrics/route";
+import { supabase } from "@/app/utils/supabaseClient/server"
 import { useParams, useRouter } from "next/navigation";
 
 import PageTitle from "@/components/page-title/page-title.component";
@@ -87,11 +86,19 @@ export default function Collection({ params }: { params: { slug: string } }) {
 
   async function getKeywordsData() {
     setLoading(true);
-    const data = await getKeywordMetrics(
-      selectedCollection[0].keywords,
-      selectedCollection[0].language,
-      selectedCollection[0].country
-    );
+    const response = await fetch("/api/keywordMetrics", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: JSON.stringify({
+        keywords: selectedCollection[0].keywords,
+        language: selectedCollection[0].language,
+        country: selectedCollection[0].country,
+      })
+    });
+
+    const data = await response.json();
 
     const updatedData = data.map((keyword: any) => ({
       ...keyword,

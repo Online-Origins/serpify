@@ -1,7 +1,7 @@
 'use client'
 import styles from "./page.module.scss";
 import { useEffect, useRef, useState } from "react";
-import { supabase } from "@/app/api/supabaseClient/route";
+import { supabase } from "@/app/utils/supabaseClient/server"
 import { useRouter } from "next/navigation";
 
 import PageTitle from "@/components/page-title/page-title.component";

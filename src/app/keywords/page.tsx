@@ -16,7 +16,7 @@ import CollectionsWrapper from "@/components/collections-wrapper/collections-wra
 
 import languageCodes from "@/json/language-codes.json";
 import countryCodes from "@/json/country-codes.json";
-import { supabase } from "@/app/api/supabaseClient/route";
+import { supabase } from "@/app/utils/supabaseClient/server"
 
 export default function CollectionsPage() {
   const [popUpOpen, setPopUpOpen] = useState(false);

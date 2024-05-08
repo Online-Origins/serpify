@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import styles from "./page.module.scss";
-import { supabase } from "@/app/api/supabaseClient/route";
+import { supabase } from "@/app/utils/supabaseClient/server"
 import InnerWrapper from "@/components/inner-wrapper/inner-wrapper.component";
 import { useEditor, EditorContent, EditorProvider } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";

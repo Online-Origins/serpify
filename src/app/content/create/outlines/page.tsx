@@ -5,7 +5,7 @@ import InnerWrapper from "@/components/inner-wrapper/inner-wrapper.component";
 import PageTitle from "@/components/page-title/page-title.component";
 import Button from "@/components/ui/button/button.component";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/app/api/supabaseClient/route";
+import { supabase } from "@/app/utils/supabaseClient/server";
 import { DragDropContext, Droppable } from "@hello-pangea/dnd";
 import {
   Dropdown,
