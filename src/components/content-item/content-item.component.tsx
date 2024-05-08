@@ -23,8 +23,13 @@ export default function ContentItem({
   const router = useRouter();
 
   function onEditClick() {
-    localStorage.setItem("content_id", content.id);
-    router.push("/content/create"); // Change this! Needs to be variable to the status of the content
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem("content_id", content.id);
+      router.push("/content/create"); // Change this! Needs to be variable to the status of the content
+    } else {
+      // If neither localStorage nor sessionStorage is supported
+      console.log('Web Storage is not supported in this environment.');
+    }
   }
 
   const getCollectionById = (id: string) => {

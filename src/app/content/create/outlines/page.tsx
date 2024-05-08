@@ -54,8 +54,13 @@ export default function CreateOutlines() {
       getContent();
       getContentRef.current = true;
     } else {
-      const id = localStorage.getItem("content_id");
-      setContentId(id);
+      if (typeof localStorage !== 'undefined') {
+        const id = localStorage.getItem("content_id"); 
+        setContentId(id);
+      } else {
+        // If neither localStorage nor sessionStorage is supported
+        console.log('Web Storage is not supported in this environment.');
+      }
     }
   });
 

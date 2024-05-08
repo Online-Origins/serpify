@@ -53,24 +53,29 @@ export default function CollectionsPage() {
     );
 
     try {
-      localStorage.setItem(
-        "filters",
-        JSON.stringify({
-          subjects: cleanArray,
-          language: keywordsLanguage,
-          country: keywordsCountry,
-          keywordLength: keywordLength,
-          volume: [
-            {
-              min: searchVolumeTranslate(searchVolume[0]),
-              max: searchVolumeTranslate(searchVolume[1]),
-            },
-          ],
-          competition: [{ min: competition[0], max: competition[1] }],
-          potential: [{ min: potential[0], max: potential[1] }],
-        })
-      );
-      router.push("/keywords/search");
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem(
+          "filters",
+          JSON.stringify({
+            subjects: cleanArray,
+            language: keywordsLanguage,
+            country: keywordsCountry,
+            keywordLength: keywordLength,
+            volume: [
+              {
+                min: searchVolumeTranslate(searchVolume[0]),
+                max: searchVolumeTranslate(searchVolume[1]),
+              },
+            ],
+            competition: [{ min: competition[0], max: competition[1] }],
+            potential: [{ min: potential[0], max: potential[1] }],
+          })
+        );
+        router.push("/keywords/search");
+      } else {
+        // If neither localStorage nor sessionStorage is supported
+        console.log('Web Storage is not supported in this environment.');
+      }
     } catch (error) {
       console.log(error);
     }
