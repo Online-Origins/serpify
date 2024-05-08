@@ -28,10 +28,36 @@ import CircularLoader from "@/components/circular-loader/circular-loader.compone
 
 export default function KeywordSearching() {
   const router = useRouter();
-  const [filters, setFilters] = useState(null);
+  const [filters, setFilters] = useState({
+    subjects: [],
+    language: "",
+    country: "",
+    keywordLength: [""],
+    volume: [
+      {
+        min: 1,
+        max: 2,
+      },
+    ],
+    competition: [{ min: 1, max: 2 }],
+    potential: [{ min: 1, max: 2}],
+  });
   useEffect(() => {
     const localStorageFilters = localStorage.getItem("filters") ? localStorage.getItem("filters") : null;
-    setFilters(localStorageFilters !== null ? JSON.parse(localStorageFilters) : null)
+    setFilters(localStorageFilters !== null ? JSON.parse(localStorageFilters) : {
+      subjects: [],
+      language: "",
+      country: "",
+      keywordLength: [""],
+      volume: [
+        {
+          min: 1,
+          max: 2,
+        },
+      ],
+      competition: [{ min: 1, max: 2 }],
+      potential: [{ min: 1, max: 2 }],
+    })
   }, []);
   const [generatedKeywords, setGeneratedKeywords] = useState<any[]>([]);
   const [shownKeywords, setShownKeywords] = useState<any[]>([]);
