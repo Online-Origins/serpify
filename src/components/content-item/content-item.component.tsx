@@ -98,7 +98,7 @@ export default function ContentItem({
     } else if (status == "outlines") {
       return "Creating outlines"
     }
-    return status.charAt(0).toUpperCase() + status.slice(1);
+    return status;
   }
 
   return (
