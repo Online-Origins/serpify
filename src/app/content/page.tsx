@@ -64,6 +64,7 @@ export default function ContentOverview() {
   async function getContents() {
     const { data } = await supabase.from("contentItems").select();
     if (data) {
+      data.sort((a,b) => new Date(b.edited_on).getTime() - new Date(a.edited_on).getTime())
       setContents(data);
     }
   }
