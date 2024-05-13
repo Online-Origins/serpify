@@ -8,6 +8,8 @@ import StarterKit from "@tiptap/starter-kit";
 import classNames from "classnames";
 import { MenuItem, Select } from "@mui/material";
 import Button from "@/components/ui/button/button.component";
+import Placeholder from "@tiptap/extension-placeholder";
+import { useRouter } from "next/navigation";
 
 import FormatBoldIcon from "@mui/icons-material/FormatBold";
 import FormatItalicIcon from "@mui/icons-material/FormatItalic";
@@ -17,8 +19,9 @@ import FormatQuoteRoundedIcon from "@mui/icons-material/FormatQuoteRounded";
 import UndoRoundedIcon from "@mui/icons-material/UndoRounded";
 import RedoRoundedIcon from "@mui/icons-material/RedoRounded";
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
-import Placeholder from "@tiptap/extension-placeholder";
-import { useRouter } from "next/navigation";
+import FormatListNumberedIcon from "@mui/icons-material/FormatListNumbered";
+import InsertPhotoOutlinedIcon from "@mui/icons-material/InsertPhotoOutlined";
+import Image from "@tiptap/extension-image";
 
 export default function Writing() {
   const router = useRouter();
@@ -32,10 +35,11 @@ export default function Writing() {
   const editor = useEditor({
     extensions: [
       StarterKit,
+      Image,
       Placeholder.configure({
         placeholder: "Write something...",
         considerAnyAsEmpty: true,
-        showOnlyCurrent: false
+        showOnlyCurrent: false,
       }),
     ],
   });
@@ -135,12 +139,12 @@ export default function Writing() {
       })
       .eq("id", contentId);
     if (!error) {
-      router.push("/content")
+      router.push("/content");
     }
   }
 
   return (
-    <InnerWrapper>
+    <InnerWrapper className={styles.smallerWidth}>
       <div className={styles.editorBar}>
         <div className={styles.tools}>
           <div className={styles.toolsWrapper}>
@@ -194,6 +198,27 @@ export default function Writing() {
               )}
             >
               <FormatListBulletedRoundedIcon />
+            </div>
+            <div
+              onClick={() => editor?.chain().focus().toggleOrderedList().run()}
+              className={classNames(
+                styles.tool,
+                editor?.isActive("orderedList") ? styles.activeTool : ""
+              )}
+            >
+              <FormatListNumberedIcon />
+            </div>
+            <div
+              onClick={() => {
+                const url = window.prompt("URL");
+
+                if (url) {
+                  editor?.chain().focus().setImage({ src: url }).run()
+                }
+              }}
+              className={styles.tool}
+            >
+              <InsertPhotoOutlinedIcon />
             </div>
             <div
               onClick={() => editor?.chain().focus().toggleBlockquote().run()}

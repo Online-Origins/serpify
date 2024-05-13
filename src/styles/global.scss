@@ -78,6 +78,16 @@ a {
     }
 }
 
+.Mui-selected, .Mui-focused, .MuiAutocomplete-option[aria-selected="true"]{
+    background-color: $purple_50 !important;
+}
+
+.MuiMenuItem-root{
+    &:hover{
+        background-color: $purple_50 !important;
+    }
+}
+
 .scrollbar {
     &::-webkit-scrollbar {
         width: .5rem;
@@ -141,5 +151,13 @@ a {
         float: left;
         height: 0;
         pointer-events: none;
+    }
+
+    
+    img {
+        margin-left: 2px;
+        &.ProseMirror-selectednode {
+            outline: 2px solid $purple_50;
+        }
     }
 }
