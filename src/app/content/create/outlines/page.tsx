@@ -41,7 +41,6 @@ export default function CreateOutlines() {
     type: string;
     title: string;
     subtitles: any[];
-    text: any[];
   }
   const [contentGeneratedOutlines, setContentGeneratedOutlines] = useState<
     OutlineItem[]
@@ -64,7 +63,7 @@ export default function CreateOutlines() {
         console.log('Web Storage is not supported in this environment.');
       }
     }
-  }, [getContentRef]);
+  }, [getContentRef, contentId]);
 
   useEffect(() => {
     if (
@@ -82,7 +81,7 @@ export default function CreateOutlines() {
       setContentGeneratedOutlines(currentContent[0].outlines);
       setUpdateTitle(currentContent[0].content_title);
     }
-  }, [currentContent, generateTitlesRef, generateOutlines]);
+  }, [currentContent, generateTitlesRef]);
 
   function sortingOutlines(titles: any[]) {
     let array: any[] = [];
@@ -319,7 +318,6 @@ export default function CreateOutlines() {
         type: selectedTitleType,
         title: customTitle,
         subtitles: [],
-        text: [],
       };
 
       sortingOutlines([...contentGeneratedOutlines, newOutlineItem]);
@@ -343,7 +341,7 @@ export default function CreateOutlines() {
       .from("contentItems")
       .update({
         outlines: contentGeneratedOutlines,
-        date_edited: currentDate,
+        edited_on: currentDate(),
         status: "outlines",
         content_title: updateTitle,
       })
@@ -392,7 +390,7 @@ export default function CreateOutlines() {
     const { error } = await supabase
       .from("contentItems")
       .update({
-        status: "Creating content",
+        status: "writing",
         outlines: contentGeneratedOutlines,
         date_edited: currentDate,
         content_title: updateTitle,
@@ -420,7 +418,7 @@ export default function CreateOutlines() {
           </Button>,
           <Button key={1} type={"solid"} onClick={() => saveOutline()}>
             <p>Save & close</p> <SaveOutlinedIcon />
-          </Button>,
+          </Button>
         ]}
       />
       {currentContent.length > 0 ? (

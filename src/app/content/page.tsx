@@ -109,6 +109,16 @@ export default function ContentOverview() {
     }
   }
 
+  function currentDate() {
+    const date = new Date();
+
+    let day = date.getDate();
+    let month = date.getMonth() + 1;
+    let year = date.getFullYear();
+
+    return `${year}-${month}-${day}`;
+  }
+
   async function createContent() {
     const inserting = await supabase.from("contentItems").insert([
       {
@@ -118,6 +128,8 @@ export default function ContentOverview() {
         tone_of_voice: toneOfVoice,
         target_audience: targetAudience,
         content_title: contentTitle,
+        edited_on: currentDate(),
+        status: "outlines"
       },
     ]).select();
     if (inserting.error) {

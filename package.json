@@ -16,6 +16,7 @@
     "@mui/material": "^5.15.15",
     "@nextui-org/dropdown": "^2.1.23",
     "@supabase/supabase-js": "^2.42.4",
+    "@tiptap/extension-placeholder": "^2.3.2",
     "@tiptap/pm": "^2.3.1",
     "@tiptap/react": "^2.3.1",
     "@tiptap/starter-kit": "^2.3.1",
