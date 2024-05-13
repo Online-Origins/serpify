@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import styles from "./page.module.scss";
 import { supabase } from "@/app/utils/supabaseClient/server";
 import InnerWrapper from "@/components/inner-wrapper/inner-wrapper.component";
@@ -10,6 +10,8 @@ import { MenuItem, Select } from "@mui/material";
 import Button from "@/components/ui/button/button.component";
 import Placeholder from "@tiptap/extension-placeholder";
 import { useRouter } from "next/navigation";
+import Image from "@tiptap/extension-image";
+import Link from "@tiptap/extension-link";
 
 import FormatBoldIcon from "@mui/icons-material/FormatBold";
 import FormatItalicIcon from "@mui/icons-material/FormatItalic";
@@ -21,7 +23,7 @@ import RedoRoundedIcon from "@mui/icons-material/RedoRounded";
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import FormatListNumberedIcon from "@mui/icons-material/FormatListNumbered";
 import InsertPhotoOutlinedIcon from "@mui/icons-material/InsertPhotoOutlined";
-import Image from "@tiptap/extension-image";
+import LinkRoundedIcon from '@mui/icons-material/LinkRounded';
 
 export default function Writing() {
   const router = useRouter();
@@ -36,6 +38,10 @@ export default function Writing() {
     extensions: [
       StarterKit,
       Image,
+      Link.configure({
+        protocols: ['ftp', 'mailto'],
+        openOnClick: 'whenNotEditable',
+      }),
       Placeholder.configure({
         placeholder: "Write something...",
         considerAnyAsEmpty: true,
@@ -143,6 +149,33 @@ export default function Writing() {
     }
   }
 
+  const setLink = useCallback(() => {
+    if(!editor?.isActive('link')) {
+
+      const previousUrl = editor?.getAttributes('link').href
+      const url = window.prompt('URL', previousUrl)
+      
+      // cancelled
+      if (url === null) {
+        return
+      }
+
+      // empty
+      if (url === '') {
+        editor?.chain().focus().extendMarkRange('link').unsetLink()
+        .run()
+        
+        return
+      }
+      
+      // update link
+      editor?.chain().focus().extendMarkRange('link').setLink({ href: url })
+      .run()
+    } else {
+      editor?.chain().focus().unsetLink().run();
+    }
+  }, [editor])
+
   return (
     <InnerWrapper className={styles.smallerWidth}>
       <div className={styles.editorBar}>
@@ -228,6 +261,15 @@ export default function Writing() {
               )}
             >
               <FormatQuoteRoundedIcon />
+            </div>
+            <div
+              onClick={() => setLink()}
+              className={classNames(
+                styles.tool,
+                editor?.isActive("link") ? styles.activeTool : ""
+              )}
+            >
+              <LinkRoundedIcon />
             </div>
           </div>
           <div className={styles.toolsWrapper}>

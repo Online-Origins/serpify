@@ -92,6 +92,11 @@
         margin: .5rem 0;
     }
 
+    a{
+        text-decoration: underline;
+        color: $purple_secundary;
+    }
+
     ul,
     ol,
     blockquote {
