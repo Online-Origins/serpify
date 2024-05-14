@@ -203,6 +203,20 @@ export default function InputWrapper({
             />
           </div>
         );
+      case type == "file":
+        return (
+          <input
+            type="file"
+            onChange={(e) => {
+              if (!e.target.files) {
+                return;
+              }
+
+              onChange(e.target.files[0]);
+            }}
+            accept="image/*"
+          />
+        );
       default:
         return null;
     }

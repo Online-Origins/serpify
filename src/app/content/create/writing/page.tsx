@@ -6,12 +6,14 @@ import InnerWrapper from "@/components/inner-wrapper/inner-wrapper.component";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import classNames from "classnames";
-import { MenuItem, Select } from "@mui/material";
+import { ImageList, MenuItem, Select } from "@mui/material";
 import Button from "@/components/ui/button/button.component";
 import Placeholder from "@tiptap/extension-placeholder";
 import { useRouter } from "next/navigation";
 import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
+import PopUpWrapper from "@/components/ui/popup-wrapper/popup-wrapper.component";
+import PopUp from "@/components/ui/popup/popup.component";
 
 import FormatBoldIcon from "@mui/icons-material/FormatBold";
 import FormatItalicIcon from "@mui/icons-material/FormatItalic";
@@ -23,7 +25,10 @@ import RedoRoundedIcon from "@mui/icons-material/RedoRounded";
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import FormatListNumberedIcon from "@mui/icons-material/FormatListNumbered";
 import InsertPhotoOutlinedIcon from "@mui/icons-material/InsertPhotoOutlined";
-import LinkRoundedIcon from '@mui/icons-material/LinkRounded';
+import LinkRoundedIcon from "@mui/icons-material/LinkRounded";
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
+import InputWrapper from "@/components/ui/input-wrapper/input-wrapper.component";
+import ArrowForwardRounded from "@mui/icons-material/ArrowForwardRounded";
 
 export default function Writing() {
   const router = useRouter();
@@ -33,14 +38,19 @@ export default function Writing() {
   const [currentContent, setCurrentContent] = useState<any[]>([]);
   const [selectedTextType, setSelectedTextType] = useState("Paragraph");
   const gotContent = useRef(false);
+  const [linkPopupOpen, setLinkPopupOpen] = useState(false);
+  const [imageLink, setImageLink] = useState("");
 
   const editor = useEditor({
     extensions: [
       StarterKit,
-      Image,
+      Image.configure({
+        allowBase64: true,
+      }),
       Link.configure({
-        protocols: ['ftp', 'mailto'],
-        openOnClick: 'whenNotEditable',
+        validate: href => /^https?:\/\//.test(href),
+        openOnClick: "whenNotEditable",
+        autolink: false,
       }),
       Placeholder.configure({
         placeholder: "Write something...",
@@ -150,31 +160,59 @@ export default function Writing() {
   }
 
   const setLink = useCallback(() => {
-    if(!editor?.isActive('link')) {
+    if (!editor?.isActive("link")) {
+      const previousUrl = editor?.getAttributes("link").href;
+      const url = window.prompt("URL", previousUrl);
 
-      const previousUrl = editor?.getAttributes('link').href
-      const url = window.prompt('URL', previousUrl)
-      
       // cancelled
       if (url === null) {
-        return
+        return;
       }
 
       // empty
-      if (url === '') {
-        editor?.chain().focus().extendMarkRange('link').unsetLink()
-        .run()
-        
-        return
+      if (url === "") {
+        editor?.chain().focus().extendMarkRange("link").unsetLink().run();
+
+        return;
       }
-      
+
+      if (!url.includes("https://" || "www")){
+        alert("Add a existing link")
+        return;
+      }
+
       // update link
-      editor?.chain().focus().extendMarkRange('link').setLink({ href: url })
-      .run()
+      editor
+        ?.chain()
+        .focus()
+        .extendMarkRange("link")
+        .setLink({ href: url })
+        .run();
     } else {
       editor?.chain().focus().unsetLink().run();
     }
-  }, [editor])
+  }, [editor]);
+
+  const onAddedFile = async (value: any) => {
+    const base64 = await toBase64(value as File);
+    setImageLink(base64 as string);
+  };
+
+  const toBase64 = (file: File) => {
+    return new Promise((resolve, reject) => {
+      const fileReader = new FileReader();
+
+      fileReader.readAsDataURL(file);
+
+      fileReader.onload = () => {
+        resolve(fileReader.result);
+      };
+
+      fileReader.onerror = (error) => {
+        reject(error);
+      };
+    });
+  };
 
   return (
     <InnerWrapper className={styles.smallerWidth}>
@@ -242,13 +280,7 @@ export default function Writing() {
               <FormatListNumberedIcon />
             </div>
             <div
-              onClick={() => {
-                const url = window.prompt("URL");
-
-                if (url) {
-                  editor?.chain().focus().setImage({ src: url }).run()
-                }
-              }}
+              onClick={() => setLinkPopupOpen(true)}
               className={styles.tool}
             >
               <InsertPhotoOutlinedIcon />
@@ -308,6 +340,47 @@ export default function Writing() {
           <h1>{currentContent[0].content_title}</h1>
           <EditorContent editor={editor} />
         </div>
+      )}
+
+      {linkPopupOpen && (
+        <PopUpWrapper>
+          <PopUp
+            title="Add image"
+            titleButtons={
+              <Button type={"textOnly"} onClick={() => setLinkPopupOpen(false)}>
+                <p>Close</p>
+                <CloseRoundedIcon />
+              </Button>
+            }
+            buttons={
+              <Button
+                disabled={imageLink == ""}
+                type={"solid"}
+                onClick={() => {
+                  editor?.chain().focus().setImage({ src: imageLink }).run();
+                  setLinkPopupOpen(false);
+                  setImageLink("");
+                }}
+              >
+                <p>Use</p>
+                <ArrowForwardRounded />
+              </Button>
+            }
+          >
+            <div className={styles.multiDropdown}>
+              <InputWrapper
+                type="text"
+                title="Paste your image link:"
+                onChange={(value: any) => setImageLink(value)}
+              />
+              <InputWrapper
+                type="file"
+                title="Or pick an image:"
+                onChange={(value: any) => onAddedFile(value)}
+              />
+            </div>
+          </PopUp>
+        </PopUpWrapper>
       )}
     </InnerWrapper>
   );

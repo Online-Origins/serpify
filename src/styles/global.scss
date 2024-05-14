@@ -78,12 +78,14 @@ a {
     }
 }
 
-.Mui-selected, .Mui-focused, .MuiAutocomplete-option[aria-selected="true"]{
+.Mui-selected,
+.Mui-focused,
+.MuiAutocomplete-option[aria-selected="true"] {
     background-color: $purple_50 !important;
 }
 
-.MuiMenuItem-root{
-    &:hover{
+.MuiMenuItem-root {
+    &:hover {
         background-color: $purple_50 !important;
     }
 }
@@ -153,11 +155,12 @@ a {
         pointer-events: none;
     }
 
-    
+
     img {
-        margin-left: 2px;
+        border: solid 2px rgba($color: $black, $alpha: 0);
+
         &.ProseMirror-selectednode {
-            outline: 2px solid $purple_50;
+            border: solid 2px rgba($color: $black, $alpha: .5);
         }
     }
 }

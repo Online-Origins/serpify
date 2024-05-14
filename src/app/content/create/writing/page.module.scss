@@ -70,7 +70,7 @@
 .editor {
     display: flex;
     flex-flow: column;
-    gap: 2rem;
+    gap: 1rem;
     overflow-y: scroll;
 
     h2,
@@ -107,18 +107,14 @@
         border-left: 2px solid rgba($color: $black, $alpha: .2);
     }
 
+    img{
+        width: 500px;
+    }
+
     h2 {
         &::before {
             content: "H2";
             font-size: calc(100% - .5rem);
-        }
-
-        &~p,
-        &~ul,
-        &~ol,
-        &~blockquote,
-        &~img {
-            margin-left: 0rem;
         }
     }
 
@@ -128,14 +124,6 @@
         &::before {
             content: "H3";
         }
-
-        &~p,
-        &~ul,
-        &~ol,
-        &~blockquote,
-        &~img {
-            margin-left: 4rem;
-        }
     }
 
     h4 {
@@ -144,13 +132,22 @@
         &::before {
             content: "H4";
         }
-
-        &~p,
-        &~ul,
-        &~ol,
-        &~blockquote,
-        &~img {
-            margin-left: 8rem;
-        }
     }
+
+    h2~*:not(h3,h4) {
+        margin-left: 0rem;
+    }
+
+    h3~*:not(h2,h4, h2+*, h4+*, p+*:not(img)) {
+        margin-left: 4rem;
+    }
+
+    h4~*:not(h2,h3, h2+*, h3+*, p+*:not(img)){
+        margin-left: 8rem;
+    }
+}
+
+.multiDropdown{
+    display: flex;
+    gap: 1rem;
 }
