@@ -8,38 +8,89 @@
     gap: 1.5rem;
     height: max-content !important;
 
-    .filterInput {
-        max-width: 800px;
+
+    .inputWrapping {
+        display: flex;
+        align-items: flex-end;
+        gap: 1.5rem;
+
+        .filterInput {
+            width: 800px;
+            margin-left: 2px;
+        }
+
+        .currentValues {
+            display: flex;
+            gap: .5rem;
+            width: 700px;
+            overflow-x: scroll;
+            padding-bottom: .2rem;
+            height: max-content;
+
+            @media (min-width: 2000px) {
+                width: 1000px;
+            }
+
+            &::-webkit-scrollbar {
+                height: .3rem;
+            }
+
+            &::-webkit-scrollbar-thumb {
+                background-color: $purple_primary;
+                border-radius: .5rem;
+            }
+
+            .value {
+                background-color: $purple_primary;
+                color: $white;
+                padding: .3rem;
+                height: max-content;
+                border-radius: .5rem;
+                display: flex;
+                align-items: center;
+                gap: .5rem;
+                text-wrap: nowrap;
+
+                p {
+                    font-size: .8rem;
+                }
+
+                svg {
+                    font-size: .8rem;
+                    margin-bottom: -.1rem;
+                }
+            }
+        }
     }
 }
 
-.outerTableWrapper{
+.outerTableWrapper {
     display: flex;
     flex-flow: column;
     gap: 1rem;
     height: 100%;
     overflow: hidden;
 
-    .buttonWrapper{
+    .buttonWrapper {
         height: max-content;
     }
 }
 
-.collection{
+.collection {
     display: flex;
     gap: 1rem;
     padding: 1rem;
     border-bottom: solid 2px $purple_50;
 }
 
-.newCollectionInput{
+.newCollectionInput {
     display: flex;
     gap: 1rem;
     padding: 1rem;
     align-items: center;
     border-bottom: solid 2px $purple_50;
 
-    .iconWrapper{
+    .iconWrapper {
         width: 18px;
         aspect-ratio: 1 / 1;
     }
@@ -60,12 +111,12 @@
     }
 }
 
-.buttonWrapper{
+.buttonWrapper {
     display: flex;
     justify-content: space-between;
     align-items: center;
 
-    .amountButtons{
+    .amountButtons {
         display: flex;
         gap: 1rem;
     }
@@ -76,7 +127,7 @@
     flex-flow: column;
     gap: 1rem;
 
-    .multiDropdown{
+    .multiDropdown {
         display: flex;
         gap: 1rem;
     }

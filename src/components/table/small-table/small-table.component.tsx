@@ -47,7 +47,7 @@ export default function SmallTable({
       });
       isGettingData.current = true;
     }
-  }, [getKeywordsData, potentialIndex]);
+  }, [isGettingData]);
 
   async function getKeywordsData() {
     const response = await fetch("/api/keywordMetrics", {

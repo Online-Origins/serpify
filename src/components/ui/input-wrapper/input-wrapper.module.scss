@@ -45,24 +45,46 @@
         align-items: center;
     }
 
+    .valuesWrapper{
+        max-width: 400px;
+    }
+
     .currentValues {
         display: flex;
+        overflow-x: auto;
+        width: 100%;
         gap: .5rem;
+        padding-bottom: .2rem;
+
+        &::-webkit-scrollbar {
+            height: .3rem;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background-color: $purple_primary;
+            border-radius: .5rem;
+        }
 
         .value {
-            background-color: $purple_primary;
-            color: $white;
-            padding: .5rem;
-            border-radius: .5rem;
-            display: flex;
-            align-items: center;
-            gap: .5rem;
-            text-wrap: nowrap;
+                background-color: $purple_primary;
+                color: $white;
+                padding: .3rem;
+                height: max-content;
+                border-radius: .5rem;
+                display: flex;
+                align-items: center;
+                gap: .5rem;
+                text-wrap: nowrap;
 
-            svg {
-                font-size: 1rem;
+                p {
+                    font-size: .8rem;
+                }
+
+                svg {
+                    font-size: .8rem;
+                    margin-bottom: -.1rem;
+                }
             }
-        }
     }
 
     input[type=text] {

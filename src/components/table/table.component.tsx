@@ -7,6 +7,7 @@ import ArrowUpwardRoundedIcon from "@mui/icons-material/ArrowUpwardRounded";
 import Information from "@/components/information/information.component";
 import IndicationIcon from "../indication-icon/indication-icon.component";
 import Selector from "../ui/selector/selector.component";
+import { useEffect, useRef } from "react";
 
 export default function Table({
   shownKeywords,
@@ -25,6 +26,8 @@ export default function Table({
   searchVolume?: any;
   potentialIndex?: any;
 }) {
+  const tableRef = useRef<HTMLDivElement>(null);
+
   function selecting(clickedKeyword: string) {
     if (!selectedKeywords.includes(clickedKeyword)) {
       setSelectedKeywords([...selectedKeywords, clickedKeyword]);
@@ -64,6 +67,16 @@ export default function Table({
         return "low";
     }
   }
+  const prevShownKeywords = useRef(shownKeywords);
+
+  useEffect(() => {
+    // Compare previous shownKeywords with current shownKeywords
+    if (prevShownKeywords.current !== shownKeywords && tableRef.current) {
+      tableRef.current.scrollTop = 0;
+      // Update the previous shownKeywords
+      prevShownKeywords.current = shownKeywords;
+    }
+  }, [shownKeywords]);
 
   return (
     <div className={styles.keywordsTable}>
@@ -119,7 +132,7 @@ export default function Table({
           <Information information="The ability of a particular keyword or key phrase to drive traffic, engagement, or conversions." />
         </div>
       </div>
-      <div className={classNames(styles.tableContent, "scrollbar")}>
+      <div className={classNames(styles.tableContent, "scrollbar")} ref={tableRef}>
         {shownKeywords.length > 0 ?
           shownKeywords.map((keyword: any) => (
             <div className={styles.row} key={keyword.text}>
@@ -151,6 +164,7 @@ export default function Table({
                   indication={Indexation(
                     100 - keyword.keywordMetrics.competitionIndex
                   )}
+                  competition
                 />
               </div>
               <div className={classNames(styles.item, styles.potential)}>

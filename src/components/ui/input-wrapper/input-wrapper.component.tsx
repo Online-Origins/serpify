@@ -68,15 +68,17 @@ export default function InputWrapper({
         return (
           <div className={styles.inputWrapper}>
             {currentValues && (
-              <div className={styles.currentValues}>
-                {currentValues.map((value: string) => (
-                  <div key={value} className={styles.value}>
-                    <p>{value}</p>
-                    <div onClick={() => changeCurrentValues(value)}>
-                      <CloseRoundedIcon />
+              <div className={styles.valuesWrapper}>
+                <div className={styles.currentValues}>
+                  {currentValues.map((value: string) => (
+                    <div key={value} className={styles.value}>
+                      <p>{value}</p>
+                      <div onClick={() => changeCurrentValues(value)}>
+                        <CloseRoundedIcon />
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             )}
             <input

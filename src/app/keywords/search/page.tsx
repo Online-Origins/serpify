@@ -1,11 +1,11 @@
-'use client'
+"use client";
 import PageTitle from "@/components/page-title/page-title.component";
 import InputWrapper from "@/components/ui/input-wrapper/input-wrapper.component";
 import InnerWrapper from "@/components/inner-wrapper/inner-wrapper.component";
 import { useEffect, useRef, useState } from "react";
 import styles from "./page.module.scss";
 
-import { supabase } from "@/app/utils/supabaseClient/server"
+import { supabase } from "@/app/utils/supabaseClient/server";
 import languageCodes from "@/json/language-codes.json";
 import countryCodes from "@/json/country-codes.json";
 
@@ -139,10 +139,12 @@ export default function KeywordSearching() {
           "Content-Type": "application/x-www-form-urlencoded",
         },
         body: JSON.stringify({
-          keywords: [...filters.subjects, ...data.generatedKeywordsList],
+          keywords: Array.from(
+            new Set([...filters.subjects, ...data.generatedKeywordsList])
+          ),
           language: filters.language,
           country: filters.country,
-        })
+        }),
       });
       const GoogleGeneratedKeywords = await response2.json();
 
@@ -427,25 +429,38 @@ export default function KeywordSearching() {
     <InnerWrapper>
       <PageTitle title={"Search keywords"} goBack={() => router.back()} />
       <div className={styles.filterWrapper}>
-        <InputWrapper
-          type="text"
-          value={subjectInput}
-          onChange={(value: any) => setSubjectInput(value)}
-          className={styles.filterInput}
-          currentValues={filters.subjects}
-          changeCurrentValues={(value: string) => updateSubjectFilters(value)}
-          onKeyDown={(e: any) => {
-            if (e.key == "Enter" && subjectInput != "") {
-              addNewSubjects();
+        <div className={styles.inputWrapping}>
+          <InputWrapper
+            type="text"
+            value={subjectInput}
+            onChange={(value: any) => setSubjectInput(value)}
+            className={styles.filterInput}
+            currentValues={filters.subjects}
+            changeCurrentValues={(value: string) => updateSubjectFilters(value)}
+            onKeyDown={(e: any) => {
+              if (e.key == "Enter" && subjectInput != "") {
+                addNewSubjects();
+              }
+            }}
+            placeholder="Search more subjects..."
+            icon={
+              <div onClick={() => addNewSubjects()}>
+                <SearchRoundedIcon />
+              </div>
             }
-          }}
-          placeholder="Search more subjects..."
-          icon={
-            <div onClick={() => addNewSubjects()}>
-              <SearchRoundedIcon />
-            </div>
-          }
-        />
+          />
+          {/* <div className={styles.currentValues}>
+            {filters.subjects.length > 0 &&
+              filters.subjects.map((value: string) => (
+                <div key={value} className={styles.value}>
+                  <p>{value}</p>
+                  <span onClick={() => updateSubjectFilters(value)}>
+                    <CloseRoundedIcon />
+                  </span>
+                </div>
+              ))}
+          </div> */}
+        </div>
         <Button type={"solid"} onClick={() => setFilterPopUpOpen(true)}>
           <p>Filter</p>
           <TuneRoundedIcon />
