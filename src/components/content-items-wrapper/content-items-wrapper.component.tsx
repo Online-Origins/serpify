@@ -64,6 +64,7 @@ export default function ContentItemsWrapper({
   return (
     <div className={styles.pageWrapper}>
       <div className={styles.topRowWrapper}>
+        <div className={styles.wrappingInput}>
         <InputWrapper
           className={styles.input}
           type="text"
@@ -72,6 +73,7 @@ export default function ContentItemsWrapper({
           icon={<SearchRoundedIcon />}
           placeholder="Search by content title"
         />
+        </div>
         <div className={styles.rowItem}>
           <h5>Content score:</h5>
           <Information information="A numerical value that ranges from 0 to 100, which is a metric used to show you how well optimized your content is in the eyes of Google." />

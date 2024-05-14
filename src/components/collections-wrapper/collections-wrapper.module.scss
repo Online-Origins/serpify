@@ -1,7 +1,11 @@
 .collectionsWrapper{
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
     gap: 1.5rem;
     overflow-y: scroll;
     overflow-x: hidden;
+
+    @media (min-width: 2000px){
+        grid-template-columns: 1fr 1fr 1fr;
+    }
 }

@@ -1,6 +1,6 @@
 @import '@/styles/variables';
 
-.pagesWrapper{
+.pagesWrapper {
     width: 100%;
     max-height: 100%;
     display: flex;
@@ -8,21 +8,28 @@
     overflow-x: auto;
     position: relative;
 
-    .innerWrapper{
+    .innerWrapper {
         padding-top: 1rem;
         max-height: 100%;
-        min-width: 1600px;
+        min-width: 1300px;
+        width: 1300px;
         transition: .6s width ease-in-out;
         transition-delay: .2s;
         margin-bottom: 1rem;
+
+        @media (min-width: 2000px) {
+            min-width: 1600px;
+            width: 1600px;
+        }
     }
 
-    @media (max-width: 1750px){
+    @media (max-width: 1500px) {
         justify-content: start;
     }
 
-    &.smallerWrapper{
-        @media (max-width: 2000px){
+
+    &.smallerWrapper {
+        @media (max-width: 1660px) {
             justify-content: start;
         }
     }
