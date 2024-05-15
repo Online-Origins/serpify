@@ -164,3 +164,14 @@ a {
         }
     }
 }
+
+#tippy-1{
+    width: 1300px;
+    overflow: hidden;
+    z-index: 100 !important;
+
+    @media (min-width: 2000px) {
+        min-width: 1600px;
+        width: 1600px;
+    }
+}

@@ -3,10 +3,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import styles from "./page.module.scss";
 import { supabase } from "@/app/utils/supabaseClient/server";
 import InnerWrapper from "@/components/inner-wrapper/inner-wrapper.component";
-import { useEditor, EditorContent } from "@tiptap/react";
+import { useEditor, EditorContent, BubbleMenu } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import classNames from "classnames";
-import { ImageList, MenuItem, Select } from "@mui/material";
+import { MenuItem, Select } from "@mui/material";
 import Button from "@/components/ui/button/button.component";
 import Placeholder from "@tiptap/extension-placeholder";
 import { useRouter } from "next/navigation";
@@ -29,6 +29,12 @@ import LinkRoundedIcon from "@mui/icons-material/LinkRounded";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import InputWrapper from "@/components/ui/input-wrapper/input-wrapper.component";
 import ArrowForwardRounded from "@mui/icons-material/ArrowForwardRounded";
+import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
+import SendRoundedIcon from "@mui/icons-material/SendRounded";
+import CustomizedTooltip from "@/components/ui/custom-tooltip/custom-tooltip.component";
+
+import toneOfVoices from "@/json/tone-of-voice.json";
+import CircularLoader from "@/components/circular-loader/circular-loader.component";
 
 export default function Writing() {
   const router = useRouter();
@@ -40,6 +46,8 @@ export default function Writing() {
   const gotContent = useRef(false);
   const [linkPopupOpen, setLinkPopupOpen] = useState(false);
   const [imageLink, setImageLink] = useState("");
+  const [AiInput, setAiInput] = useState("");
+  const [generating, setGenerating] = useState(false);
 
   const editor = useEditor({
     extensions: [
@@ -48,7 +56,7 @@ export default function Writing() {
         allowBase64: true,
       }),
       Link.configure({
-        validate: href => /^https?:\/\//.test(href),
+        validate: (href) => /^https?:\/\//.test(href),
         openOnClick: "whenNotEditable",
         autolink: false,
       }),
@@ -176,8 +184,8 @@ export default function Writing() {
         return;
       }
 
-      if (!url.includes("https://" || "www")){
-        alert("Add a existing link")
+      if (!url.includes("https://" || "www")) {
+        alert("Add a existing link");
         return;
       }
 
@@ -212,6 +220,98 @@ export default function Writing() {
         reject(error);
       };
     });
+  };
+
+  function AiContentChange() {
+    if (AiInput == "") {
+      return;
+    }
+    generateTitleContent(AiInput);
+  }
+
+  const getPreviousHeading = () => {
+    if (!editor || !editor.state) return null;
+
+    const { state } = editor;
+    const { $from } = state.selection;
+
+    for (let pos = $from.pos - 1; pos >= 0; pos--) {
+      const node = state.doc.nodeAt(pos);
+      if (node && node.type.name === "heading") {
+        return node.textContent;
+      }
+    }
+
+    return null;
+  };
+
+  const handleGetPreviousHeading = () => {
+    const previousHeading = getPreviousHeading();
+    if (previousHeading) {
+      return previousHeading;
+    } else {
+      return "";
+    }
+  };
+
+  async function generateTitleContent(AiInputPrompt?: string) {
+    try {
+      setGenerating(true);
+      const toneOfVoice = toneOfVoices.find(
+        (item) => item.id == currentContent[0].tone_of_voice
+      );
+
+      const response = await fetch("/api/generateContent", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          heading: handleGetPreviousHeading(),
+          title: currentContent[0].title,
+          language: currentContent[0].language,
+          keywords: currentContent[0].keywords,
+          toneOfVoice: toneOfVoice?.value,
+          prompt: AiInputPrompt ? AiInputPrompt : "",
+        }),
+      });
+      setAiInput("");
+
+      const { generatedContent } = await response.json();
+      console.log(generatedContent);
+
+      if (editor?.state.selection.empty) {
+        replaceText(generatedContent);
+      } else {
+        editor
+          ?.chain()
+          .focus()
+          .deleteSelection()
+          .insertContent(generatedContent)
+          .run();
+      }
+
+      setGenerating(false);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const replaceText = (newContent: string) => {
+    if (!editor) return;
+
+    const { state, dispatch } = editor.view;
+    const { selection } = state;
+    const { $from, $to } = selection;
+
+    // Get the start and end positions of the current paragraph
+    const startPos = $from.start($from.depth);
+    const endPos = $to.end($to.depth);
+
+    // Replace the entire content of the paragraph with new text
+    dispatch(
+      state.tr.replaceWith(startPos, endPos, state.schema.text(newContent))
+    );
   };
 
   return (
@@ -279,10 +379,7 @@ export default function Writing() {
             >
               <FormatListNumberedIcon />
             </div>
-            <div
-              onClick={() => setLinkPopupOpen(true)}
-              className={styles.tool}
-            >
+            <div onClick={() => setLinkPopupOpen(true)} className={styles.tool}>
               <InsertPhotoOutlinedIcon />
             </div>
             <div
@@ -339,6 +436,45 @@ export default function Writing() {
         <div className={classNames(styles.editor, "scrollbar")}>
           <h1>{currentContent[0].content_title}</h1>
           <EditorContent editor={editor} />
+          {editor && (
+            <BubbleMenu
+              editor={editor}
+              tippyOptions={{
+                duration: 0,
+                interactive: true,
+                placement: "bottom-start",
+                maxWidth: "none",
+                appendTo: "parent",
+              }}
+              shouldShow={({ editor, view, state, oldState, from, to }) => {
+                // always show the bubble except when an image is selected
+                return editor.isActive("image") ? false : true;
+              }}
+              className={styles.bubbleMenu}
+            >
+              <div className={styles.bubbleInput}>
+                <input
+                  type="text"
+                  placeholder="Ask AI to write something for you..."
+                  value={AiInput}
+                  onChange={(event) => setAiInput(event.target.value)}
+                />
+                <div className={styles.buttonsWrapper}>
+                  <div onClick={() => AiContentChange()}>
+                    <SendRoundedIcon />
+                  </div>
+                  <div onClick={() => generateTitleContent()}>
+                    <CustomizedTooltip information="Generate text for this subtitle">
+                      <AutoAwesomeIcon />
+                    </CustomizedTooltip>
+                  </div>
+                </div>
+              </div>
+              <div className={styles.inputOptions}>
+                <h5>Hi</h5>
+              </div>
+            </BubbleMenu>
+          )}
         </div>
       )}
 
@@ -380,6 +516,12 @@ export default function Writing() {
               />
             </div>
           </PopUp>
+        </PopUpWrapper>
+      )}
+      {generating && (
+        <PopUpWrapper>
+          <CircularLoader />
+          <p>Generating text...</p>
         </PopUpWrapper>
       )}
     </InnerWrapper>

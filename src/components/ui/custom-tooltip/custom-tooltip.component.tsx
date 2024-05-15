@@ -15,6 +15,7 @@ const CustomToolTip = styled(({ className, ...props }: TooltipProps) => (
     padding: 8,
     marginRight: 16,
     boxShadow: "3px 6px 10px rgba(98, 16, 204, .05)",
+    zIndex: 9999,
   },
   [`& .${tooltipClasses.arrow}`]: {
     fontSize: 20,
