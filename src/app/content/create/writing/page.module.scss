@@ -137,7 +137,7 @@
         margin-left: 4rem;
     }
 
-    h4~*:not(h2,h3, h2+*, h3+*, p+*:not(img)){
+    h4~*:not(h2,h3, h2+*, h3+*, p+*:not(img), h3+*+img) {
         margin-left: 8rem;
     }
 }
