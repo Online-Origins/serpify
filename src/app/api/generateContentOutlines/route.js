@@ -21,12 +21,14 @@ export async function POST(request) {
             },
             {
                 "role": "user",
-                "content": `Generate a list of subtitles for a blog with the title: ${title}. The blog needs to be in ${language}, needs to have a ${toneOfVoice} tone of voice ${audience != '' ? ", and needs to target" + audience : ""}. The following keywords are going to be used in the blog: ${keywords.join(',')}. Only give back an JSON object with the following structure: [{id: , type: (h2,h3 or h4), title: , text: [] (keep this empty) }], for coding purposes only.`
+                "content": `Generate a list of subtitles for a blog with the title: ${title}. The blog needs to be in ${language}, needs to have a ${toneOfVoice} tone of voice ${audience != '' ? ", and needs to target" + audience : ""}. The following keywords are going to be used in the blog: ${keywords.join(',')}. Only give back an JSON format array with the following structure: [{id: , type: (h2,h3 or h4), title: }], for coding purposes only.`
             }
         ],
-        model: "gpt-3.5-turbo",
+        model: "gpt-4o",
+        response_format: { type: "json_object" },
     });
 
-    const generatedOutlines = response.choices[0].message.content;
+    const generatedOutlinesJSON = response.choices[0].message.content;
+    const generatedOutlines = JSON.parse(generatedOutlinesJSON);
     return NextResponse.json({ generatedOutlines });
 }

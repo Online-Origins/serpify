@@ -131,7 +131,7 @@ export default function KeywordSearching() {
         }),
       });
 
-      const data = await response.json();
+      const { generatedKeywordsList } = await response.json();
 
       const response2 = await fetch("/api/googleKeywords", {
         method: "POST",
@@ -140,7 +140,7 @@ export default function KeywordSearching() {
         },
         body: JSON.stringify({
           keywords: Array.from(
-            new Set([...filters.subjects, ...data.generatedKeywordsList])
+            new Set([...filters.subjects, ...generatedKeywordsList.keywords])
           ),
           language: filters.language,
           country: filters.country,

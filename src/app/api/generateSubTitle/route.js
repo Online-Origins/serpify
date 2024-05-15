@@ -25,7 +25,7 @@ export async function POST(request) {
                 content: `generate a new subtitle with the type ${type}, for a blog with the title "${title}". The blog is in ${language}, has a ${toneOfVoice} tone of voice and already contains the follwing subtitles: ${subtitles}. Only give back a string of the generated subtitle and nothing more.`
             }
         ],
-        model: "gpt-3.5-turbo",
+        model: "gpt-4o",
     });
 
     const generatedTitle = response.choices[0].message.content;

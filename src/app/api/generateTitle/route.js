@@ -22,7 +22,7 @@ export async function POST(request) {
                 "content": `Generate a title for a blog with the following keywords: ${keywords.join(',')}. The tone of voice for the blog should be ${toneOfVoice}. Make sure the title is in ${language}. Only give back an string.`
             }
         ],
-        model: "gpt-3.5-turbo",
+        model: "gpt-4o",
     });
 
     const generatedTitle = response.choices[0].message.content;

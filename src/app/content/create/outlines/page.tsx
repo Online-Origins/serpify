@@ -144,19 +144,16 @@ export default function CreateOutlines() {
       });
 
       const { generatedOutlines } = await response.json();
-      const cleanOutlinesArray = JSON.parse(
-        generatedOutlines.replace(/```json/g, "").replace(/[`]/g, "")
-      );
-      sortingOutlines(cleanOutlinesArray);
+      sortingOutlines(generatedOutlines.subtitles)
       setGenerating(false);
     } catch (error) {
       console.log(error);
-      if (retryCount > 0) {
-        console.log(`Retrying... attempts left: ${retryCount}`);
-        generateOutlines(retryCount - 1);
-      } else {
-        console.log("Max retry attempts reached.");
-      }
+      // if (retryCount > 0) {
+      //   console.log(`Retrying... attempts left: ${retryCount}`);
+      //   generateOutlines(retryCount - 1);
+      // } else {
+      //   console.log("Max retry attempts reached.");
+      // }
     }
   }
 
