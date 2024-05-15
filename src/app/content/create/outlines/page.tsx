@@ -148,12 +148,12 @@ export default function CreateOutlines() {
       setGenerating(false);
     } catch (error) {
       console.log(error);
-      // if (retryCount > 0) {
-      //   console.log(`Retrying... attempts left: ${retryCount}`);
-      //   generateOutlines(retryCount - 1);
-      // } else {
-      //   console.log("Max retry attempts reached.");
-      // }
+      if (retryCount > 0) {
+        console.log(`Retrying... attempts left: ${retryCount}`);
+        generateOutlines(retryCount - 1);
+      } else {
+        console.log("Max retry attempts reached.");
+      }
     }
   }
 
