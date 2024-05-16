@@ -254,6 +254,22 @@ export default function Writing() {
     }
   };
 
+  const getActiveNode = () => {
+    if (!editor) {
+      return;
+    }
+    const { state } = editor;
+    const { from } = state.selection;
+    const domAtPos = editor.view.domAtPos.bind(editor.view);
+    let element = domAtPos(from).node;
+
+    // If the current node is a text node, get its parent element
+    if (element.nodeType === Node.TEXT_NODE && element.parentElement) {
+      element = element.parentElement;
+    }
+    return element;
+  };
+
   async function generateTitleContent(AiInputPrompt?: string) {
     try {
       setGenerating(true);
@@ -261,24 +277,67 @@ export default function Writing() {
         (item) => item.id == currentContent[0].tone_of_voice
       );
 
+      const currentNode = getActiveNode();
+
+      let gptPrompt = "";
+      // Different prompts depending on the type of the element
+      if (currentNode?.nodeName.toLowerCase() == "p") {
+        if (AiInputPrompt) {
+          gptPrompt = `${AiInputPrompt}. `;
+        } else {
+          gptPrompt = `Generate a paragraph for a blog. `
+        }
+
+        gptPrompt += `The text is for a blog with the title "${
+          currentContent[0].content_title
+        }" and will be about the following subtitle: "${handleGetPreviousHeading()}". The text has a ${
+          toneOfVoice?.value
+        } tone of voice, is in the language with the code ${
+          currentContent[0].language
+        }${
+          currentContent[0].audience
+            ? `, has the target audience "${currentContent[0].audience}",`
+            : ", "
+        } and contains these keywords: ${currentContent[0].keywords.join(
+          ","
+        )}. `;
+
+        if (!editor?.state.selection.empty) {
+          const selection = editor?.state.selection;
+          if (selection && !selection.empty && currentNode.textContent) {
+            const selectedText = editor.state.doc.textBetween(
+              selection.from,
+              selection.to,
+              '\n'
+            );
+
+            const notSelectedText = currentNode.textContent.replace(selectedText, "");
+            gptPrompt += `The text will be an addition on the existing text: "${notSelectedText}". It wil replace this text: "${selectedText}". `;
+          }
+        } else {
+          if (currentNode.textContent != ""){
+            gptPrompt += `The text will replace this text: "${currentNode.textContent}". `
+          }
+        }
+        gptPrompt += `Only give back an string of the generated text and don't include the subtitle.`;
+      } else if (currentNode?.nodeName.toLowerCase().includes("h")) {
+        if (!AiInputPrompt) {
+          gptPrompt = `Rewrite the subtitle "${currentNode?.textContent}" with type: ${currentNode?.nodeName}. The title of the blog is"${currentContent[0].content_title}". Make sure the generated subtitle is not the same as the previous one and only give back a string of the regenerated subtitle.`;
+        } 
+      }
+
       const response = await fetch("/api/generateContent", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          heading: handleGetPreviousHeading(),
-          title: currentContent[0].title,
-          language: currentContent[0].language,
-          keywords: currentContent[0].keywords,
-          toneOfVoice: toneOfVoice?.value,
-          prompt: AiInputPrompt ? AiInputPrompt : "",
+          prompt: gptPrompt,
         }),
       });
       setAiInput("");
 
       const { generatedContent } = await response.json();
-      console.log(generatedContent);
 
       if (editor?.state.selection.empty) {
         replaceText(generatedContent);
@@ -445,29 +504,27 @@ export default function Writing() {
                 placement: "bottom-start",
                 maxWidth: "none",
                 appendTo: "parent",
+                offset: [0, 5],
               }}
-              shouldShow={({ editor, view, state, oldState, from, to }) => {
+              shouldShow={({ editor }) => {
                 // always show the bubble except when an image is selected
                 return editor.isActive("image") ? false : true;
               }}
               className={styles.bubbleMenu}
             >
               <div className={styles.bubbleInput}>
+                <Button type={"solid"} onClick={() => generateTitleContent()}>
+                  <p>Generate text</p>
+                  <AutoAwesomeIcon />
+                </Button>
                 <input
                   type="text"
-                  placeholder="Ask AI to write something for you..."
+                  placeholder="Or ask AI something specific to write for you..."
                   value={AiInput}
                   onChange={(event) => setAiInput(event.target.value)}
                 />
-                <div className={styles.buttonsWrapper}>
-                  <div onClick={() => AiContentChange()}>
-                    <SendRoundedIcon />
-                  </div>
-                  <div onClick={() => generateTitleContent()}>
-                    <CustomizedTooltip information="Generate text for this subtitle">
-                      <AutoAwesomeIcon />
-                    </CustomizedTooltip>
-                  </div>
+                <div onClick={() => AiContentChange()}>
+                  <SendRoundedIcon />
                 </div>
               </div>
               <div className={styles.inputOptions}>

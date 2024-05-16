@@ -35,11 +35,6 @@
         &:focus {
             outline: none;
         }
-
-        &::selection{
-            background-color: $purple_primary;
-            color: $white;
-        }
     }
 
     .delete{

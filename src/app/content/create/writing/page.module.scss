@@ -157,17 +157,26 @@
     gap: 1rem;
     align-items: center;
 
+    &:focus-visible{
+        outline: none;
+    }
+
     .bubbleInput {
         width: 100%;
         border: solid 1px rgba($color: $purple_primary, $alpha: .25);
         background-color: $purple_50;
-        padding: .5rem 1rem;
         border-radius: .75rem;
         display: flex;
         align-items: center;
         gap: 1rem;
+        overflow: hidden;
+        padding: .5rem;
 
-        input[type=text]{
+        p{
+            margin: 0;
+        }
+
+        input[type=text] {
             background-color: rgba($color: #000000, $alpha: 0);
             border: none;
             outline: none;
@@ -175,30 +184,18 @@
             width: 100%;
         }
 
-        .buttonsWrapper{
-            display: flex;
+        div:last-of-type {
+            cursor: pointer;
+            padding-right: .5rem;
+            svg {
+                transition: .3s all ease-in-out;
 
-            div{
-                padding: 0 1rem;
-
-                svg{
-                    cursor: pointer;
-                    margin-bottom: -.2rem;
-                    transition: .3s all ease-in-out;
-
-                    &:hover{
-                        color: $purple_primary;
-                    }
+                &:hover {
+                    color: $purple_primary;
                 }
-            }
-            div:last-of-type{
-                border-left: solid 1px rgba($color: $black, $alpha: .25);
-                padding-right: 0;
             }
         }
     }
 
-    .inputOptions{
-        
-    }
+    .inputOptions {}
 }

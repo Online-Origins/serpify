@@ -5,6 +5,11 @@
 * {
     margin: 0;
     padding: 0;
+
+    &::selection {
+        background-color: $purple_primary;
+        color: $white;
+    }
 }
 
 body {
@@ -165,13 +170,19 @@ a {
     }
 }
 
-#tippy-1{
+div[id^="tippy-"] {
     width: 1300px;
     overflow: hidden;
     z-index: 100 !important;
 
     @media (min-width: 2000px) {
-        min-width: 1600px;
         width: 1600px;
+    }
+
+    .tippy-content,
+    .tippy-box {
+        &:focus-visible {
+            outline: none;
+        }
     }
 }

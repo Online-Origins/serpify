@@ -8,12 +8,6 @@ const openai = new OpenAI({
 export async function POST(request) {
     const body = await request.json();
     const prompt = body.prompt || "";
-    const keywords = body.keywords || '';
-    const language = body.language || '';
-    const audience = body.audience || '';
-    const toneOfVoice = body.toneOfVoice || '';
-    const title = body.title || '';
-    const heading = body.heading || '';
 
     const response = await openai.chat.completions.create({
         messages: [
@@ -23,12 +17,12 @@ export async function POST(request) {
             },
             {
                 "role": "user",
-                "content": `Generate the text for the following heading: ${heading}. The text is going to be used for a blog with the title "${title}", ${audience != "" ? `the target audience "${audience}",` : ","} has a ${toneOfVoice} tone of voice, that is in the language with the code ${language} and that contains these keywords: ${keywords.join(',')}. Only give back an string.`
+                "content": `${prompt}`
             }
         ],
         model: "gpt-4o",
     });
 
-    const generatedContent = response.choices[0].message.content;
+    const generatedContent = response.choices[0].message.content.replace(/["#]/g, '').replace(/^\s+/, '');
     return NextResponse.json({ generatedContent });
 }
