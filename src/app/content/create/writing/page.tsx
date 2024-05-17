@@ -39,6 +39,7 @@ import MovingIcon from "@mui/icons-material/Moving";
 import CloseFullscreenRoundedIcon from "@mui/icons-material/CloseFullscreenRounded";
 
 import toneOfVoices from "@/json/tone-of-voice.json";
+import CustomizedTooltip from "@/components/ui/custom-tooltip/custom-tooltip.component";
 
 export default function Writing() {
   const router = useRouter();
@@ -302,11 +303,13 @@ export default function Writing() {
       const currentNode = getActiveNode();
 
       let gptPrompt = "";
-      // Different prompts depending on the type of the element
+      // Prompt building for when the element is a paragraph
       if (currentNode?.nodeName.toLowerCase() == "p") {
         if (AiInputPrompt) {
+          // If the user used his own prompt
           gptPrompt = `${AiInputPrompt}. `;
         } else if (option) {
+          // If the user selected one of the options
           if (option == "grammar") {
             gptPrompt = `Correct the spelling and grammar of the text: `;
           } else if (option == "expand") {
@@ -318,10 +321,12 @@ export default function Writing() {
           }
           setOpenOptions(false);
         } else {
+          // Otherwise just generate a pragraph
           gptPrompt = `Generate the paragraph for a blog. `;
         }
 
         if (!editor?.state.selection.empty) {
+          // If the user made a selection from a paragraph
           const selection = editor?.state.selection;
           if (selection && !selection.empty && currentNode.textContent) {
             const selectedText = editor.state.doc.textBetween(
@@ -334,15 +339,20 @@ export default function Writing() {
               ""
             );
             if (notSelectedText != "" && option != "grammar") {
+              // If the selected text is not the same as the whole text of the paragraph
               gptPrompt += `The text will be an addition on the existing text: "${notSelectedText}", and wil replace this text: "${selectedText}". `;
             } else if (notSelectedText == "") {
+              // If the selected text is the same as the whole text of the paragraph
               gptPrompt += `The newly generated will replace this text: "${currentNode.textContent}". `;
             } else if (option == "grammar") {
+              // If the user selected the option grammar
               gptPrompt += `"${selectedText}". `;
             }
           }
         } else {
+          // When the user didn't make a selection from a paragraph
           if (currentNode.textContent != "" && option != "grammar") {
+            // The generated text needs to replace the text in te current element if the current element is not empty and if the user didn't chose the grammar option
             gptPrompt += `The newly generated will replace this text: "${currentNode.textContent}". `;
           } else if (currentNode.textContent == "") {
             gptPrompt += `The text is for a blog with the title "${
@@ -359,14 +369,75 @@ export default function Writing() {
               ","
             )}. `;
           } else if (option == "grammar") {
+            // If the user did chose the grammar option give the current element text to the api
             gptPrompt += `"${currentNode.textContent}". `;
           }
         }
 
+        // Specify to the AI that only a string of the generated text is needed
         gptPrompt += `Only give back an string of the generated text and don't include the subtitle.`;
+
+        // Prompt building for when the element is an header
       } else if (currentNode?.nodeName.toLowerCase().includes("h")) {
-        if (!AiInputPrompt) {
-          gptPrompt = `Rewrite the subtitle "${currentNode?.textContent}" with type: ${currentNode?.nodeName}. The title of the blog is"${currentContent[0].content_title}". Make sure the generated subtitle is not the same as the previous one and only give back a string of the regenerated subtitle.`;
+        if (AiInputPrompt) {
+          // If the user used his own prompt
+          gptPrompt = `${AiInputPrompt}. The current subtitle is: "${currentNode?.textContent}". Only give back an string of the generated subtitle. `;
+        } else if (option) {
+          // If the user selected one of the options
+          if (!editor?.state.selection.empty) {
+            // If the user made a selection from a header
+            const selection = editor?.state.selection;
+            if (selection && !selection.empty && currentNode.textContent) {
+              const selectedText = editor.state.doc.textBetween(
+                selection.from,
+                selection.to,
+                "\n"
+              );
+              const notSelectedText = currentNode.textContent.replace(
+                selectedText,
+                ""
+              );
+
+              if (notSelectedText != "") {
+                // If the selected text is not the same as the whole text of the header
+                if (option == "grammar") {
+                  gptPrompt = `Correct the spelling and grammar of the text: "${selectedText}"`;
+                } else if (option == "expand") {
+                  gptPrompt = `Expand the text: "${selectedText}"`;
+                } else if (option == "shorten") {
+                  gptPrompt = `Shorten the text: "${selectedText}"`;
+                } else if (option == "improve") {
+                  gptPrompt = `Improve the text: "${selectedText}"`;
+                }
+                gptPrompt += `, which is part of the subtitle: "${currentNode?.textContent}". Only give back the updated text part and not the whole subitle.`;
+              } else {
+                // If the selected text is the same as the whole text of the header
+                if (option == "grammar") {
+                  gptPrompt = `Correct the spelling and grammar of the subtitle: `;
+                } else if (option == "expand") {
+                  gptPrompt = `expand the current subtitle: `;
+                } else if (option == "shorten") {
+                  gptPrompt = `Shorten the current subtitle: `;
+                } else if (option == "improve") {
+                  gptPrompt = `Improve the current subtitle: `;
+                }
+                gptPrompt += `"${currentNode?.textContent}". Only give back the new subtitle.`;
+              }
+            }
+          } else {
+            // When the user didn't make a selection from a paragraph
+            if (option == "grammar") {
+              gptPrompt = `Correct the spelling and grammar of the subtitle: `;
+            } else if (option == "expand") {
+              gptPrompt = `expand the current subtitle: `;
+            } else if (option == "shorten") {
+              gptPrompt = `Shorten the current subtitle: `;
+            } else if (option == "improve") {
+              gptPrompt = `Improve the current subtitle: `;
+            }
+            gptPrompt += `"${currentNode?.textContent}". Only give back the new sutbtitle.`;
+          }
+          setOpenOptions(false);
         }
       }
 
@@ -384,8 +455,10 @@ export default function Writing() {
       const { generatedContent } = await response.json();
 
       if (editor?.state.selection.empty) {
+        // Replace the user selected text
         replaceText(generatedContent);
       } else {
+        // Add the new generated text into the current selected element of the editor
         editor
           ?.chain()
           .focus()
@@ -416,7 +489,7 @@ export default function Writing() {
       state.tr.replaceWith(startPos, endPos, state.schema.text(newContent))
     );
   };
-  
+
   return (
     <InnerWrapper className={styles.editorWrapper}>
       <div className={styles.editorBar}>
@@ -566,34 +639,41 @@ export default function Writing() {
                   placeholder="Or ask AI something specific to write for you..."
                   value={AiInput}
                   onChange={(event) => setAiInput(event.target.value)}
+                  onKeyDown={(e: any) => {
+                    if (e.key == "Enter" && AiInput != "") {
+                      AiContentChange();
+                    }
+                  }}
                 />
                 <div onClick={() => AiContentChange()}>
                   <SendRoundedIcon />
                 </div>
               </div>
-              <div
-                ref={optionsRef}
-                className={styles.inputOptions}
-                onClick={() => setOpenOptions(!openOptions)}
-              >
-                <MoreVertIcon />
-                {openOptions && (
-                  <div className={styles.optionsMenu}>
-                    <p onClick={() => generateTitleContent(undefined, "improve")}>
-                      <MovingIcon /> Improve
-                    </p>
-                    <p onClick={() => generateTitleContent(undefined, "shorten")}>
-                      <CloseFullscreenRoundedIcon /> Shorten
-                    </p>
-                    <p onClick={() => generateTitleContent(undefined, "expand")}>
-                      <ExpandIcon /> Expand
-                    </p>
-                    <p onClick={() => generateTitleContent(undefined, "grammar")}>
-                      <SpellcheckIcon /> Correct spelling & grammar
-                    </p>
-                  </div>
-                )}
-              </div>
+              <CustomizedTooltip information="Need some help? Try one of the options in this menu">
+                <div
+                  ref={optionsRef}
+                  className={styles.inputOptions}
+                  onClick={() => setOpenOptions(!openOptions)}
+                >
+                  <MoreVertIcon />
+                </div>
+              </CustomizedTooltip>
+              {openOptions && (
+                <div className={styles.optionsMenu}>
+                  <p onClick={() => generateTitleContent(undefined, "improve")}>
+                    <MovingIcon /> Improve
+                  </p>
+                  <p onClick={() => generateTitleContent(undefined, "shorten")}>
+                    <CloseFullscreenRoundedIcon /> Shorten
+                  </p>
+                  <p onClick={() => generateTitleContent(undefined, "expand")}>
+                    <ExpandIcon /> Expand
+                  </p>
+                  <p onClick={() => generateTitleContent(undefined, "grammar")}>
+                    <SpellcheckIcon /> Correct spelling & grammar
+                  </p>
+                </div>
+              )}
             </BubbleMenu>
           )}
         </div>
