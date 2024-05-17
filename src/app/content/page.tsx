@@ -57,7 +57,6 @@ export default function ContentOverview() {
     );
     if (filtered.length > 0) {
       setKeywordOptions(filtered[0].keywords);
-      setChosenKeywords(filtered[0].keywords);
     }
   }, [chosenCollection]);
 
