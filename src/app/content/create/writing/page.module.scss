@@ -150,19 +150,21 @@
 }
 
 .bubbleMenu {
-    width: calc(100% - 1rem);
+    width: 100%;
     box-shadow: $shadow;
     margin-bottom: 1rem;
     display: flex;
     gap: 1rem;
-    align-items: center;
+    height: max-content;
+    align-items: stretch;
+    position: relative;
 
-    &:focus-visible{
+    &:focus-visible {
         outline: none;
     }
 
     .bubbleInput {
-        width: 100%;
+        height: max-content;
         border: solid 1px rgba($color: $purple_primary, $alpha: .25);
         background-color: $purple_50;
         border-radius: .75rem;
@@ -171,8 +173,9 @@
         gap: 1rem;
         overflow: hidden;
         padding: .5rem;
+        flex: 1;
 
-        p{
+        p {
             margin: 0;
         }
 
@@ -187,6 +190,7 @@
         div:last-of-type {
             cursor: pointer;
             padding-right: .5rem;
+
             svg {
                 transition: .3s all ease-in-out;
 
@@ -197,5 +201,68 @@
         }
     }
 
-    .inputOptions {}
+    .inputOptions {
+        border: solid 1px rgba($color: $purple_primary, $alpha: .25);
+        background-color: $purple_50;
+        border-radius: .75rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 3rem;
+        cursor: pointer;
+
+        svg {
+            font-size: 1.6rem;
+        }
+    }
+
+    .optionsMenu {
+        position: absolute;
+        top: 0;
+        right: 0;
+        transform: translateY(-100%);
+        margin-top: -.5rem;
+        border: solid 1px rgba($color: $purple_primary, $alpha: .25);
+        background-color: $purple_50;
+        border-radius: .75rem;
+        display: flex;
+        flex-flow: column;
+        text-wrap: nowrap;
+        overflow: hidden;
+        box-shadow: $shadow;
+        animation: showAni .3s ease-in-out forwards;
+
+        @keyframes showAni {
+        0% {
+            opacity: 0%;
+        }
+        100% {
+            opacity: 100%;
+        }
+    }    
+
+        p {
+            margin: 0;
+            padding: .75rem .5rem;
+            transition: .3s all ease-in-out;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+
+            svg {
+                font-size: 1.1rem;
+            }
+
+            &:not(:last-of-type) {
+                border-bottom: solid 1px rgba($color: $black, $alpha: .1);
+            }
+
+            &:hover {
+                background-color: $purple_secundary;
+                color: $white;
+
+            }
+        }
+    }
 }

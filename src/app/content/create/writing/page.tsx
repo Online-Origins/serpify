@@ -14,6 +14,7 @@ import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
 import PopUpWrapper from "@/components/ui/popup-wrapper/popup-wrapper.component";
 import PopUp from "@/components/ui/popup/popup.component";
+import CircularLoader from "@/components/circular-loader/circular-loader.component";
 
 import FormatBoldIcon from "@mui/icons-material/FormatBold";
 import FormatItalicIcon from "@mui/icons-material/FormatItalic";
@@ -31,10 +32,13 @@ import InputWrapper from "@/components/ui/input-wrapper/input-wrapper.component"
 import ArrowForwardRounded from "@mui/icons-material/ArrowForwardRounded";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
-import CustomizedTooltip from "@/components/ui/custom-tooltip/custom-tooltip.component";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import ExpandIcon from "@mui/icons-material/Expand";
+import SpellcheckIcon from '@mui/icons-material/Spellcheck';
+import MovingIcon from '@mui/icons-material/Moving';
+import CloseFullscreenRoundedIcon from '@mui/icons-material/CloseFullscreenRounded';
 
 import toneOfVoices from "@/json/tone-of-voice.json";
-import CircularLoader from "@/components/circular-loader/circular-loader.component";
 
 export default function Writing() {
   const router = useRouter();
@@ -48,6 +52,24 @@ export default function Writing() {
   const [imageLink, setImageLink] = useState("");
   const [AiInput, setAiInput] = useState("");
   const [generating, setGenerating] = useState(false);
+  const [openOptions, setOpenOptions] = useState(false);
+  const optionsRef = useRef<HTMLDivElement>(null);
+
+  const handleClickOutside = (event: MouseEvent) => {
+    if (
+      optionsRef.current &&
+      !optionsRef.current.contains(event.target as Node)
+    ) {
+      setOpenOptions(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const editor = useEditor({
     extensions: [
@@ -270,7 +292,7 @@ export default function Writing() {
     return element;
   };
 
-  async function generateTitleContent(AiInputPrompt?: string) {
+  async function generateTitleContent(AiInputPrompt?: string, option?: string) {
     try {
       setGenerating(true);
       const toneOfVoice = toneOfVoices.find(
@@ -284,23 +306,20 @@ export default function Writing() {
       if (currentNode?.nodeName.toLowerCase() == "p") {
         if (AiInputPrompt) {
           gptPrompt = `${AiInputPrompt}. `;
+        } else if (option) {
+          if (option == "grammar") {
+            gptPrompt = `Correct the spelling and grammar of the text: `;
+          } else if (option == "expand") {
+            gptPrompt = `expand the current text. `;
+          } else if (option == "shorten") {
+            gptPrompt = `Shorten the current text. `;
+          } else if (option == "improve") {
+            gptPrompt = `Improve the current text. `;
+          }
+          setOpenOptions(false);
         } else {
-          gptPrompt = `Generate a paragraph for a blog. `
+          gptPrompt = `Generate the paragraph for a blog. `;
         }
-
-        gptPrompt += `The text is for a blog with the title "${
-          currentContent[0].content_title
-        }" and will be about the following subtitle: "${handleGetPreviousHeading()}". The text has a ${
-          toneOfVoice?.value
-        } tone of voice, is in the language with the code ${
-          currentContent[0].language
-        }${
-          currentContent[0].audience
-            ? `, has the target audience "${currentContent[0].audience}",`
-            : ", "
-        } and contains these keywords: ${currentContent[0].keywords.join(
-          ","
-        )}. `;
 
         if (!editor?.state.selection.empty) {
           const selection = editor?.state.selection;
@@ -308,22 +327,47 @@ export default function Writing() {
             const selectedText = editor.state.doc.textBetween(
               selection.from,
               selection.to,
-              '\n'
+              "\n"
             );
-
-            const notSelectedText = currentNode.textContent.replace(selectedText, "");
-            gptPrompt += `The text will be an addition on the existing text: "${notSelectedText}". It wil replace this text: "${selectedText}". `;
+            const notSelectedText = currentNode.textContent.replace(
+              selectedText,
+              ""
+            );
+            if (notSelectedText != "" && option != "grammar") {
+              gptPrompt += `The text will be an addition on the existing text: "${notSelectedText}", and wil replace this text: "${selectedText}". `;
+            } else if (notSelectedText == "") {
+              gptPrompt += `The newly generated will replace this text: "${currentNode.textContent}". `;
+            } else if (option == "grammar") {
+              gptPrompt += `"${selectedText}". `;
+            }
           }
         } else {
-          if (currentNode.textContent != ""){
-            gptPrompt += `The text will replace this text: "${currentNode.textContent}". `
+          if (currentNode.textContent != "" && option != "grammar") {
+            gptPrompt += `The newly generated will replace this text: "${currentNode.textContent}". `;
+          } else if (currentNode.textContent == "") {
+            gptPrompt += `The text is for a blog with the title "${
+              currentContent[0].content_title
+            }" and will be about the following subtitle: "${handleGetPreviousHeading()}". The text has a ${
+              toneOfVoice?.value
+            } tone of voice, is in the language with the code ${
+              currentContent[0].language
+            }${
+              currentContent[0].audience
+                ? `, has the target audience "${currentContent[0].audience}",`
+                : ", "
+            } and contains these keywords: ${currentContent[0].keywords.join(
+              ","
+            )}. `;
+          } else if (option == "grammar") {
+            gptPrompt += `"${currentNode.textContent}". `;
           }
         }
+
         gptPrompt += `Only give back an string of the generated text and don't include the subtitle.`;
       } else if (currentNode?.nodeName.toLowerCase().includes("h")) {
         if (!AiInputPrompt) {
           gptPrompt = `Rewrite the subtitle "${currentNode?.textContent}" with type: ${currentNode?.nodeName}. The title of the blog is"${currentContent[0].content_title}". Make sure the generated subtitle is not the same as the previous one and only give back a string of the regenerated subtitle.`;
-        } 
+        }
       }
 
       const response = await fetch("/api/generateContent", {
@@ -504,7 +548,7 @@ export default function Writing() {
                 placement: "bottom-start",
                 maxWidth: "none",
                 appendTo: "parent",
-                offset: [0, 5],
+                offset: [0, 8],
               }}
               shouldShow={({ editor }) => {
                 // always show the bubble except when an image is selected
@@ -527,9 +571,28 @@ export default function Writing() {
                   <SendRoundedIcon />
                 </div>
               </div>
-              <div className={styles.inputOptions}>
-                <h5>Hi</h5>
+              <div
+                className={styles.inputOptions}
+                onClick={() => setOpenOptions(!openOptions)}
+              >
+                <MoreVertIcon />
               </div>
+              {openOptions && (
+                <div className={styles.optionsMenu} ref={optionsRef}>
+                  <p onClick={() => generateTitleContent(undefined, "improve")}>
+                    <MovingIcon /> Improve
+                  </p>
+                  <p onClick={() => generateTitleContent(undefined, "shorten")}>
+                    <CloseFullscreenRoundedIcon /> Shorten
+                  </p>
+                  <p onClick={() => generateTitleContent(undefined, "expand")}>
+                    <ExpandIcon /> Expand
+                  </p>
+                  <p onClick={() => generateTitleContent(undefined, "grammar")}>
+                    <SpellcheckIcon /> Correct spelling & grammar
+                  </p>
+                </div>
+              )}
             </BubbleMenu>
           )}
         </div>

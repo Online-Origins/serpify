@@ -171,13 +171,8 @@ a {
 }
 
 div[id^="tippy-"] {
-    width: 1300px;
-    overflow: hidden;
+    width: 800px;
     z-index: 100 !important;
-
-    @media (min-width: 2000px) {
-        width: 1600px;
-    }
 
     .tippy-content,
     .tippy-box {
