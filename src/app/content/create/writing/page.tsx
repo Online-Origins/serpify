@@ -34,9 +34,9 @@ import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import ExpandIcon from "@mui/icons-material/Expand";
-import SpellcheckIcon from '@mui/icons-material/Spellcheck';
-import MovingIcon from '@mui/icons-material/Moving';
-import CloseFullscreenRoundedIcon from '@mui/icons-material/CloseFullscreenRounded';
+import SpellcheckIcon from "@mui/icons-material/Spellcheck";
+import MovingIcon from "@mui/icons-material/Moving";
+import CloseFullscreenRoundedIcon from "@mui/icons-material/CloseFullscreenRounded";
 
 import toneOfVoices from "@/json/tone-of-voice.json";
 
@@ -416,9 +416,9 @@ export default function Writing() {
       state.tr.replaceWith(startPos, endPos, state.schema.text(newContent))
     );
   };
-
+  
   return (
-    <InnerWrapper className={styles.smallerWidth}>
+    <InnerWrapper className={styles.editorWrapper}>
       <div className={styles.editorBar}>
         <div className={styles.tools}>
           <div className={styles.toolsWrapper}>
@@ -572,27 +572,28 @@ export default function Writing() {
                 </div>
               </div>
               <div
+                ref={optionsRef}
                 className={styles.inputOptions}
                 onClick={() => setOpenOptions(!openOptions)}
               >
                 <MoreVertIcon />
+                {openOptions && (
+                  <div className={styles.optionsMenu}>
+                    <p onClick={() => generateTitleContent(undefined, "improve")}>
+                      <MovingIcon /> Improve
+                    </p>
+                    <p onClick={() => generateTitleContent(undefined, "shorten")}>
+                      <CloseFullscreenRoundedIcon /> Shorten
+                    </p>
+                    <p onClick={() => generateTitleContent(undefined, "expand")}>
+                      <ExpandIcon /> Expand
+                    </p>
+                    <p onClick={() => generateTitleContent(undefined, "grammar")}>
+                      <SpellcheckIcon /> Correct spelling & grammar
+                    </p>
+                  </div>
+                )}
               </div>
-              {openOptions && (
-                <div className={styles.optionsMenu} ref={optionsRef}>
-                  <p onClick={() => generateTitleContent(undefined, "improve")}>
-                    <MovingIcon /> Improve
-                  </p>
-                  <p onClick={() => generateTitleContent(undefined, "shorten")}>
-                    <CloseFullscreenRoundedIcon /> Shorten
-                  </p>
-                  <p onClick={() => generateTitleContent(undefined, "expand")}>
-                    <ExpandIcon /> Expand
-                  </p>
-                  <p onClick={() => generateTitleContent(undefined, "grammar")}>
-                    <SpellcheckIcon /> Correct spelling & grammar
-                  </p>
-                </div>
-              )}
             </BubbleMenu>
           )}
         </div>

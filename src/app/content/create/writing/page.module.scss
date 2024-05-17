@@ -1,8 +1,13 @@
 @import '@/styles/variables.scss';
 
+.editorWrapper {
+    gap: 0;
+}
+
 .editorBar {
     width: 100%;
     display: flex;
+    background-color: $white;
     justify-content: space-between;
     align-items: flex-end;
     padding-bottom: 1rem;
@@ -69,6 +74,7 @@
     overflow-y: scroll;
     overflow-x: hidden;
     position: relative;
+    padding-top: 2rem;
 
     h2,
     h3,
@@ -157,7 +163,6 @@
     gap: 1rem;
     height: max-content;
     align-items: stretch;
-    position: relative;
 
     &:focus-visible {
         outline: none;
