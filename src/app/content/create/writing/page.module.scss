@@ -141,11 +141,11 @@
         margin-left: 0rem;
     }
 
-    h3~*:not(h2, h4, h2+*, h4+*) {
+    h3~*:not(h2, h4, h2+*, h4+*, p+*:not(img, blockquote, ul, ol)) {
         margin-left: 4rem;
     }
 
-    h4~*:not(h2, h3, h2+*, h3+*, h3+*+img) {
+    h4~*:not(h2, h3, h2+*, h3+*, h3+*+img, p+*:not(img, blockquote, ul, ol)) {
         margin-left: 8rem;
     }
 }
@@ -270,4 +270,9 @@
             }
         }
     }
+}
+
+.bottomButtons{
+    display: flex;
+    justify-content: flex-end;
 }

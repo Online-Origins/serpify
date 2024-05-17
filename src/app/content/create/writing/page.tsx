@@ -55,6 +55,7 @@ export default function Writing() {
   const [generating, setGenerating] = useState(false);
   const [openOptions, setOpenOptions] = useState(false);
   const optionsRef = useRef<HTMLDivElement>(null);
+  const editorRef = useRef<HTMLDivElement>(null);
 
   const handleClickOutside = (event: MouseEvent) => {
     if (
@@ -490,6 +491,35 @@ export default function Writing() {
     );
   };
 
+  const findPreviousHeader = (node: HTMLElement): HTMLElement | null => {
+    let previousSibling = node.previousElementSibling;
+    while (previousSibling) {
+      if (previousSibling.tagName.match(/^H[1-6]$/)) {
+        return previousSibling as HTMLElement;
+      }
+      previousSibling = previousSibling.previousElementSibling;
+    }
+    return null;
+  };
+
+  function generateAllContent() {
+    // setGenerating(true);
+    try {
+      if (editorRef.current) {
+        const paragraphs = editorRef.current.querySelectorAll("p");
+        paragraphs.forEach((p, index) => {
+          const previousHeader = findPreviousHeader(p as HTMLElement);
+          if (previousHeader) {
+            p.innerText = previousHeader.innerText;
+            // Generate the text for the paragraph with the subtitle and title.
+          } else {
+            p.innerText = 'No previous header found';
+          }
+        });
+      }
+    } catch (error) {}
+  }
+
   return (
     <InnerWrapper className={styles.editorWrapper}>
       <div className={styles.editorBar}>
@@ -609,7 +639,7 @@ export default function Writing() {
         </div>
       </div>
       {currentContent.length > 0 && (
-        <div className={classNames(styles.editor, "scrollbar")}>
+        <div ref={editorRef} className={classNames(styles.editor, "scrollbar")}>
           <h1>{currentContent[0].content_title}</h1>
           <EditorContent editor={editor} />
           {editor && (
@@ -649,16 +679,13 @@ export default function Writing() {
                   <SendRoundedIcon />
                 </div>
               </div>
-              <CustomizedTooltip information="Need some help? Try one of the options in this menu">
                 <div
                   ref={optionsRef}
                   className={styles.inputOptions}
                   onClick={() => setOpenOptions(!openOptions)}
                 >
                   <MoreVertIcon />
-                </div>
-              </CustomizedTooltip>
-              {openOptions && (
+                  {openOptions && (
                 <div className={styles.optionsMenu}>
                   <p onClick={() => generateTitleContent(undefined, "improve")}>
                     <MovingIcon /> Improve
@@ -674,11 +701,20 @@ export default function Writing() {
                   </p>
                 </div>
               )}
+                </div>
+              
             </BubbleMenu>
           )}
         </div>
       )}
-
+      {currentContent.length > 0 && !currentContent[0].content && (
+        <div className={styles.bottomButtons}>
+          <Button type={"outline"} onClick={() => generateAllContent()}>
+            <p>Generate all</p>
+            <AutoAwesomeIcon />
+          </Button>
+        </div>
+      )}
       {linkPopupOpen && (
         <PopUpWrapper>
           <PopUp

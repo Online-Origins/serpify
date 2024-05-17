@@ -321,6 +321,7 @@ export default function KeywordSearching() {
         subjects: [...prevState.subjects, ...cleanArray],
       }));
       setSubjectInput("");
+      setKeywordAmount([0,20]);
       isKeywordsGenerated.current = false;
     }
   }
@@ -449,17 +450,6 @@ export default function KeywordSearching() {
               </div>
             }
           />
-          {/* <div className={styles.currentValues}>
-            {filters.subjects.length > 0 &&
-              filters.subjects.map((value: string) => (
-                <div key={value} className={styles.value}>
-                  <p>{value}</p>
-                  <span onClick={() => updateSubjectFilters(value)}>
-                    <CloseRoundedIcon />
-                  </span>
-                </div>
-              ))}
-          </div> */}
         </div>
         <Button type={"solid"} onClick={() => setFilterPopUpOpen(true)}>
           <p>Filter</p>
