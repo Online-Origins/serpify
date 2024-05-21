@@ -9,19 +9,23 @@ import { useEffect, useRef, useState } from "react";
 import { supabase } from "./utils/supabaseClient/server";
 import CollectionsWrapper from "@/components/collections-wrapper/collections-wrapper.component";
 import classNames from "classnames";
+import { useRouter } from "next/navigation";
+import PopUpWrapper from "@/components/ui/popup-wrapper/popup-wrapper.component";
+import CircularLoader from "@/components/circular-loader/circular-loader.component";
 
 export default function Home() {
-  const getCollectionsRef = useRef(false);
+  const loadingRef = useRef(true);
   const [collections, setCollections] = useState<any[]>([]);
   const [contents, setContents] = useState<any[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
-    if (!getCollectionsRef.current) {
+    if (loadingRef.current) {
       getCollections();
       getContents();
-      getCollectionsRef.current = true;
+      loadingRef.current = false;
     }
-  }, [getCollectionsRef]);
+  }, [loadingRef]);
 
   async function getContents() {
     const { data } = await supabase.from("contentItems").select();
@@ -47,13 +51,13 @@ export default function Home() {
           title={"Content projects"}
           smallerHeader
           buttons={
-            <Button type={"textOnly"} onClick={() => console.log("hello")}>
+            <Button type={"textOnly"} onClick={() => router.push("/content")}>
               <p>See all projects</p>
               <ArrowForwardRounded />
             </Button>
           }
         />
-        {getCollectionsRef.current ? (
+        {!loadingRef.current ? (
           <ContentItemsWrapper contents={contents} collections={collections} small />
         ) : (
           <h5>Loading...</h5>
@@ -64,18 +68,24 @@ export default function Home() {
           title={"Keyword collections"}
           smallerHeader
           buttons={
-            <Button type={"textOnly"} onClick={() => console.log("hello")}>
+            <Button type={"textOnly"} onClick={() => router.push("/keywords")}>
               <p>See all collections</p>
               <ArrowForwardRounded />
             </Button>
           }
         />
-        {getCollectionsRef.current ? (
+        {!loadingRef.current ? (
           <CollectionsWrapper collections={collections} small />
         ) : (
           <h5>Loading...</h5>
         )}
       </div>
+      {loadingRef.current &&
+        <PopUpWrapper>
+          <CircularLoader />
+          <p>Loading...</p>
+        </PopUpWrapper>
+      }
     </InnerWrapper>
   );
 }

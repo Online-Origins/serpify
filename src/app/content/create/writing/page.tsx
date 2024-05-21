@@ -37,7 +37,7 @@ import {
   Expand,
   Spellcheck,
   Moving,
-  CloseFullscreenRounded
+  CloseFullscreenRounded,
 } from "@mui/icons-material";
 
 import toneOfVoices from "@/json/tone-of-voice.json";
@@ -503,22 +503,51 @@ export default function Writing() {
     return null;
   };
 
-  function generateAllContent() {
-    // setGenerating(true);
+  async function generateAllContent() {
+    setGenerating(true);
+    const toneOfVoice = toneOfVoices.find(
+      (item) => item.id == currentContent[0].tone_of_voice
+    );
     try {
       if (editorRef.current) {
-        const paragraphs = editorRef.current.querySelectorAll("p");
-        paragraphs.forEach((p, index) => {
+        const paragraphs = Array.from(editorRef.current.querySelectorAll("p"));
+        for (const p of paragraphs) {
           const previousHeader = findPreviousHeader(p as HTMLElement);
           if (previousHeader) {
-            p.innerText = previousHeader.innerText;
-            // Generate the text for the paragraph with the subtitle and title.
-          } else {
-            p.innerText = 'No previous header found';
+            const response = await fetch("/api/generateContent", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                prompt: `Generate the paragraph for a blog. The text is for a blog with the title "${
+                  currentContent[0].content_title
+                }" and will be about the following subtitle: "${
+                  previousHeader.innerText
+                }". The text has a ${
+                  toneOfVoice?.value
+                } tone of voice, is in the language with the code ${
+                  currentContent[0].language
+                }${
+                  currentContent[0].audience
+                    ? `, has the target audience "${currentContent[0].audience}",`
+                    : ","
+                } and contains these keywords: ${currentContent[0].keywords.join(
+                  ","
+                )}. Only give back an string of the generated text and don't include the subtitle.`,
+              }),
+            });
+            const { generatedContent } = await response.json();
+            p.innerText = generatedContent;
+            // Handle the response here if needed
           }
-        });
+        }
+        setGenerating(false);
       }
-    } catch (error) {}
+    } catch (error) {
+      console.error(error);
+      setGenerating(false); // Ensure to set generating false in case of error
+    }
   }
 
   return (
@@ -680,42 +709,47 @@ export default function Writing() {
                   <SendRounded />
                 </div>
               </div>
-                <div
-                  ref={optionsRef}
-                  className={styles.inputOptions}
-                  onClick={() => setOpenOptions(!openOptions)}
-                >
-                  <MoreVert />
-                  {openOptions && (
-                <div className={styles.optionsMenu}>
-                  <p onClick={() => generateTitleContent(undefined, "improve")}>
-                    <Moving /> Improve
-                  </p>
-                  <p onClick={() => generateTitleContent(undefined, "shorten")}>
-                    <CloseFullscreenRounded /> Shorten
-                  </p>
-                  <p onClick={() => generateTitleContent(undefined, "expand")}>
-                    <Expand /> Expand
-                  </p>
-                  <p onClick={() => generateTitleContent(undefined, "grammar")}>
-                    <Spellcheck /> Correct spelling & grammar
-                  </p>
-                </div>
-              )}
-                </div>
-              
+              <div
+                ref={optionsRef}
+                className={styles.inputOptions}
+                onClick={() => setOpenOptions(!openOptions)}
+              >
+                <MoreVert />
+                {openOptions && (
+                  <div className={styles.optionsMenu}>
+                    <p
+                      onClick={() => generateTitleContent(undefined, "improve")}
+                    >
+                      <Moving /> Improve
+                    </p>
+                    <p
+                      onClick={() => generateTitleContent(undefined, "shorten")}
+                    >
+                      <CloseFullscreenRounded /> Shorten
+                    </p>
+                    <p
+                      onClick={() => generateTitleContent(undefined, "expand")}
+                    >
+                      <Expand /> Expand
+                    </p>
+                    <p
+                      onClick={() => generateTitleContent(undefined, "grammar")}
+                    >
+                      <Spellcheck /> Correct spelling & grammar
+                    </p>
+                  </div>
+                )}
+              </div>
             </BubbleMenu>
           )}
         </div>
       )}
-      {currentContent.length > 0 && !currentContent[0].content && (
-        <div className={styles.bottomButtons}>
-          <Button type={"outline"} onClick={() => generateAllContent()}>
-            <p>Generate all</p>
-            <AutoAwesome />
-          </Button>
-        </div>
-      )}
+      <div className={styles.bottomButtons}>
+        <Button type={"outline"} onClick={() => generateAllContent()}>
+          <p>Generate all</p>
+          <AutoAwesome />
+        </Button>
+      </div>
       {linkPopupOpen && (
         <PopUpWrapper>
           <PopUp
