@@ -11,26 +11,35 @@
     .innerWrapper {
         padding-top: 1rem;
         max-height: 100%;
-        min-width: 1300px;
-        width: 1300px;
+        min-width: 1200px;
+        width: 1200px;
         transition: .6s width ease-in-out;
         transition-delay: .2s;
         margin-bottom: 1rem;
 
         @media (min-width: 2000px) {
-            min-width: 1600px;
-            width: 1600px;
+            min-width: 1500px;
+            width: 1500px;
         }
     }
 
-    @media (max-width: 1500px) {
+    @media (max-width: 1400px) {
         justify-content: start;
     }
 
 
     &.smallerWrapper {
-        @media (max-width: 1660px) {
+        justify-content: start;
+    }
+
+    &.small{
+        @media (max-width: 1700px) {
             justify-content: start;
         }
     }
+}
+
+.scoreWrapper {
+    padding-top: 1rem;
+    width: 400px;
 }
