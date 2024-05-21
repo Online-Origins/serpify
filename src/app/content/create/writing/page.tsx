@@ -15,31 +15,32 @@ import Link from "@tiptap/extension-link";
 import PopUpWrapper from "@/components/ui/popup-wrapper/popup-wrapper.component";
 import PopUp from "@/components/ui/popup/popup.component";
 import CircularLoader from "@/components/circular-loader/circular-loader.component";
-
-import FormatBoldIcon from "@mui/icons-material/FormatBold";
-import FormatItalicIcon from "@mui/icons-material/FormatItalic";
-import FormatStrikethroughIcon from "@mui/icons-material/FormatStrikethrough";
-import FormatListBulletedRoundedIcon from "@mui/icons-material/FormatListBulletedRounded";
-import FormatQuoteRoundedIcon from "@mui/icons-material/FormatQuoteRounded";
-import UndoRoundedIcon from "@mui/icons-material/UndoRounded";
-import RedoRoundedIcon from "@mui/icons-material/RedoRounded";
-import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
-import FormatListNumberedIcon from "@mui/icons-material/FormatListNumbered";
-import InsertPhotoOutlinedIcon from "@mui/icons-material/InsertPhotoOutlined";
-import LinkRoundedIcon from "@mui/icons-material/LinkRounded";
-import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import InputWrapper from "@/components/ui/input-wrapper/input-wrapper.component";
-import ArrowForwardRounded from "@mui/icons-material/ArrowForwardRounded";
-import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
-import SendRoundedIcon from "@mui/icons-material/SendRounded";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import ExpandIcon from "@mui/icons-material/Expand";
-import SpellcheckIcon from "@mui/icons-material/Spellcheck";
-import MovingIcon from "@mui/icons-material/Moving";
-import CloseFullscreenRoundedIcon from "@mui/icons-material/CloseFullscreenRounded";
+
+import {
+  FormatBold,
+  FormatItalic,
+  FormatStrikethrough,
+  FormatListBulletedRounded,
+  FormatQuoteRounded,
+  UndoRounded,
+  RedoRounded,
+  SaveOutlined,
+  FormatListNumbered,
+  InsertPhotoOutlined,
+  LinkRounded,
+  CloseRounded,
+  ArrowForwardRounded,
+  AutoAwesome,
+  SendRounded,
+  MoreVert,
+  Expand,
+  Spellcheck,
+  Moving,
+  CloseFullscreenRounded
+} from "@mui/icons-material";
 
 import toneOfVoices from "@/json/tone-of-voice.json";
-import CustomizedTooltip from "@/components/ui/custom-tooltip/custom-tooltip.component";
 
 export default function Writing() {
   const router = useRouter();
@@ -545,7 +546,7 @@ export default function Writing() {
                 editor?.isActive("bold") ? styles.activeTool : ""
               )}
             >
-              <FormatBoldIcon />
+              <FormatBold />
             </div>
             <div
               onClick={() => editor?.chain().focus().toggleItalic().run()}
@@ -554,7 +555,7 @@ export default function Writing() {
                 editor?.isActive("italic") ? styles.activeTool : ""
               )}
             >
-              <FormatItalicIcon />
+              <FormatItalic />
             </div>
             <div
               onClick={() => editor?.chain().focus().toggleStrike().run()}
@@ -563,7 +564,7 @@ export default function Writing() {
                 editor?.isActive("strike") ? styles.activeTool : ""
               )}
             >
-              <FormatStrikethroughIcon />
+              <FormatStrikethrough />
             </div>
           </div>
           <div className={styles.toolsWrapper}>
@@ -574,7 +575,7 @@ export default function Writing() {
                 editor?.isActive("bulletList") ? styles.activeTool : ""
               )}
             >
-              <FormatListBulletedRoundedIcon />
+              <FormatListBulletedRounded />
             </div>
             <div
               onClick={() => editor?.chain().focus().toggleOrderedList().run()}
@@ -583,10 +584,10 @@ export default function Writing() {
                 editor?.isActive("orderedList") ? styles.activeTool : ""
               )}
             >
-              <FormatListNumberedIcon />
+              <FormatListNumbered />
             </div>
             <div onClick={() => setLinkPopupOpen(true)} className={styles.tool}>
-              <InsertPhotoOutlinedIcon />
+              <InsertPhotoOutlined />
             </div>
             <div
               onClick={() => editor?.chain().focus().toggleBlockquote().run()}
@@ -595,7 +596,7 @@ export default function Writing() {
                 editor?.isActive("blockquote") ? styles.activeTool : ""
               )}
             >
-              <FormatQuoteRoundedIcon />
+              <FormatQuoteRounded />
             </div>
             <div
               onClick={() => setLink()}
@@ -604,7 +605,7 @@ export default function Writing() {
                 editor?.isActive("link") ? styles.activeTool : ""
               )}
             >
-              <LinkRoundedIcon />
+              <LinkRounded />
             </div>
           </div>
           <div className={styles.toolsWrapper}>
@@ -617,7 +618,7 @@ export default function Writing() {
                   : ""
               )}
             >
-              <UndoRoundedIcon />
+              <UndoRounded />
             </div>
             <div
               onClick={() => editor?.chain().focus().redo().run()}
@@ -628,13 +629,13 @@ export default function Writing() {
                   : ""
               )}
             >
-              <RedoRoundedIcon />
+              <RedoRounded />
             </div>
           </div>
         </div>
         <div className={styles.buttonWrapper}>
           <Button key={1} type={"solid"} onClick={() => saveContent()}>
-            <p>Save & close</p> <SaveOutlinedIcon />
+            <p>Save & close</p> <SaveOutlined />
           </Button>
         </div>
       </div>
@@ -662,7 +663,7 @@ export default function Writing() {
               <div className={styles.bubbleInput}>
                 <Button type={"solid"} onClick={() => generateTitleContent()}>
                   <p>Generate text</p>
-                  <AutoAwesomeIcon />
+                  <AutoAwesome />
                 </Button>
                 <input
                   type="text"
@@ -676,7 +677,7 @@ export default function Writing() {
                   }}
                 />
                 <div onClick={() => AiContentChange()}>
-                  <SendRoundedIcon />
+                  <SendRounded />
                 </div>
               </div>
                 <div
@@ -684,20 +685,20 @@ export default function Writing() {
                   className={styles.inputOptions}
                   onClick={() => setOpenOptions(!openOptions)}
                 >
-                  <MoreVertIcon />
+                  <MoreVert />
                   {openOptions && (
                 <div className={styles.optionsMenu}>
                   <p onClick={() => generateTitleContent(undefined, "improve")}>
-                    <MovingIcon /> Improve
+                    <Moving /> Improve
                   </p>
                   <p onClick={() => generateTitleContent(undefined, "shorten")}>
-                    <CloseFullscreenRoundedIcon /> Shorten
+                    <CloseFullscreenRounded /> Shorten
                   </p>
                   <p onClick={() => generateTitleContent(undefined, "expand")}>
-                    <ExpandIcon /> Expand
+                    <Expand /> Expand
                   </p>
                   <p onClick={() => generateTitleContent(undefined, "grammar")}>
-                    <SpellcheckIcon /> Correct spelling & grammar
+                    <Spellcheck /> Correct spelling & grammar
                   </p>
                 </div>
               )}
@@ -711,7 +712,7 @@ export default function Writing() {
         <div className={styles.bottomButtons}>
           <Button type={"outline"} onClick={() => generateAllContent()}>
             <p>Generate all</p>
-            <AutoAwesomeIcon />
+            <AutoAwesome />
           </Button>
         </div>
       )}
@@ -722,7 +723,7 @@ export default function Writing() {
             titleButtons={
               <Button type={"textOnly"} onClick={() => setLinkPopupOpen(false)}>
                 <p>Close</p>
-                <CloseRoundedIcon />
+                <CloseRounded />
               </Button>
             }
             buttons={

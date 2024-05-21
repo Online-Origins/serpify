@@ -8,14 +8,16 @@ export default function PageTitle({
   title,
   goBack,
   editing,
+  smallerHeader,
 }: {
   buttons?: React.ReactNode;
   title: String;
   goBack?: any;
   editing?: any;
+  smallerHeader?: boolean;
 }) {
   return (
-    <div className={styles.topTitleWrapper}>
+    <div className={classNames(styles.topTitleWrapper, smallerHeader && styles.smallerHeader)}>
       <div className={styles.leftWrapper}>
         {goBack && (
           <div className={styles.arrowWrapper} onClick={() => goBack()}>
@@ -23,7 +25,7 @@ export default function PageTitle({
           </div>
         )}
         <div onClick={editing ? editing : null} className={classNames(styles.titleWrapper, editing ? styles.editing : '')}>
-          <h1>{title}</h1>
+          {!smallerHeader ? <h1>{title}</h1> : <h2>{title}</h2>}
           {editing && <EditIcon />}
         </div>
       </div>

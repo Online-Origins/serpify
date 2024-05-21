@@ -1,5 +1,5 @@
 'use client';
-import styles from "./index.module.scss";
+import styles from "./app-wrapper.module.scss";
 import MenuBar from "@/components/menu-bar/menu-bar.component";
 import ComponentWrapper from "@/components/ui/component-wrapper/component-wrapper.component";
 import classNames from "classnames";

@@ -31,14 +31,20 @@ export default function CollectionsWrapper({
         } else if (array.length >= collections.length) {
           loadingRef.current = false;
         }
-        setCounter(counter + 1);
-      }, 1000);
+        if (!small){
+          setCounter(counter + 1);
+        } else {
+          if (counter < 3){
+            setCounter(counter + 1);
+          }
+        }
+        }, 1000);
     }
   }, [counter, collections, shownCollections]);
 
   return (
     <div className={classNames(styles.collectionsWrapper, "scrollbar")}>
-      {shownCollections.length > 0 ?
+      {shownCollections.length > 0 &&
         shownCollections
           .filter((collection) => collection) // Filter out undefined or null collections
           .map((collection: any) => (
@@ -48,7 +54,7 @@ export default function CollectionsWrapper({
               shownCollections={shownCollections}
               setShownCollections={setShownCollections}
             />
-          )) : <h5>No collections found</h5>}
+          ))}
       {!small && loadingRef.current &&
         <PopUpWrapper>
           <CircularLoader />

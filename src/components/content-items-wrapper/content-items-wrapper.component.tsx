@@ -41,7 +41,7 @@ export default function ContentItemsWrapper({
     setShownContents(sortContents(array));
   }
 
-  function sortContents(array:any) {
+  function sortContents(array: any) {
     const sorted = array.sort((a: any, b: any) => {
       const dateA = new Date(a.date_edited);
       const dateB = new Date(b.date_edited);
@@ -65,14 +65,16 @@ export default function ContentItemsWrapper({
     <div className={styles.pageWrapper}>
       <div className={styles.topRowWrapper}>
         <div className={styles.wrappingInput}>
-        <InputWrapper
-          className={styles.input}
-          type="text"
-          value={titleFilter}
-          onChange={(value: string) => setTitleFilter(value)}
-          icon={<SearchRoundedIcon />}
-          placeholder="Search by content title"
-        />
+          {!small && (
+            <InputWrapper
+              className={styles.input}
+              type="text"
+              value={titleFilter}
+              onChange={(value: string) => setTitleFilter(value)}
+              icon={<SearchRoundedIcon />}
+              placeholder="Search by content title"
+            />
+          )}
         </div>
         <div className={styles.rowItem}>
           <h5>Content score:</h5>

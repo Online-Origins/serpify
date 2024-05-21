@@ -8,6 +8,10 @@
     padding-bottom: 1rem;
     border-bottom: solid 2px $black;
 
+    &.smallerHeader{
+    border-bottom: solid 1px $black;
+    }
+
     .leftWrapper {
         display: flex;
         align-items: center;
