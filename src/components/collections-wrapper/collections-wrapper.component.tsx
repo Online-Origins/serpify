@@ -17,15 +17,20 @@ export default function CollectionsWrapper({
   const loadingRef = useRef(true);
 
   useEffect(() => {
-    if(loadingRef.current && collections.length > 0){
-      let array: any[] = [];
-      for (let x = 0; x < (small ? 3 : collections.length); x++){
-        array.push(collections[x]);
+    const loadCollections = async () => {
+      if (loadingRef.current && collections.length > 0) {
+        let array = [];
+        for (let x = 0; x < (small ? 3 : collections.length); x++) {
+          await new Promise(resolve => setTimeout(resolve, 750)); // Adjust delay time as needed
+          array.push(collections[x]);
+          setShownCollections([...array]); // Update shown collections
+        }
+        loadingRef.current = false;
       }
-      setShownCollections(array)
-      loadingRef.current = false;
-    }
-  }, [loadingRef.current])
+    };
+
+    loadCollections();
+  }, [loadingRef.current, collections, small]);
 
   return (
     <div className={classNames(styles.collectionsWrapper, "scrollbar")}>
