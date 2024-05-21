@@ -71,7 +71,7 @@
     display: flex;
     flex-flow: column;
     gap: 1rem;
-    overflow-y: scroll;
+    overflow-y: auto;
     overflow-x: hidden;
     position: relative;
     padding-top: 2rem;
@@ -236,6 +236,12 @@
         overflow: hidden;
         box-shadow: $shadow;
         animation: showAni .3s ease-in-out forwards;
+
+        &.bottomPos{
+            top: auto;
+            bottom: 0;
+            transform: translateY(100%);
+        }
 
         @keyframes showAni {
         0% {

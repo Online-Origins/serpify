@@ -57,6 +57,7 @@ export default function Writing() {
   const [openOptions, setOpenOptions] = useState(false);
   const optionsRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<HTMLDivElement>(null);
+  const [bubbleDistance, setBubbleDistance] = useState(0)
 
   const handleClickOutside = (event: MouseEvent) => {
     if (
@@ -73,6 +74,27 @@ export default function Writing() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  useEffect(() => {
+    const handleMouseDown = () => {
+      if (editorRef.current && optionsRef.current) {
+        const parentRect = editorRef.current.getBoundingClientRect();
+        const childRect = optionsRef.current.getBoundingClientRect();
+        const distanceTop = childRect.top - parentRect.top;
+        setBubbleDistance(childRect.top - parentRect.top);
+      }
+    };
+
+    if (editorRef.current) {
+      editorRef.current.addEventListener("click", handleMouseDown);
+    }
+
+    return () => {
+      if (editorRef.current) {
+        editorRef.current.removeEventListener("click", handleMouseDown);
+      }
+    };
+  });
 
   const editor = useEditor({
     extensions: [
@@ -96,6 +118,8 @@ export default function Writing() {
   useEffect(() => {
     if (editor?.isActive("paragraph")) {
       setSelectedTextType("Paragraph");
+    } else if (editor?.isActive("heading", { level: 1 })) {
+      setSelectedTextType("Heading 1");
     } else if (editor?.isActive("heading", { level: 2 })) {
       setSelectedTextType("Heading 2");
     } else if (editor?.isActive("heading", { level: 3 })) {
@@ -121,8 +145,7 @@ export default function Writing() {
       !getOutlines.current &&
       !gotContent.current
     ) {
-      let content = "";
-
+      let content = `<h1>${currentContent[0].content_title}</h1>`;
       currentContent[0].outlines.map((outline: any) => {
         content += `<${outline.type}>${outline.title}</${outline.type}><p></p>`;
         if (outline.subtitles) {
@@ -150,7 +173,9 @@ export default function Writing() {
     if (data) {
       if (data[0].content) {
         gotContent.current = true;
-        editor?.commands.setContent(data[0].content);
+        editor?.commands.setContent(
+          `<h1>${data[0].content_title}</h1>` + data[0].content
+        );
       }
       setCurrentContent(data);
     }
@@ -159,6 +184,8 @@ export default function Writing() {
   function changeTextType(value: string) {
     if (value == "Paragraph") {
       editor?.chain().focus().setParagraph().run();
+    } else if (value == "Heading 1") {
+      editor?.chain().focus().toggleHeading({ level: 1 }).run();
     } else if (value == "Heading 2") {
       editor?.chain().focus().toggleHeading({ level: 2 }).run();
     } else if (value == "Heading 3") {
@@ -562,6 +589,7 @@ export default function Writing() {
               className={styles.typeDropdown}
             >
               <MenuItem value="Paragraph">Paragraph</MenuItem>
+              <MenuItem value="Heading 1">Heading 1</MenuItem>
               <MenuItem value="Heading 2">Heading 2</MenuItem>
               <MenuItem value="Heading 3">Heading 3</MenuItem>
               <MenuItem value="Heading 4">Heading 4</MenuItem>
@@ -670,7 +698,6 @@ export default function Writing() {
       </div>
       {currentContent.length > 0 && (
         <div ref={editorRef} className={classNames(styles.editor, "scrollbar")}>
-          <h1>{currentContent[0].content_title}</h1>
           <EditorContent editor={editor} />
           {editor && (
             <BubbleMenu
@@ -716,7 +743,7 @@ export default function Writing() {
               >
                 <MoreVert />
                 {openOptions && (
-                  <div className={styles.optionsMenu}>
+                  <div className={classNames(styles.optionsMenu, bubbleDistance < 175 && styles.bottomPos)}>
                     <p
                       onClick={() => generateTitleContent(undefined, "improve")}
                     >
