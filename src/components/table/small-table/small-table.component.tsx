@@ -40,7 +40,7 @@ export default function SmallTable({
           },
         }));
         newData.sort(
-          (a: any, b:any) =>
+          (a: any, b: any) =>
             b.keywordMetrics.potentialIndex - a.keywordMetrics.potentialIndex
         );
         setKeywordsData(newData);
@@ -50,20 +50,31 @@ export default function SmallTable({
   }, [isGettingData]);
 
   async function getKeywordsData() {
-    const response = await fetch("/api/keywordMetrics", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: JSON.stringify({
-        keywords: smallTableKeywords,
-        language: language,
-        country: country,
-      })
-    });
+    let attempt = 0;
+    const retries = 3;
+    while (attempt < retries) {
+      try {
+        const response = await fetch("/api/keywordMetrics", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: JSON.stringify({
+            keywords: smallTableKeywords,
+            language: language,
+            country: country,
+          }),
+        });
 
-    const data = await response.json();
-    return data;
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        attempt++;
+        if (attempt === retries) {
+          throw error;
+        }
+      }
+    }
   }
 
   function searchVolume(googleVolume: number) {
@@ -171,7 +182,9 @@ export default function SmallTable({
                 <p>{keyword.keywordMetrics.potentialIndex.toString()}</p>
 
                 <IndicationIcon
-                  indication={Indexation(100 - keyword.keywordMetrics.potentialIndex)}
+                  indication={Indexation(
+                    100 - keyword.keywordMetrics.potentialIndex
+                  )}
                 />
               </div>
             </div>

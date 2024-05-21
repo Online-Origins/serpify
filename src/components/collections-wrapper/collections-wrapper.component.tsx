@@ -14,33 +14,18 @@ export default function CollectionsWrapper({
   small?: boolean;
 }) {
   const [shownCollections, setShownCollections] = useState<any[]>([]);
-  const [counter, setCounter] = useState(0);
   const loadingRef = useRef(true);
 
   useEffect(() => {
-    if (collections.length > 0) {
-      let array = shownCollections;
-      setTimeout(() => {
-        if (
-          array.length < collections.length &&
-          !array.includes(collections[counter])
-        ) {
-          array.push(collections[counter]);
-          setShownCollections(array);
-          loadingRef.current = true;
-        } else if (array.length >= collections.length) {
-          loadingRef.current = false;
-        }
-        if (!small){
-          setCounter(counter + 1);
-        } else {
-          if (counter < 3){
-            setCounter(counter + 1);
-          }
-        }
-        }, 1000);
+    if(loadingRef.current && collections.length > 0){
+      let array: any[] = [];
+      for (let x = 0; x < (small ? 3 : collections.length); x++){
+        array.push(collections[x]);
+      }
+      setShownCollections(array)
+      loadingRef.current = false;
     }
-  }, [counter, collections, shownCollections]);
+  }, [loadingRef.current])
 
   return (
     <div className={classNames(styles.collectionsWrapper, "scrollbar")}>
@@ -53,14 +38,15 @@ export default function CollectionsWrapper({
               collection={collection}
               shownCollections={shownCollections}
               setShownCollections={setShownCollections}
+              smallWrapper={small}
             />
           ))}
-      {!small && loadingRef.current &&
+      {loadingRef.current && (
         <PopUpWrapper>
           <CircularLoader />
           <p>Loading collections...</p>
         </PopUpWrapper>
-      }
+      )}
     </div>
   );
 }

@@ -11,10 +11,12 @@ export default function CollectionCard({
   collection,
   shownCollections,
   setShownCollections,
+  smallWrapper,
 }: {
   collection: any;
   shownCollections: any;
   setShownCollections: any;
+  smallWrapper?: boolean;
 }) {
   const router = useRouter();
 
@@ -47,7 +49,7 @@ export default function CollectionCard({
           },
         ])
         .select();
-      if (!inserting.error) {
+      if (!inserting.error && !smallWrapper) {
         setShownCollections([
           ...shownCollections,
           { ...data[0], id: inserting.data[0].id },
@@ -79,6 +81,7 @@ export default function CollectionCard({
         >
           <p>See collection</p>
         </Button>
+        {/* Needs to be fixed */}
         <Button type={"solid"} onClick={() => console.log(true)}>
           <p>Create content</p>
           <ArrowForwardRoundedIcon />

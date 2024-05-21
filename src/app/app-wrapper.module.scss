@@ -10,16 +10,16 @@
 
     .innerWrapper {
         padding-top: 1rem;
-        max-height: 100%;
-        min-width: 1200px;
-        width: 1200px;
+        height: max-content;
+        min-width: 1300px;
+        width: 1300px;
         transition: .6s width ease-in-out;
         transition-delay: .2s;
         margin-bottom: 1rem;
 
         @media (min-width: 2000px) {
-            min-width: 1500px;
-            width: 1500px;
+            min-width: 1600px;
+            width: 1600px;
         }
     }
 
@@ -29,17 +29,32 @@
 
 
     &.smallerWrapper {
-        justify-content: start;
-    }
+        @media (max-width: 1550px) {
+            justify-content: start;
+        }
 
-    &.small{
-        @media (max-width: 1700px) {
+        &.small {
             justify-content: start;
         }
     }
-}
 
-.scoreWrapper {
-    padding-top: 1rem;
-    width: 400px;
+    &.small {
+        overflow-y: hidden;
+
+        @media (max-width: 1700px) {
+            justify-content: start;
+        }
+
+        .innerWrapper {
+            height: calc(100% - 2rem);
+
+            min-width: 1200px;
+            width: 1200px;
+
+            @media (min-width: 2000px) {
+                min-width: 1400px;
+                width: 1400px;
+            }
+        }
+    }
 }

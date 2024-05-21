@@ -23,7 +23,8 @@ export default function AppWrapper({
         className={classNames(
           styles.pagesWrapper,
           !smallNav && styles.smallerWrapper,
-          pathname == "/content/create/writing" && styles.small
+          pathname == "/content/create/writing" && styles.small,
+          "scrollbar"
         )}
       >
         <div className={styles.innerWrapper}>{children}</div>

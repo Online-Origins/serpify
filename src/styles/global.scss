@@ -98,6 +98,7 @@ a {
 .scrollbar {
     &::-webkit-scrollbar {
         width: .5rem;
+        height: .5rem;
         position: absolute;
     }
 
@@ -105,6 +106,11 @@ a {
         background-color: $purple_secundary;
         border-radius: 1rem;
     }
+
+    &::-webkit-scrollbar-track {
+        margin: 1rem;
+        border-radius: 1rem;
+      }
 }
 
 .typeDropdown {
