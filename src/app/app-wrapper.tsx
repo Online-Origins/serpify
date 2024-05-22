@@ -7,6 +7,7 @@ import classNames from "classnames";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import ContentScore from "@/components/content-score/content-score.component";
+import { useSharedContext } from '@/context/SharedContext';
 
 export default function AppWrapper({
   children,
@@ -15,6 +16,7 @@ export default function AppWrapper({
 }) {
   const pathname = usePathname();
   const [smallNav, setSmallNav] = useState(pathname != "/");
+  const { sharedData } = useSharedContext();
 
   return (
     <body>
@@ -31,7 +33,7 @@ export default function AppWrapper({
       </ComponentWrapper>
       {pathname == "/content/create/writing" && (
         <ComponentWrapper className={styles.scoreWrapper}>
-          <ContentScore/>
+          <ContentScore contentHTML={sharedData} />
         </ComponentWrapper>
       )}
     </body>

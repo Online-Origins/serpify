@@ -41,6 +41,7 @@ import {
 } from "@mui/icons-material";
 
 import toneOfVoices from "@/json/tone-of-voice.json";
+import { useSharedContext } from '@/context/SharedContext';
 
 export default function Writing() {
   const router = useRouter();
@@ -57,7 +58,16 @@ export default function Writing() {
   const [openOptions, setOpenOptions] = useState(false);
   const optionsRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<HTMLDivElement>(null);
-  const [bubbleDistance, setBubbleDistance] = useState(0)
+  const [bubbleDistance, setBubbleDistance] = useState(0);
+  const [contentHTML, setContentHTML] = useState("");
+
+  const { setSharedData } = useSharedContext();
+
+  useEffect(() => {
+    if (contentHTML != ""){
+      setSharedData(contentHTML);
+    }
+  }, [contentHTML])
 
   const handleClickOutside = (event: MouseEvent) => {
     if (
@@ -80,7 +90,6 @@ export default function Writing() {
       if (editorRef.current && optionsRef.current) {
         const parentRect = editorRef.current.getBoundingClientRect();
         const childRect = optionsRef.current.getBoundingClientRect();
-        const distanceTop = childRect.top - parentRect.top;
         setBubbleDistance(childRect.top - parentRect.top);
       }
     };
@@ -113,6 +122,10 @@ export default function Writing() {
         showOnlyCurrent: false,
       }),
     ],
+    onUpdate: ({editor}) => {
+      const html = editor.getHTML();
+      setContentHTML(html);
+    }
   });
 
   useEffect(() => {

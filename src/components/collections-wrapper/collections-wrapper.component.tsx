@@ -21,9 +21,9 @@ export default function CollectionsWrapper({
       if (loadingRef.current && collections.length > 0) {
         let array = [];
         for (let x = 0; x < (small ? 3 : collections.length); x++) {
-          await new Promise(resolve => setTimeout(resolve, 750)); // Adjust delay time as needed
+          await new Promise(resolve => setTimeout(resolve, 750));
           array.push(collections[x]);
-          setShownCollections([...array]); // Update shown collections
+          setShownCollections([...array]);
         }
         loadingRef.current = false;
       }

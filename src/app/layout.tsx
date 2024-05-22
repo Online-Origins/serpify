@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "@/styles/global.scss";
 import AppWrapper from "./app-wrapper";
+import { SharedProvider } from "@/context/SharedContext";
 
 export const metadata: Metadata = {
   title: "Serpify | Automate SEO, Optimize Visibility, Dominate Online",
@@ -13,10 +14,11 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   return (
     <html lang="en">
-      <AppWrapper>{children}</AppWrapper>
+      <SharedProvider>
+        <AppWrapper>{children}</AppWrapper>
+      </SharedProvider>
     </html>
   );
 }
