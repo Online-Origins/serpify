@@ -32,8 +32,8 @@ export default function AppWrapper({
         <div className={styles.innerWrapper}>{children}</div>
       </ComponentWrapper>
       {pathname == "/content/create/writing" && (
-        <ComponentWrapper className={styles.scoreWrapper}>
-          <ContentScore contentHTML={sharedData} />
+        <ComponentWrapper className={classNames(styles.scoreWrapper, "scrollbar")}>
+          <ContentScore contentScore={sharedData} />
         </ComponentWrapper>
       )}
     </body>

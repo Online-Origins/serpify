@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 interface SharedContextProps {
   sharedData: string | null;
-  setSharedData: (data: string) => void;
+  setSharedData: (data: any) => void;
 }
 
 const SharedContext = createContext<SharedContextProps | undefined>(undefined);

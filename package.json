@@ -31,7 +31,8 @@
     "react": "^18",
     "react-circular-progressbar": "^2.1.0",
     "react-dom": "^18",
-    "sass": "^1.74.1"
+    "sass": "^1.74.1",
+    "seord": "^0.0.5-patch.2"
   },
   "devDependencies": {
     "@types/node": "^20",

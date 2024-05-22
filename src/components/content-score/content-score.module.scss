@@ -1,6 +1,146 @@
 @import '@/styles/variables';
 
-.contentScore{
+.contentScore {
+    width: 350px;
     padding-top: 1rem;
-    width: 400px;
+    display: flex;
+    flex-flow: column;
+    height: calc(100% - 2rem);
+    overflow: hidden;
+
+    .analysis {
+        display: flex;
+        flex-flow: column;
+        padding-top: 1rem;
+        padding-right: .5rem;
+        gap: 1rem;
+        align-items: center;
+        overflow-y: scroll;
+        height: 100%;
+
+        .horizontal {
+            display: flex;
+            justify-content: space-between;
+            text-wrap: nowrap;
+            width: 100%;
+        }
+
+        .meterWrapper {
+            width: 200px;
+            height: 100px;
+            position: relative;
+
+            .score {
+                width: 100%;
+            }
+
+            h1 {
+                color: $purple_primary;
+                position: absolute;
+                bottom: 0;
+                margin-bottom: -.2rem;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+        }
+
+        .points {
+            width: 100%;
+            display: flex;
+            flex-flow: column;
+            align-items: flex-start;
+            z-index: 100;
+            position: relative;
+
+            .pointsHeader {
+                display: flex;
+                width: 100%;
+                justify-content: space-between;
+                user-select: none;
+                cursor: pointer;
+                background-color: $white;
+                z-index: 100;
+
+                h4 {
+                    width: 100%;
+                }
+                
+                svg{
+                    transition: .6s all ease-in-out;
+                }
+            }
+
+            p {
+                display: flex;
+                gap: .5rem;
+                padding: .25rem 0;
+                opacity: 0;
+                animation: dropup 0.3s ease-out forwards;
+
+                @keyframes dropup {
+                    0% {
+                        display: flex;
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+
+                    99% {
+                        opacity: 0;
+                        transform: translateY(-20px);
+                    }
+
+                    100% {
+                        display: none;
+                    }
+                }
+
+                svg {
+                    font-size: .8rem;
+                    margin-top: .15rem;
+                }
+
+                &.good {
+                    svg {
+                        color: $green;
+                    }
+                }
+
+                &.minor {
+                    svg {
+                        color: $orange;
+                    }
+                }
+
+                &.warning {
+                    svg {
+                        color: $red;
+                    }
+                }
+            }
+
+            &.open {
+                .pointsHeader {
+                    svg {
+                        rotate: 180deg;
+                    }
+                }
+
+                p {
+                    animation: dropdown 0.6s ease-out forwards;
+                }
+            }
+
+            @keyframes dropdown {
+                0% {
+                    opacity: 0;
+                    transform: translateY(-20px);
+                }
+
+                100% {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        }
+    }
 }

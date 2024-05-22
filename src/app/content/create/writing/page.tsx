@@ -16,6 +16,7 @@ import PopUpWrapper from "@/components/ui/popup-wrapper/popup-wrapper.component"
 import PopUp from "@/components/ui/popup/popup.component";
 import CircularLoader from "@/components/circular-loader/circular-loader.component";
 import InputWrapper from "@/components/ui/input-wrapper/input-wrapper.component";
+import { SeoCheck } from "seord";
 
 import {
   FormatBold,
@@ -41,6 +42,7 @@ import {
 } from "@mui/icons-material";
 
 import toneOfVoices from "@/json/tone-of-voice.json";
+import languages from "@/json/language-codes.json";
 import { useSharedContext } from '@/context/SharedContext';
 
 export default function Writing() {
@@ -59,15 +61,33 @@ export default function Writing() {
   const optionsRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<HTMLDivElement>(null);
   const [bubbleDistance, setBubbleDistance] = useState(0);
-  const [contentHTML, setContentHTML] = useState("");
-
+  const [contentInfo, setContentInfo] = useState({html: "", keywords: [""], language: "", title: ""});
+  const [seoAnalysis, setSeoAnalysis] = useState<any>();
   const { setSharedData } = useSharedContext();
 
   useEffect(() => {
-    if (contentHTML != ""){
-      setSharedData(contentHTML);
+    if (contentInfo.html != ""){
+      getContentScore();
     }
-  }, [contentHTML])
+  }, [contentInfo])
+
+  async function getContentScore() {
+    const contentJson = {
+      title: contentInfo.title,
+      htmlText: contentInfo.html,
+      subKeywords: contentInfo.keywords,
+      keyword: contentInfo.keywords[0],
+      metaDescription: "",
+      languageCode: contentInfo.language,
+      countryCode: "",
+    };
+
+    const seoCheck = new SeoCheck(contentJson);
+
+    const result = await seoCheck.analyzeSeo();
+    setSeoAnalysis(result);
+    setSharedData(result)
+  }
 
   const handleClickOutside = (event: MouseEvent) => {
     if (
@@ -122,9 +142,12 @@ export default function Writing() {
         showOnlyCurrent: false,
       }),
     ],
-    onUpdate: ({editor}) => {
+    onUpdate: ({ editor }) => {
       const html = editor.getHTML();
-      setContentHTML(html);
+      setContentInfo((prevContentInfo) => ({
+        ...prevContentInfo,
+        html: html
+      }));
     }
   });
 
@@ -173,6 +196,16 @@ export default function Writing() {
         }
       });
       editor?.commands.setContent(content);
+      
+      const language = languages.find(
+        (item) => item.id == currentContent[0].language
+      );
+      setContentInfo({
+        title: currentContent[0].content_title,
+        keywords: currentContent[0].keywords,
+        language: language ? language.languageCode : "",
+        html: content
+      });
 
       getOutlines.current = true;
     }
@@ -186,10 +219,17 @@ export default function Writing() {
     if (data) {
       if (data[0].content) {
         gotContent.current = true;
-        editor?.commands.setContent(
-          `<h1>${data[0].content_title}</h1>` + data[0].content
-        );
+        editor?.commands.setContent(data[0].content);
       }
+      const language = languages.find(
+        (item) => item.id == data[0].language
+      );
+      setContentInfo({
+        title: data[0].content_title,
+        keywords: data[0].keywords,
+        language: language ? language.languageCode : "",
+        html: data[0].content
+      });
       setCurrentContent(data);
     }
   }
@@ -225,6 +265,7 @@ export default function Writing() {
       .update({
         edited_on: currentDate(),
         content: editor?.getHTML(),
+        content_score: Math.ceil(seoAnalysis.seoScore),
       })
       .eq("id", contentId);
     if (!error) {
