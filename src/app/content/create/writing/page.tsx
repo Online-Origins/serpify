@@ -844,7 +844,7 @@ export default function Writing() {
             type={"outline"}
             onClick={() => {
               alert("Progress won't be saved");
-              router.push("/content");
+              router.back();
             }}
           >
             <p>close</p> <CloseRounded />

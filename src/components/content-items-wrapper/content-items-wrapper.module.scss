@@ -6,6 +6,10 @@
     gap: 1rem;
     transition: none;
 
+    &.bottomExtend{
+        margin-bottom: 2.5rem;
+    }
+
     .topRowWrapper {
         display: flex;
         gap: 2rem;

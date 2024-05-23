@@ -8,6 +8,7 @@ import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import Information from "../information/information.component";
 
 import ArrowDownwardRoundedIcon from "@mui/icons-material/ArrowDownwardRounded";
+import classNames from "classnames";
 
 export default function ContentItemsWrapper({
   contents,
@@ -62,7 +63,7 @@ export default function ContentItemsWrapper({
   }, [titleFilter, contents]);
 
   return (
-    <div className={styles.pageWrapper}>
+    <div className={classNames(styles.pageWrapper, !small && styles.bottomExtend)}>
       <div className={styles.topRowWrapper}>
         <div className={styles.wrappingInput}>
           {!small && (
