@@ -11,19 +11,18 @@
     .innerWrapper {
         padding-top: 1rem;
         height: max-content;
-        min-width: 1300px;
-        width: 1300px;
-        transition: .6s width ease-in-out;
+        min-width: 1100px;
+        width: 1100px;
         transition-delay: .2s;
         margin-bottom: 1rem;
 
         @media (min-width: 2000px) {
-            min-width: 1600px;
-            width: 1600px;
+            min-width: 1450px;
+            width: 1450px;
         }
     }
 
-    @media (max-width: 1400px) {
+    @media (max-width: 1300px) {
         justify-content: start;
     }
 
@@ -41,20 +40,20 @@
     &.small {
         overflow-y: hidden;
 
-        @media (max-width: 1700px) {
+        @media (max-width: 1680px) {
             justify-content: start;
         }
 
         .innerWrapper {
             height: calc(100% - 2rem);
 
-            min-width: 1200px;
-            width: 1200px;
+            // min-width: 1200px;
+            // width: 1200px;
 
-            @media (min-width: 2000px) {
-                min-width: 1400px;
-                width: 1400px;
-            }
+            // @media (min-width: 2000px) {
+            //     min-width: 1450px;
+            //     width: 1450px;
+            // }
         }
     }
 }

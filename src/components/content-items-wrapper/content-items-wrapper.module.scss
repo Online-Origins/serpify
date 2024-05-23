@@ -8,9 +8,9 @@
 
     .topRowWrapper {
         display: flex;
-        gap: 1rem;
+        gap: 2rem;
         align-items: flex-end;
-        padding-right: 100px;
+        padding-right: 115px;
 
         .wrappingInput {
             width: 100%;
@@ -18,23 +18,26 @@
             .input {
                 width: 100%;
             }
-                @media (min-width: 2000px) {
-                    width: 700px;
 
-                    .input{
-                        width: 500px;
-                    }
+            @media (min-width: 2000px) {
+                width: 700px;
+
+                .input {
+                    width: 500px;
                 }
+            }
         }
 
         .rowItem {
             display: flex;
             gap: 1rem;
-            min-width: 200px;
+            min-width: 150px;
             align-items: center;
         }
 
         @media (min-width:2000px) {
+            padding-right: 100px;
+            gap: 1rem;
             .rowItem {
                 min-width: 250px;
             }

@@ -1,11 +1,23 @@
-.collectionsWrapper{
+.collectionsWrapper {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1.5rem;
     overflow-y: scroll;
     overflow-x: hidden;
 
-    @media (min-width: 2000px){
+    @media (min-width: 2000px) {
         grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    &.small {
+        div[class^="collection-card_"]:last-of-type{
+            display: none;
+        }
+
+        @media (min-width: 2000px) {
+            div[class^="collection-card_"]:last-of-type{
+                display: flex;
+            }
+        }
     }
 }

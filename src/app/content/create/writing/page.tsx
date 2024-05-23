@@ -43,7 +43,7 @@ import {
 
 import toneOfVoices from "@/json/tone-of-voice.json";
 import languages from "@/json/language-codes.json";
-import { useSharedContext } from '@/context/SharedContext';
+import { useSharedContext } from "@/context/SharedContext";
 
 export default function Writing() {
   const router = useRouter();
@@ -61,20 +61,29 @@ export default function Writing() {
   const optionsRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<HTMLDivElement>(null);
   const [bubbleDistance, setBubbleDistance] = useState(0);
-  const [contentInfo, setContentInfo] = useState({html: "", keywords: [""], language: "", title: ""});
+  const [contentInfo, setContentInfo] = useState({
+    html: "",
+    keywords: [""],
+    language: "",
+    title: "",
+  });
   const [seoAnalysis, setSeoAnalysis] = useState<any>();
   const { setSharedData } = useSharedContext();
 
+  // If the editor updates then update the content score
   useEffect(() => {
-    if (contentInfo.html != ""){
+    if (contentInfo.html != "") {
       getContentScore();
     }
-  }, [contentInfo])
+  }, [contentInfo]);
 
   async function getContentScore() {
     const contentJson = {
-      title: contentInfo.title,
-      htmlText: contentInfo.html,
+      title: contentInfo.title.replace(/[-_@#!'"]/g, " ").toLowerCase(), // Filter out punction marks
+      htmlText: contentInfo.html
+        .replace(/[-_@#!'"]/g, " ") // Filter out punction marks
+        .toLowerCase()
+        .replace(/<h1>.*?<\/h1>/, ""), // Filter out the h1
       subKeywords: contentInfo.keywords,
       keyword: contentInfo.keywords[0],
       metaDescription: "",
@@ -83,22 +92,21 @@ export default function Writing() {
     };
 
     const seoCheck = new SeoCheck(contentJson);
-
     const result = await seoCheck.analyzeSeo();
     setSeoAnalysis(result);
-    setSharedData(result)
+    setSharedData(result);
   }
 
-  const handleClickOutside = (event: MouseEvent) => {
-    if (
-      optionsRef.current &&
-      !optionsRef.current.contains(event.target as Node)
-    ) {
-      setOpenOptions(false);
-    }
-  };
-
   useEffect(() => {
+    // Close menu when clicked outside
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        optionsRef.current &&
+        !optionsRef.current.contains(event.target as Node)
+      ) {
+        setOpenOptions(false);
+      }
+    };
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
@@ -106,6 +114,7 @@ export default function Writing() {
   }, []);
 
   useEffect(() => {
+    // Get distance to top from bubble
     const handleMouseDown = () => {
       if (editorRef.current && optionsRef.current) {
         const parentRect = editorRef.current.getBoundingClientRect();
@@ -146,9 +155,9 @@ export default function Writing() {
       const html = editor.getHTML();
       setContentInfo((prevContentInfo) => ({
         ...prevContentInfo,
-        html: html
+        html: html,
       }));
-    }
+    },
   });
 
   useEffect(() => {
@@ -196,7 +205,7 @@ export default function Writing() {
         }
       });
       editor?.commands.setContent(content);
-      
+
       const language = languages.find(
         (item) => item.id == currentContent[0].language
       );
@@ -204,7 +213,7 @@ export default function Writing() {
         title: currentContent[0].content_title,
         keywords: currentContent[0].keywords,
         language: language ? language.languageCode : "",
-        html: content
+        html: content,
       });
 
       getOutlines.current = true;
@@ -221,14 +230,12 @@ export default function Writing() {
         gotContent.current = true;
         editor?.commands.setContent(data[0].content);
       }
-      const language = languages.find(
-        (item) => item.id == data[0].language
-      );
+      const language = languages.find((item) => item.id == data[0].language);
       setContentInfo({
         title: data[0].content_title,
         keywords: data[0].keywords,
         language: language ? language.languageCode : "",
-        html: data[0].content
+        html: data[0].content,
       });
       setCurrentContent(data);
     }
@@ -745,6 +752,16 @@ export default function Writing() {
           </div>
         </div>
         <div className={styles.buttonWrapper}>
+          <Button
+            key={2}
+            type={"outline"}
+            onClick={() => {
+              alert("Progress won't be saved");
+              router.push("/content");
+            }}
+          >
+            <p>close</p> <CloseRounded />
+          </Button>
           <Button key={1} type={"solid"} onClick={() => saveContent()}>
             <p>Save & close</p> <SaveOutlined />
           </Button>
@@ -797,7 +814,12 @@ export default function Writing() {
               >
                 <MoreVert />
                 {openOptions && (
-                  <div className={classNames(styles.optionsMenu, bubbleDistance < 175 && styles.bottomPos)}>
+                  <div
+                    className={classNames(
+                      styles.optionsMenu,
+                      bubbleDistance < 175 && styles.bottomPos
+                    )}
+                  >
                     <p
                       onClick={() => generateTitleContent(undefined, "improve")}
                     >
@@ -825,12 +847,14 @@ export default function Writing() {
           )}
         </div>
       )}
-      <div className={styles.bottomButtons}>
-        <Button type={"outline"} onClick={() => generateAllContent()}>
-          <p>Generate all</p>
-          <AutoAwesome />
-        </Button>
-      </div>
+      {currentContent.length > 0 && (
+        <div className={styles.bottomButtons}>
+          <Button type={"outline"} onClick={() => generateAllContent()}>
+            <p>Generate all</p>
+            <AutoAwesome />
+          </Button>
+        </div>
+      )}
       {linkPopupOpen && (
         <PopUpWrapper>
           <PopUp

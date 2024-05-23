@@ -19,7 +19,7 @@
         display: flex;
         flex-flow: column;
         gap: .5rem;
-        width: 550px;
+        width: 450px;
 
         h4 {
             width: 100%;
@@ -36,12 +36,12 @@
         }
 
         @media (min-width: 2000px){
-            width: 700px;
+            width: 550px;
         }
     }
 
     .contentInfo{
-        width: 200px;
+        width: 150px;
 
         @media (min-width: 2000px) {
             width: 250px;

@@ -33,7 +33,7 @@ export default function CollectionsWrapper({
   }, [loadingRef.current, collections, small]);
 
   return (
-    <div className={classNames(styles.collectionsWrapper, "scrollbar")}>
+    <div className={classNames(styles.collectionsWrapper, "scrollbar", small && styles.small)}>
       {shownCollections.length > 0 &&
         shownCollections
           .filter((collection) => collection) // Filter out undefined or null collections

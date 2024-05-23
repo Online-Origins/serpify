@@ -65,6 +65,11 @@
             }
         }
     }
+
+    .buttonWrapper{
+        display: flex;
+        gap: 1rem;
+    }
 }
 
 .editor {

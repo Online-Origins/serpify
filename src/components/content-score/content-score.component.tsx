@@ -1,16 +1,23 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import PageTitle from "../page-title/page-title.component";
 import styles from "./content-score.module.scss";
 import { CircularProgressbar } from "react-circular-progressbar";
 
-import { KeyboardArrowUpRounded, CircleRounded } from "@mui/icons-material";
+import {
+  ArrowForwardIosRounded,
+  CircleRounded,
+  CloseRounded,
+  CheckRounded,
+} from "@mui/icons-material";
 import classNames from "classnames";
+import CustomizedTooltip from "../ui/custom-tooltip/custom-tooltip.component";
 
 export default function ContentScore({ contentScore }: { contentScore: any }) {
   const [goodOpen, setGoodOpen] = useState(false);
-  const [warningOpen, setWarningOpen] = useState(true);
   const [minorOpen, setMinorOpen] = useState(false);
+  const [warningOpen, setWarningOpen] = useState(false);
+  const [keywordsOpen, setKeywordsOpen] = useState(true);
 
   return (
     <div className={styles.contentScore}>
@@ -26,7 +33,7 @@ export default function ContentScore({ contentScore }: { contentScore: any }) {
             <h5>{contentScore.totalLinks}</h5>
           </div>
           <div className={styles.meterWrapper}>
-            <h1>{Math.ceil(contentScore.seoScore)}</h1>
+            <h1>{contentScore.seoScore.toFixed(0)}</h1>
             <CircularProgressbar
               value={contentScore.seoScore}
               circleRatio={0.5}
@@ -41,26 +48,26 @@ export default function ContentScore({ contentScore }: { contentScore: any }) {
               }}
             />
           </div>
-          <div className={classNames(styles.points,
-                goodOpen && styles.open)}>
+          <div className={classNames(styles.points, goodOpen && styles.open)}>
             <div
               className={styles.pointsHeader}
               onClick={() => setGoodOpen(!goodOpen)}
             >
               <h4>Good points: {contentScore.messages.goodPoints.length}</h4>
-              <KeyboardArrowUpRounded />
+              <ArrowForwardIosRounded />
             </div>
             {contentScore.messages.goodPoints.map(
-                (point: string, index: number) => (
-                  <p className={styles.good} key={index}>
+              (point: string, index: number) => (
+                <div className={styles.pointWrapper} key={index}>
+                  <p className={styles.good}>
                     <CircleRounded />
                     {point}
                   </p>
-                )
-              )}
+                </div>
+              )
+            )}
           </div>
-          <div className={classNames(styles.points,
-                minorOpen && styles.open)}>
+          <div className={classNames(styles.points, minorOpen && styles.open)}>
             <div
               className={styles.pointsHeader}
               onClick={() => setMinorOpen(!minorOpen)}
@@ -68,36 +75,76 @@ export default function ContentScore({ contentScore }: { contentScore: any }) {
               <h4>
                 Minor warnings: {contentScore.messages.minorWarnings.length}
               </h4>
-              <KeyboardArrowUpRounded />
+              <ArrowForwardIosRounded />
             </div>
             {contentScore.messages.minorWarnings.map(
-                (point: string, index: number) => (
-                  <p className={styles.minor} key={index}>
+              (point: string, index: number) => (
+                <div className={styles.pointWrapper} key={index}>
+                  <p className={styles.minor}>
                     <CircleRounded />
                     {point}
                   </p>
-                )
-              )}
+                </div>
+              )
+            )}
           </div>
-          <div className={classNames(styles.points,
-                warningOpen && styles.open)}>
+          <div
+            className={classNames(styles.points, warningOpen && styles.open)}
+          >
             <div
               className={styles.pointsHeader}
               onClick={() => setWarningOpen(!warningOpen)}
             >
-              <h4>
-                Warnings: {contentScore.messages.warnings.length}
-              </h4>
-              <KeyboardArrowUpRounded />
+              <h4>Warnings: {contentScore.messages.warnings.length}</h4>
+              <ArrowForwardIosRounded />
             </div>
             {contentScore.messages.warnings.map(
-                (point: string, index: number) => (
-                  <p className={styles.warning} key={index}>
+              (point: string, index: number) => (
+                <div className={styles.pointWrapper} key={index}>
+                  <p className={styles.warning}>
                     <CircleRounded />
                     {point}
                   </p>
-                )
-              )}
+                </div>
+              )
+            )}
+          </div>
+          <div
+            className={classNames(styles.points, keywordsOpen && styles.open)}
+          >
+            <div
+              className={styles.pointsHeader}
+              onClick={() => setKeywordsOpen(!keywordsOpen)}
+            >
+              <h4>Keywords</h4>
+              <ArrowForwardIosRounded />
+            </div>
+            {contentScore.subKeywordDensity.map(
+              (keyword: any, index: number) => (
+                <CustomizedTooltip
+                  information={`Keyword density: ${keyword.density.toFixed(
+                    2
+                  )}%`}
+                  key={index}
+                >
+                  <div
+                    className={classNames(
+                      styles.pointWrapper,
+                      keyword.density <= 2 && keyword.density >= 1
+                        ? styles.good
+                        : styles.warning
+                    )}
+                  >
+                    <p>{keyword.keyword}</p>
+                    {keyword.density <= 2 && keyword.density >= 1 ? (
+                      <CheckRounded />
+                    ) : (
+                      <CloseRounded />
+                    )}
+                  </div>
+                </CustomizedTooltip>
+              )
+            )}
           </div>
         </div>
       )}
