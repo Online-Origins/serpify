@@ -91,10 +91,97 @@ export default function Writing() {
       countryCode: "",
     };
 
-    const seoCheck = new SeoCheck(contentJson);
+    const seoCheck = new SeoCheck(contentJson); // Later add the website domain of the project
     const result = await seoCheck.analyzeSeo();
-    setSeoAnalysis(result);
-    setSharedData(result);
+    filterSeoCheck(result);
+  }
+
+  function filterSeoCheck(result: any) {
+    let analysis = result;
+
+    // Filter out the points removal when there is no meta description
+    // If meta description is added to the tool then remove this
+    for (let x = 0; x < analysis.messages.warnings.length; x++) {
+      if (
+        analysis.messages.warnings[x].toLowerCase().includes("meta description")
+      ) {
+        analysis.seoScore = analysis.seoScore + 2;
+      }
+    }
+
+    // Filter and add custom messages
+    analysis.messages.warnings = analysis.messages.warnings.filter(
+      (item: string) =>
+        !item.toLowerCase().includes("density of sub keyword") &&
+        !item.toLowerCase().includes("keyword density") &&
+        !item.toLowerCase().includes("meta description") &&
+        !item.toLowerCase().includes("internal links") //If there is a website domain remove this filter
+    );
+    analysis.messages.minorWarnings = analysis.messages.minorWarnings.filter(
+      (item: string) =>
+        !item.toLowerCase().includes("density of sub keyword") &&
+        !item.toLowerCase().includes("keyword density")
+    );
+    if (analysis.wordCount < 300) {
+      analysis.seoScore = analysis.seoScore - 30;
+      analysis.messages.warnings.push("Not enough words. Try adding more");
+    } else if (analysis.wordCount < 500) {
+      analysis.seoScore = analysis.seoScore - 15;
+      analysis.messages.warnings.push("Not enough words. Try adding more");
+    } else if (analysis.wordCount < 650) {
+      analysis.seoScore = analysis.seoScore - 5;
+      analysis.messages.minorWarnings.push(
+        "Decent amount of words. Try adding some more"
+      );
+    } else if (analysis.wordCount > 1000 && analysis.seoScore < 92) {
+      analysis.messages.goodPoints.push("Good amount of words used.");
+      analysis.seoScore = analysis.seoScore + 5;
+    }
+    analysis.messages.minorWarnings = analysis.messages.minorWarnings.filter(
+      (item: string) => !item.toLowerCase().includes(`tag "`)
+    );
+    analysis.messages.goodPoints = analysis.messages.goodPoints.filter(
+      (item: string) =>
+        !item.toLowerCase().includes(`tag "`) &&
+        !item.toLowerCase().includes("a keyword ")
+    );
+    analysis.messages.goodPoints = analysis.messages.goodPoints.map(
+      (item: string) => item.replace(/this./g, "").replace(/sub./g, "")
+    );
+
+    const expectedLinks = Math.floor(analysis.wordCount / 300); // Use Math.floor for integer comparison
+
+    if (analysis.totalLinks <= (expectedLinks / 4).toFixed(0)) {
+      analysis.seoScore -= 5;
+    } else if (analysis.totalLinks < expectedLinks && analysis.totalLinks > (expectedLinks / 4).toFixed(0)) {
+      analysis.seoScore -= 2;
+      analysis.messages.warnings = analysis.messages.warnings.filter(
+        (item: string) => !item.toLowerCase().includes("outbound links")
+      );
+      analysis.messages.minorWarnings.push(
+        `Decent amount of outbound links made: ${analysis.totalLinks}. Try adding some more`
+      );
+    } else if (analysis.totalLinks >= expectedLinks) {
+      analysis.messages.goodPoints.push(
+        `Good amount of outbound links: ${analysis.totalLinks}`
+      );
+    }
+
+    // Update the content score
+    for (let x = 0; x < analysis.subKeywordDensity.length; x++) {
+      if (
+        analysis.subKeywordDensity[x].density >= 1 &&
+        analysis.subKeywordDensity[x].density <= 2
+      ) {
+        analysis.seoScore = analysis.seoScore + 2;
+      } else {
+        analysis.seoScore = analysis.seoScore - 2;
+      }
+    }
+
+    setSeoAnalysis(analysis);
+    console.log(analysis);
+    setSharedData(analysis);
   }
 
   useEffect(() => {
