@@ -72,7 +72,7 @@ export default function Writing() {
 
   // If the editor updates then update the content score
   useEffect(() => {
-    if (contentInfo.html != "") {
+    if (contentInfo.html && contentInfo.html != "") {
       getContentScore();
     }
   }, [contentInfo]);
@@ -85,7 +85,7 @@ export default function Writing() {
         .toLowerCase()
         .replace(/<h1>.*?<\/h1>/, ""), // Filter out the h1
       subKeywords: contentInfo.keywords,
-      keyword: contentInfo.keywords[0],
+      keyword: "",
       metaDescription: "",
       languageCode: contentInfo.language,
       countryCode: "",
@@ -122,6 +122,11 @@ export default function Writing() {
         !item.toLowerCase().includes("density of sub keyword") &&
         !item.toLowerCase().includes("keyword density")
     );
+    analysis.messages.goodPoints = analysis.messages.goodPoints.filter(
+      (item: string) =>
+        !item.toLowerCase().includes("density of sub keyword") &&
+        !item.toLowerCase().includes("keyword density")
+    );
     if (analysis.wordCount < 300) {
       analysis.seoScore = analysis.seoScore - 30;
       analysis.messages.warnings.push("Not enough words. Try adding more");
@@ -149,11 +154,14 @@ export default function Writing() {
       (item: string) => item.replace(/this./g, "").replace(/sub./g, "")
     );
 
-    const expectedLinks = Math.floor(analysis.wordCount / 300); // Use Math.floor for integer comparison
+    const expectedLinks = Math.floor(analysis.wordCount / 300);
 
     if (analysis.totalLinks <= (expectedLinks / 4).toFixed(0)) {
       analysis.seoScore -= 5;
-    } else if (analysis.totalLinks < expectedLinks && analysis.totalLinks > (expectedLinks / 4).toFixed(0)) {
+    } else if (
+      analysis.totalLinks < expectedLinks &&
+      analysis.totalLinks > (expectedLinks / 4).toFixed(0)
+    ) {
       analysis.seoScore -= 2;
       analysis.messages.warnings = analysis.messages.warnings.filter(
         (item: string) => !item.toLowerCase().includes("outbound links")
@@ -239,9 +247,14 @@ export default function Writing() {
     ],
     onUpdate: ({ editor }) => {
       const html = editor.getHTML();
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, "text/html");
+      const h1Element = doc.querySelector("h1");
+
       setContentInfo((prevContentInfo) => ({
         ...prevContentInfo,
         html: html,
+        title: h1Element ? h1Element.innerText : prevContentInfo.title,
       }));
     },
   });
@@ -358,7 +371,8 @@ export default function Writing() {
       .update({
         edited_on: currentDate(),
         content: editor?.getHTML(),
-        content_score: Math.ceil(seoAnalysis.seoScore),
+        content_score: Math.floor(seoAnalysis.seoScore),
+        content_title: contentInfo.title,
       })
       .eq("id", contentId);
     if (!error) {
@@ -532,7 +546,7 @@ export default function Writing() {
             gptPrompt += `The newly generated will replace this text: "${currentNode.textContent}". `;
           } else if (currentNode.textContent == "") {
             gptPrompt += `The text is for a blog with the title "${
-              currentContent[0].content_title
+              contentInfo.title
             }" and will be about the following subtitle: "${handleGetPreviousHeading()}". The text has a ${
               toneOfVoice?.value
             } tone of voice, is in the language with the code ${
@@ -695,7 +709,7 @@ export default function Writing() {
               },
               body: JSON.stringify({
                 prompt: `Generate the paragraph for a blog. The text is for a blog with the title "${
-                  currentContent[0].content_title
+                  contentInfo.title
                 }" and will be about the following subtitle: "${
                   previousHeader.innerText
                 }". The text has a ${
@@ -843,7 +857,7 @@ export default function Writing() {
             type={"outline"}
             onClick={() => {
               alert("Progress won't be saved");
-              router.back();
+              router.push("/content");
             }}
           >
             <p>close</p> <CloseRounded />

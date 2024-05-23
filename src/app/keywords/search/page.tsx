@@ -232,6 +232,15 @@ export default function KeywordSearching() {
   // Show an amount of keywords according to the "page"
   function showKeywords(keywords: any) {
     let array: any[] = [];
+    if (keywordAmount[0] == 0) {
+      keywords.map((keyword: any) => {
+        filters.subjects.map((subject) => {
+          if (subject == keyword.text) {
+            array.push(keyword);
+          }
+        });
+      });
+    }
     for (
       let x = keywordAmount[0];
       x < keywordAmount[1] && x < keywords.length;
@@ -244,6 +253,7 @@ export default function KeywordSearching() {
 
   // Sort the keywords on the sorting type
   function sortKeywords(array: any) {
+    setKeywordAmount([0, 20]);
     if (sorting == "potential") {
       return array.sort(
         (a: any, b: any) =>
@@ -321,7 +331,7 @@ export default function KeywordSearching() {
         subjects: [...prevState.subjects, ...cleanArray],
       }));
       setSubjectInput("");
-      setKeywordAmount([0,20]);
+      setKeywordAmount([0, 20]);
       isKeywordsGenerated.current = false;
     }
   }

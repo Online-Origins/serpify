@@ -33,7 +33,7 @@ export default function ContentScore({ contentScore }: { contentScore: any }) {
             <h5>{contentScore.totalLinks}</h5>
           </div>
           <div className={styles.meterWrapper}>
-            <h1>{contentScore.seoScore.toFixed(0)}</h1>
+            <h1>{Math.floor(contentScore.seoScore)}</h1>
             <CircularProgressbar
               value={contentScore.seoScore}
               circleRatio={0.5}
