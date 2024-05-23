@@ -16,7 +16,7 @@ import CustomizedTooltip from "../ui/custom-tooltip/custom-tooltip.component";
 export default function ContentScore({ contentScore }: { contentScore: any }) {
   const [goodOpen, setGoodOpen] = useState(false);
   const [minorOpen, setMinorOpen] = useState(false);
-  const [warningOpen, setWarningOpen] = useState(false);
+  const [warningOpen, setWarningOpen] = useState(true);
   const [keywordsOpen, setKeywordsOpen] = useState(true);
 
   return (

@@ -180,7 +180,6 @@ export default function Writing() {
     }
 
     setSeoAnalysis(analysis);
-    console.log(analysis);
     setSharedData(analysis);
   }
 
