@@ -136,7 +136,8 @@ export default function CreateOutlines() {
         },
         body: JSON.stringify({
           title: currentContent[0].content_title,
-          keywords: currentContent[0].keywords,
+          sub_keywords: currentContent[0].sub_keywords,
+          keyword: currentContent[0].keyword,
           language: language?.value,
           audience: currentContent[0].target_audience,
           toneOfVoice: toneOfVoice?.value,
@@ -365,7 +366,8 @@ export default function CreateOutlines() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          keywords: currentContent[0].keywords,
+          sub_keywords: currentContent[0].sub_keywords,
+          keyword: currentContent[0].keyword,
           toneofvoice: toneOfVoicebyId?.value,
           language: language?.value,
           type: selectedTitleType,

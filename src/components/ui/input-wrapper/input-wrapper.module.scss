@@ -135,7 +135,7 @@
             flex-flow: column;
             width: calc(100% - 1rem);
             gap: 0;
-            height: 15rem;
+            max-height: 15rem;
             overflow-x: hidden;
             overflow-y: scroll;
             

@@ -7,7 +7,7 @@ const openai = new OpenAI({
 
 export async function POST(request) {
     const body = await request.json();
-    const keywords = body.keywords || '';
+    const keyword = body.keyword || '';
     const language = body.language || '';
     const toneOfVoice = body.toneOfVoice || '';
 
@@ -19,7 +19,7 @@ export async function POST(request) {
             },
             {
                 "role": "user",
-                "content": `Generate a title for a blog with the following keywords: ${keywords.join(',')}. The tone of voice for the blog should be ${toneOfVoice}. Make sure the title is in ${language}. Only give back an string.`
+                "content": `Generate a title for a blog with the following focus keyword: "${keyword}". The tone of voice for the blog should be ${toneOfVoice}. Make sure the title is in ${language}. Only give back an string.`
             }
         ],
         model: "gpt-4o",

@@ -1,7 +1,7 @@
-'use client'
+"use client";
 import styles from "./page.module.scss";
 import { useEffect, useRef, useState } from "react";
-import { supabase } from "@/app/utils/supabaseClient/server"
+import { supabase } from "@/app/utils/supabaseClient/server";
 import { useRouter } from "next/navigation";
 
 import PageTitle from "@/components/page-title/page-title.component";
@@ -27,6 +27,7 @@ export default function ContentOverview() {
   const getContentsRef = useRef(false);
   const [collections, setCollections] = useState<any[]>([]);
   const [chosenCollection, setChosenCollection] = useState();
+  const [chosenKeyword, setChosenKeyword] = useState("");
   const [popUpStep, setPopUpStep] = useState(1);
   const [keywordOptions, setKeywordOptions] = useState([]);
   const [chosenKeywords, setChosenKeywords] = useState([]);
@@ -57,13 +58,17 @@ export default function ContentOverview() {
     );
     if (filtered.length > 0) {
       setKeywordOptions(filtered[0].keywords);
+      setChosenKeyword(filtered[0].keywords[0])
     }
   }, [chosenCollection]);
 
   async function getContents() {
     const { data } = await supabase.from("contentItems").select();
     if (data) {
-      data.sort((a,b) => new Date(b.edited_on).getTime() - new Date(a.edited_on).getTime())
+      data.sort(
+        (a, b) =>
+          new Date(b.edited_on).getTime() - new Date(a.edited_on).getTime()
+      );
       setContents(data);
     }
   }
@@ -80,7 +85,7 @@ export default function ContentOverview() {
   }
 
   async function generateTitle() {
-    setGenerating(true)
+    setGenerating(true);
     try {
       const language = languageCodes.find((lang) => lang.id === chosenLanguage); // Get the language that is combined to the chosen language
       const toneOfVoicebyId = toneOfVoices.find(
@@ -93,7 +98,7 @@ export default function ContentOverview() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          keywords: chosenKeywords,
+          keyword: chosenKeyword,
           toneofvoice: toneOfVoicebyId,
           language: language?.value,
         }),
@@ -119,29 +124,33 @@ export default function ContentOverview() {
   }
 
   async function createContent() {
-    const inserting = await supabase.from("contentItems").insert([
-      {
-        collection: chosenCollection,
-        language: chosenLanguage,
-        keywords: chosenKeywords,
-        tone_of_voice: toneOfVoice,
-        target_audience: targetAudience,
-        content_title: contentTitle,
-        edited_on: currentDate(),
-        status: "outlines"
-      },
-    ]).select();
+    const inserting = await supabase
+      .from("contentItems")
+      .insert([
+        {
+          collection: chosenCollection,
+          language: chosenLanguage,
+          sub_keywords: chosenKeywords,
+          tone_of_voice: toneOfVoice,
+          target_audience: targetAudience,
+          content_title: contentTitle,
+          edited_on: currentDate(),
+          status: "outlines",
+          keyword: chosenKeyword
+        },
+      ])
+      .select();
     if (inserting.error) {
       console.log(inserting.error);
-      alert("Something went wrong. Please try again!")
+      alert("Something went wrong. Please try again!");
     } else {
-      if (typeof localStorage !== 'undefined') {
+      if (typeof localStorage !== "undefined") {
         localStorage.setItem("content_id", inserting.data[0].id);
       } else {
         // If neither localStorage nor sessionStorage is supported
-        console.log('Web Storage is not supported in this environment.');
+        console.log("Web Storage is not supported in this environment.");
       }
-      router.push("/content/create/outlines")
+      router.push("/content/create/outlines");
       getContentsRef.current = false;
     }
   }
@@ -156,7 +165,11 @@ export default function ContentOverview() {
           </Button>
         }
       />
-      {getContentsRef.current ? <ContentItemsWrapper contents={contents} collections={collections} /> : <h5>Loading...</h5>}
+      {getContentsRef.current ? (
+        <ContentItemsWrapper contents={contents} collections={collections} />
+      ) : (
+        <h5>Loading...</h5>
+      )}
       {popUpOpen && (
         <PopUpWrapper>
           <PopUp
@@ -202,11 +215,22 @@ export default function ContentOverview() {
                   placeholder="Which collection do you want to use?"
                 />
                 <InputWrapper
-                  type="vertMultiSelect"
-                  title="Keyword to use:"
+                  type="dropdown"
+                  title="Focus keyword:"
                   required={false}
+                  value={chosenKeyword}
                   options={keywordOptions}
+                  information="This will be the keyword your content is focused on."
+                  onChange={(value: any) => setChosenKeyword(value)}
+                  placeholder="Which collection do you want to use?"
+                />
+                <InputWrapper
+                  type="vertMultiSelect"
+                  title="Subkeywords to use:"
+                  required={false}
+                  options={keywordOptions.filter((option) => option != chosenKeyword)}
                   defValue={chosenKeywords}
+                  information="Keywords that help by enhancing the relevance, reach, and effectiveness of your main keyword strategy."
                   onChange={(value: any) => setChosenKeywords(value)}
                   placeholder="Which collection do you want to use?"
                 />
@@ -220,7 +244,11 @@ export default function ContentOverview() {
                   required={false}
                   value={chosenLanguage}
                   options={languageCodes}
-                  onChange={(value: any) => setChosenLanguage(value != null ? value : languageCodes[0].id)}
+                  onChange={(value: any) =>
+                    setChosenLanguage(
+                      value != null ? value : languageCodes[0].id
+                    )
+                  }
                   placeholder="In what language should the keywords be?"
                 />
                 <InputWrapper
@@ -229,7 +257,9 @@ export default function ContentOverview() {
                   required={false}
                   value={toneOfVoice}
                   options={toneOfVoices}
-                  onChange={(value: any) => setToneOfVoice(value != null ? value : toneOfVoices[0].id)}
+                  onChange={(value: any) =>
+                    setToneOfVoice(value != null ? value : toneOfVoices[0].id)
+                  }
                   placeholder="How do you want to tell the information?"
                 />
                 <InputWrapper
@@ -250,11 +280,11 @@ export default function ContentOverview() {
                 />
               </div>
             )}
-            {generating &&
-            <div className={styles.loader}>
-              <CircularLoader />
-            </div>
-            }
+            {generating && (
+              <div className={styles.loader}>
+                <CircularLoader />
+              </div>
+            )}
           </PopUp>
         </PopUpWrapper>
       )}
