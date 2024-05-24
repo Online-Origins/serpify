@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PageTitle from "../page-title/page-title.component";
 import styles from "./content-score.module.scss";
 import { CircularProgressbar } from "react-circular-progressbar";
@@ -14,8 +14,8 @@ import classNames from "classnames";
 import CustomizedTooltip from "../ui/custom-tooltip/custom-tooltip.component";
 
 export default function ContentScore({ contentScore }: { contentScore: any }) {
-  const [goodOpen, setGoodOpen] = useState(false);
-  const [minorOpen, setMinorOpen] = useState(false);
+  const [goodOpen, setGoodOpen] = useState(true);
+  const [minorOpen, setMinorOpen] = useState(true);
   const [warningOpen, setWarningOpen] = useState(true);
   const [keywordsOpen, setKeywordsOpen] = useState(true);
 
@@ -33,7 +33,7 @@ export default function ContentScore({ contentScore }: { contentScore: any }) {
             <h5>{contentScore.totalLinks}</h5>
           </div>
           <div className={styles.meterWrapper}>
-            <h1>{Math.floor(contentScore.seoScore)}</h1>
+            <h1>{contentScore.seoScore}</h1>
             <CircularProgressbar
               value={contentScore.seoScore}
               circleRatio={0.5}
@@ -53,10 +53,10 @@ export default function ContentScore({ contentScore }: { contentScore: any }) {
               className={styles.pointsHeader}
               onClick={() => setGoodOpen(!goodOpen)}
             >
-              <h4>Good points: {contentScore.messages.goodPoints.length}</h4>
+              <h4>Good points: {contentScore.points.goodPoints.length}</h4>
               <ArrowForwardIosRounded />
             </div>
-            {contentScore.messages.goodPoints.map(
+            {contentScore.points.goodPoints.map(
               (point: string, index: number) => (
                 <div className={styles.pointWrapper} key={index}>
                   <p className={styles.good}>
@@ -73,11 +73,11 @@ export default function ContentScore({ contentScore }: { contentScore: any }) {
               onClick={() => setMinorOpen(!minorOpen)}
             >
               <h4>
-                Minor warnings: {contentScore.messages.minorWarnings.length}
+                Minor warnings: {contentScore.points.minorWarnings.length}
               </h4>
               <ArrowForwardIosRounded />
             </div>
-            {contentScore.messages.minorWarnings.map(
+            {contentScore.points.minorWarnings.map(
               (point: string, index: number) => (
                 <div className={styles.pointWrapper} key={index}>
                   <p className={styles.minor}>
@@ -95,10 +95,10 @@ export default function ContentScore({ contentScore }: { contentScore: any }) {
               className={styles.pointsHeader}
               onClick={() => setWarningOpen(!warningOpen)}
             >
-              <h4>Warnings: {contentScore.messages.warnings.length}</h4>
+              <h4>Warnings: {contentScore.points.warnings.length}</h4>
               <ArrowForwardIosRounded />
             </div>
-            {contentScore.messages.warnings.map(
+            {contentScore.points.warnings.map(
               (point: string, index: number) => (
                 <div className={styles.pointWrapper} key={index}>
                   <p className={styles.warning}>
@@ -119,32 +119,31 @@ export default function ContentScore({ contentScore }: { contentScore: any }) {
               <h4>Keywords</h4>
               <ArrowForwardIosRounded />
             </div>
-            {contentScore.subKeywordDensity.map(
-              (keyword: any, index: number) => (
-                <CustomizedTooltip
-                  information={`Keyword density: ${keyword.density.toFixed(
-                    2
-                  )}%`}
-                  key={index}
+            {[
+              ...[contentScore.keywordDensity],
+              ...contentScore.subKeywordDensity,
+            ].map((keyword: any, index: number) => (
+              <CustomizedTooltip
+                information={`${index == 0 ? "Focus keyword" : "Subkeyword"} density: ${keyword.density.toFixed(2)}%`}
+                key={index}
+              >
+                <div
+                  className={classNames(
+                    styles.pointWrapper,
+                    keyword.density <= 2 && keyword.density >= 1
+                      ? styles.good
+                      : styles.warning
+                  )}
                 >
-                  <div
-                    className={classNames(
-                      styles.pointWrapper,
-                      keyword.density <= 2 && keyword.density >= 1
-                        ? styles.good
-                        : styles.warning
-                    )}
-                  >
-                    <p>{keyword.keyword}</p>
-                    {keyword.density <= 2 && keyword.density >= 1 ? (
-                      <CheckRounded />
-                    ) : (
-                      <CloseRounded />
-                    )}
-                  </div>
-                </CustomizedTooltip>
-              )
-            )}
+                  <p>{keyword.keyword}</p>
+                  {keyword.density <= 2 && keyword.density >= 1 ? (
+                    <CheckRounded />
+                  ) : (
+                    <CloseRounded />
+                  )}
+                </div>
+              </CustomizedTooltip>
+            ))}
           </div>
         </div>
       )}

@@ -44,6 +44,7 @@ import {
 import toneOfVoices from "@/json/tone-of-voice.json";
 import languages from "@/json/language-codes.json";
 import { useSharedContext } from "@/context/SharedContext";
+import useAnalyzeContent from "@/hooks/analyze-content/analyzeContent";
 
 export default function Writing() {
   const router = useRouter();
@@ -80,117 +81,20 @@ export default function Writing() {
 
   async function getContentScore() {
     const contentJson = {
-      title: contentInfo.title.replace(/[-_@#!'"]/g, " ").toLowerCase(), // Filter out punction marks
+      title: contentInfo.title.replace(/[-_@#!'"]/g, " ").toLowerCase(), // Filter out punctuation marks
       htmlText: contentInfo.html
-        .replace(/[-_@#!'"]/g, " ") // Filter out punction marks
-        .toLowerCase()
-        .replace(/<h1>.*?<\/h1>/, ""), // Filter out the h1
+        .replace(/[-_@#!'"]/g, " ") // Filter out punctuation marks
+        .toLowerCase(),
       subKeywords: contentInfo.sub_keywords,
       keyword: contentInfo.keyword,
-      metaDescription: "",
       languageCode: contentInfo.language,
-      countryCode: "",
     };
 
-    // const seoCheck = new SeoCheck(contentJson); // Later add the website domain of the project
-    // const result = await seoCheck.analyzeSeo();
-    // filterSeoCheck(result);
+    const analyzedContent = useAnalyzeContent(contentJson);
+    console.log(analyzedContent)
+    setSeoAnalysis(analyzedContent);
+    setSharedData(analyzedContent);
   }
-
-  // function filterSeoCheck(result: any) {
-  //   let analysis = result;
-
-  //   // Filter out the points removal when there is no meta description
-  //   // If meta description is added to the tool then remove this
-  //   for (let x = 0; x < analysis.messages.warnings.length; x++) {
-  //     if (
-  //       analysis.messages.warnings[x].toLowerCase().includes("meta description")
-  //     ) {
-  //       analysis.seoScore = analysis.seoScore + 2;
-  //     }
-  //   }
-
-  //   // Filter and add custom messages
-  //   analysis.messages.warnings = analysis.messages.warnings.filter(
-  //     (item: string) =>
-  //       !item.toLowerCase().includes("density of sub keyword") &&
-  //       !item.toLowerCase().includes("keyword density") &&
-  //       !item.toLowerCase().includes("meta description") &&
-  //       !item.toLowerCase().includes("internal links") //If there is a website domain remove this filter
-  //   );
-  //   analysis.messages.minorWarnings = analysis.messages.minorWarnings.filter(
-  //     (item: string) =>
-  //       !item.toLowerCase().includes("density of sub keyword") &&
-  //       !item.toLowerCase().includes("keyword density")
-  //   );
-  //   analysis.messages.goodPoints = analysis.messages.goodPoints.filter(
-  //     (item: string) =>
-  //       !item.toLowerCase().includes("density of sub keyword") &&
-  //       !item.toLowerCase().includes("keyword density")
-  //   );
-  //   if (analysis.wordCount < 300) {
-  //     analysis.seoScore = analysis.seoScore - 30;
-  //     analysis.messages.warnings.push("Not enough words. Try adding more");
-  //   } else if (analysis.wordCount < 500) {
-  //     analysis.seoScore = analysis.seoScore - 15;
-  //     analysis.messages.warnings.push("Not enough words. Try adding more");
-  //   } else if (analysis.wordCount < 650) {
-  //     analysis.seoScore = analysis.seoScore - 5;
-  //     analysis.messages.minorWarnings.push(
-  //       "Decent amount of words. Try adding some more"
-  //     );
-  //   } else if (analysis.wordCount > 1000 && analysis.seoScore < 92) {
-  //     analysis.messages.goodPoints.push("Good amount of words used.");
-  //     analysis.seoScore = analysis.seoScore + 5;
-  //   }
-  //   analysis.messages.minorWarnings = analysis.messages.minorWarnings.filter(
-  //     (item: string) => !item.toLowerCase().includes(`tag "`)
-  //   );
-  //   analysis.messages.goodPoints = analysis.messages.goodPoints.filter(
-  //     (item: string) =>
-  //       !item.toLowerCase().includes(`tag "`) &&
-  //       !item.toLowerCase().includes("a keyword ")
-  //   );
-  //   analysis.messages.goodPoints = analysis.messages.goodPoints.map(
-  //     (item: string) => item.replace(/this./g, "").replace(/sub./g, "")
-  //   );
-
-  //   const expectedLinks = Math.floor(analysis.wordCount / 300);
-
-  //   if (analysis.totalLinks <= (expectedLinks / 4).toFixed(0)) {
-  //     analysis.seoScore -= 5;
-  //   } else if (
-  //     analysis.totalLinks < expectedLinks &&
-  //     analysis.totalLinks > (expectedLinks / 4).toFixed(0)
-  //   ) {
-  //     analysis.seoScore -= 2;
-  //     analysis.messages.warnings = analysis.messages.warnings.filter(
-  //       (item: string) => !item.toLowerCase().includes("outbound links")
-  //     );
-  //     analysis.messages.minorWarnings.push(
-  //       `Decent amount of outbound links made: ${analysis.totalLinks}. Try adding some more`
-  //     );
-  //   } else if (analysis.totalLinks >= expectedLinks) {
-  //     analysis.messages.goodPoints.push(
-  //       `Good amount of outbound links: ${analysis.totalLinks}`
-  //     );
-  //   }
-
-  //   // Update the content score
-  //   for (let x = 0; x < analysis.subKeywordDensity.length; x++) {
-  //     if (
-  //       analysis.subKeywordDensity[x].density >= 1 &&
-  //       analysis.subKeywordDensity[x].density <= 2
-  //     ) {
-  //       analysis.seoScore = analysis.seoScore + 2;
-  //     } else {
-  //       analysis.seoScore = analysis.seoScore - 2;
-  //     }
-  //   }
-
-  //   setSeoAnalysis(analysis);
-  //   setSharedData(analysis);
-  // }
 
   useEffect(() => {
     // Close menu when clicked outside
@@ -373,7 +277,7 @@ export default function Writing() {
       .update({
         edited_on: currentDate(),
         content: editor?.getHTML(),
-        content_score: Math.floor(seoAnalysis.seoScore),
+        content_score: seoAnalysis.seoScore,
         content_title: contentInfo.title,
       })
       .eq("id", contentId);
@@ -557,7 +461,9 @@ export default function Writing() {
               currentContent[0].audience
                 ? `, has the target audience "${currentContent[0].audience}",`
                 : ","
-            } and contains this keyword: "${currentContent[0].keyword}" and these subkeywords: ${currentContent[0].sub_keywords.join(
+            } and contains this keyword: "${
+              currentContent[0].keyword
+            }" and these subkeywords: ${currentContent[0].sub_keywords.join(
               ","
             )}. `;
           } else if (option == "grammar") {
@@ -631,7 +537,7 @@ export default function Writing() {
           }
           setOpenOptions(false);
         } else {
-          gptPrompt = `Regenerate The subtitle: "${currentNode?.textContent}". Only give back an string of the generated subtitle. `
+          gptPrompt = `Regenerate The subtitle: "${currentNode?.textContent}". Only give back an string of the generated subtitle. `;
         }
       }
 
@@ -724,7 +630,9 @@ export default function Writing() {
                   currentContent[0].audience
                     ? `, has the target audience "${currentContent[0].audience}",`
                     : ","
-                } and contains this keyword: "${currentContent[0].keyword}" and these subkeywords: ${currentContent[0].sub_keywords.join(
+                } and contains this keyword: "${
+                  currentContent[0].keyword
+                }" and these subkeywords: ${currentContent[0].sub_keywords.join(
                   ","
                 )}. Only give back an string of the generated text and don't include the subtitle.`,
               }),
