@@ -1,4 +1,4 @@
-function useAnalyzeContent(contentJson) {
+export function analyzeContent(contentJson) {
     const title = contentJson.title;
     const keyword = contentJson.keyword;
     const subKeywords = contentJson.subKeywords;
@@ -164,7 +164,7 @@ function useAnalyzeContent(contentJson) {
         return seoScore;
     }
 
-    return {
+    const analyzedContent = {
         wordCount: getWordCount(),
         totalLinks: getLinkCount(),
         points: {
@@ -176,6 +176,5 @@ function useAnalyzeContent(contentJson) {
         subKeywordDensity: getSubKeywordDensity(),
         seoScore: Math.ceil(getSeoScore())
     };
+    return { analyzedContent }
 }
-
-export default useAnalyzeContent;

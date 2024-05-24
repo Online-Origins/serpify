@@ -44,7 +44,7 @@ import {
 import toneOfVoices from "@/json/tone-of-voice.json";
 import languages from "@/json/language-codes.json";
 import { useSharedContext } from "@/context/SharedContext";
-import useAnalyzeContent from "@/hooks/analyze-content/analyzeContent";
+import { analyzeContent } from "@/app/utils/analyze-content/analyzeContent";
 
 export default function Writing() {
   const router = useRouter();
@@ -71,33 +71,30 @@ export default function Writing() {
   });
   const [seoAnalysis, setSeoAnalysis] = useState<any>();
   const { setSharedData } = useSharedContext();
-  // State to trigger content score analysis
-  const [analyzeTrigger, setAnalyzeTrigger] = useState(false);
 
   // If the editor updates then update the content score
   useEffect(() => {
-    if (contentInfo.html && contentInfo.html !== "") {
-      setAnalyzeTrigger(true);
+    if (contentInfo.html && contentInfo.html != "") {
+      getContentScore();
     }
   }, [contentInfo]);
 
-  useEffect(() => {
-    if (analyzeTrigger) {
-      const contentJson = {
-        title: contentInfo.title.replace(/[-_@#!'"]/g, " ").toLowerCase(), // Filter out punctuation marks
-        htmlText: contentInfo.html.replace(/[-_@#!'"]/g, " ").toLowerCase(), // Filter out punctuation marks
-        subKeywords: contentInfo.sub_keywords,
-        keyword: contentInfo.keyword,
-        languageCode: contentInfo.language,
-      };
+  function getContentScore() {
+    const contentJson = {
+      title: contentInfo.title.replace(/[-_@#!'"]/g, " ").toLowerCase(), // Filter out punctuation marks
+      htmlText: contentInfo.html
+        .replace(/[-_@#!'"]/g, " ") // Filter out punctuation marks
+        .toLowerCase(),
+      subKeywords: contentInfo.sub_keywords,
+      keyword: contentInfo.keyword,
+      languageCode: contentInfo.language,
+    };
 
-      const analyzedContent = useAnalyzeContent(contentJson);
-      console.log(analyzedContent);
-      setSeoAnalysis(analyzedContent);
-      setSharedData(analyzedContent);
-      setAnalyzeTrigger(false); // Reset the trigger
-    }
-  }, [analyzeTrigger, contentInfo, setSharedData]);
+    const { analyzedContent } = analyzeContent(contentJson);
+    console.log(analyzedContent);
+    setSeoAnalysis(analyzedContent);
+    setSharedData(analyzedContent);
+  }
 
   useEffect(() => {
     // Close menu when clicked outside
