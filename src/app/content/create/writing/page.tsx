@@ -71,30 +71,33 @@ export default function Writing() {
   });
   const [seoAnalysis, setSeoAnalysis] = useState<any>();
   const { setSharedData } = useSharedContext();
+  // State to trigger content score analysis
+  const [analyzeTrigger, setAnalyzeTrigger] = useState(false);
 
   // If the editor updates then update the content score
   useEffect(() => {
-    if (contentInfo.html && contentInfo.html != "") {
-      getContentScore();
+    if (contentInfo.html && contentInfo.html !== "") {
+      setAnalyzeTrigger(true);
     }
   }, [contentInfo]);
 
-  async function getContentScore() {
-    const contentJson = {
-      title: contentInfo.title.replace(/[-_@#!'"]/g, " ").toLowerCase(), // Filter out punctuation marks
-      htmlText: contentInfo.html
-        .replace(/[-_@#!'"]/g, " ") // Filter out punctuation marks
-        .toLowerCase(),
-      subKeywords: contentInfo.sub_keywords,
-      keyword: contentInfo.keyword,
-      languageCode: contentInfo.language,
-    };
+  useEffect(() => {
+    if (analyzeTrigger) {
+      const contentJson = {
+        title: contentInfo.title.replace(/[-_@#!'"]/g, " ").toLowerCase(), // Filter out punctuation marks
+        htmlText: contentInfo.html.replace(/[-_@#!'"]/g, " ").toLowerCase(), // Filter out punctuation marks
+        subKeywords: contentInfo.sub_keywords,
+        keyword: contentInfo.keyword,
+        languageCode: contentInfo.language,
+      };
 
-    const analyzedContent = useAnalyzeContent(contentJson);
-    console.log(analyzedContent)
-    setSeoAnalysis(analyzedContent);
-    setSharedData(analyzedContent);
-  }
+      const analyzedContent = useAnalyzeContent(contentJson);
+      console.log(analyzedContent);
+      setSeoAnalysis(analyzedContent);
+      setSharedData(analyzedContent);
+      setAnalyzeTrigger(false); // Reset the trigger
+    }
+  }, [analyzeTrigger, contentInfo, setSharedData]);
 
   useEffect(() => {
     // Close menu when clicked outside
