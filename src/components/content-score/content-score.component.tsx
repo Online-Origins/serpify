@@ -12,7 +12,7 @@ import {
 } from "@mui/icons-material";
 import classNames from "classnames";
 import CustomizedTooltip from "../ui/custom-tooltip/custom-tooltip.component";
-import GradientSVG from "../gradientSVG/gradientSVG";
+import GradientSVG from "@/components/gradient-svg/gradient-svg.component";
 
 export default function ContentScore({ contentScore }: { contentScore: any }) {
   const [goodOpen, setGoodOpen] = useState(true);
