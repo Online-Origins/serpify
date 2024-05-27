@@ -47,19 +47,27 @@ export function analyzeContent(contentJson) {
         var count = (htmlText.match(regex) || []).length;
         if (type == "h1") {
             if (count == 1) {
-                goodPoints.push(`Your text contains an ${type} title`);
+                goodPoints.push(`Your text contains an ${type.toUpperCase()} title`);
                 return points
             } else if (count > 1) {
                 warnings.push(`Your text can't contain multiple ${type.toUpperCase()} titles`)
                 return 0
+            } else {
+                warnings.push(`Your text doesn't contain an ${type.toUpperCase()} title. You need to add one`)
             }
-        } else {
-            if (count > 1) {
-                goodPoints.push(`Your text contains an ${type} title`);
+        } else if (type == "h4") {
+            if (count >= 1) {
+                goodPoints.push(`Your text contains an ${type.toUpperCase()} sub title`);
                 return points
             }
+        } else {
+            if (count >= 1) {
+                goodPoints.push(`Your text contains an ${type.toUpperCase()} sub title`);
+                return points
+            } else {
+                warnings.push(`Your text doesn't contain an ${type.toUpperCase()} sub title. Try to add one`)
+            }
         }
-        warnings.push(`Your text doesn't contain an ${type.toUpperCase()} title. Add one`)
         return 0;
     }
 
@@ -108,10 +116,11 @@ export function analyzeContent(contentJson) {
 
     function getKeywordLength() {
         if (title.length >= 40 && title.length <= 60) {
+            goodPoints.push("Your title has a good length. Nice work!")
             return 5
         } else {
             if (title.length < 40) {
-                warnings.push(`The length of your title is ${title.length} and needs to be at least 40 characters`);
+                warnings.push(`The length of your title is ${title.length} and needs to be at least 40 characters`)
             } else if (title.length > 60) {
                 warnings.push(`The length of your title is ${title.length} and needs to be maximal 60 characters`)
             }
@@ -125,8 +134,10 @@ export function analyzeContent(contentJson) {
 
         // Check if a match is found and if it contains the search string
         if (match && match[1].includes(keyword)) {
+            goodPoints.push("Your first paragraph contains the focus keyword. Good job!")
             return 5;
         } else {
+            warnings.push("Your first paragraph doesn't contain the focus keyword. Try to add it")
             return 0;
         }
     }
@@ -149,24 +160,52 @@ export function analyzeContent(contentJson) {
         return count;
     }
 
-    function getSeoScore() {
-        // Check if heading types exist
-        seoScore += getHeading("h1", 10);
-        seoScore += getHeading("h2", 5);
-        seoScore += getHeading("h3", 5);
+    function getKeywordsinSubTitles() {
+        let score = 10;
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(htmlText, 'text/html');
+        const headings = Array.from(doc.querySelectorAll('h2, h3')).map(heading => `<${heading.tagName.toLowerCase()}>${heading.textContent}</${heading.tagName.toLowerCase()}>`);
 
+        subKeywords.map((subKeyword) => {
+            let subKeywordAmount = 0;
+            headings.map((heading) => {
+                if (subKeywordAmount < 1 && heading.includes(subKeyword)) {
+                    subKeywordAmount++;
+                }
+            })
+            if (subKeywordAmount == 0) {
+                score -= (10 / subKeywords.length);
+                warnings.push(`Your subkeyword "${subKeyword}" is in none of your subheadings. Try to add it somewhere`);
+            } else {
+                goodPoints.push(`Your subkeyword "${subKeyword}" is in one of your subheadings. Awesome!`);
+            }
+        })
+
+        return score;
+    }
+
+    function getSeoScore() {
         // Check the title for the focus keyword and length
         seoScore += getKeywordInTitle();
         seoScore += getKeywordLength();
 
+        // Check if heading types exist
+        seoScore += getHeading("h1", 10);
+        seoScore += getHeading("h2", 5);
+        seoScore += getHeading("h3", 5);
+        seoScore += getHeading("h4", 0);
+
+        // Check if the first paragraph contains the keyword
         seoScore += getKeywordInParagraph();
+
+        // Check if the subtitles contain subkeywords
+        seoScore += getKeywordsinSubTitles();
 
         return seoScore;
     }
 
     const analyzedContent = {
         wordCount: getWordCount(),
-        totalLinks: getLinkCount(),
         points: {
             goodPoints: goodPoints,
             minorWarnings: minorWarnings,
@@ -174,6 +213,7 @@ export function analyzeContent(contentJson) {
         },
         keywordDensity: getKeywordDensity(),
         subKeywordDensity: getSubKeywordDensity(),
+        totalLinks: getLinkCount(),
         seoScore: Math.ceil(getSeoScore())
     };
     return { analyzedContent }
