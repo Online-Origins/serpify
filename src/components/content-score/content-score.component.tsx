@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import PageTitle from "../page-title/page-title.component";
 import styles from "./content-score.module.scss";
-import { CircularProgressbar } from "react-circular-progressbar";
+import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 
 import {
   ArrowForwardIosRounded,
@@ -12,12 +12,14 @@ import {
 } from "@mui/icons-material";
 import classNames from "classnames";
 import CustomizedTooltip from "../ui/custom-tooltip/custom-tooltip.component";
+import GradientSVG from "../gradientSVG/gradientSVG";
 
 export default function ContentScore({ contentScore }: { contentScore: any }) {
   const [goodOpen, setGoodOpen] = useState(true);
   const [minorOpen, setMinorOpen] = useState(true);
   const [warningOpen, setWarningOpen] = useState(true);
   const [keywordsOpen, setKeywordsOpen] = useState(true);
+  const idCSS = "hello";
 
   return (
     <div className={styles.contentScore}>
@@ -33,19 +35,19 @@ export default function ContentScore({ contentScore }: { contentScore: any }) {
             <h5>{contentScore.totalLinks}</h5>
           </div>
           <div className={styles.meterWrapper}>
+            <GradientSVG />
             <h1>{contentScore.seoScore}</h1>
             <CircularProgressbar
               value={contentScore.seoScore}
               circleRatio={0.5}
               strokeWidth={15}
               className={styles.score}
-              styles={{
-                root: {
-                  transform: "rotate(0.75turn)",
-                },
-                path: { stroke: "#6210CC", strokeLinecap: "butt" },
-                trail: { stroke: "#FAF6FF", strokeLinecap: "butt" },
-              }}
+              styles={buildStyles({
+                rotation: -.25,
+                pathColor: `url(#${idCSS})`,
+                trailColor: "#FAF6FF",
+                pathTransitionDuration: 0.4
+              })}
             />
           </div>
           <div
