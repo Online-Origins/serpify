@@ -71,12 +71,19 @@
                     rotate: -90deg;
                 }
             }
+            .pointsList {
+                display: flex;
+                flex-flow: column;
+            }
 
             .pointWrapper {
-                display: none;
+                display: flex;
                 align-items: center;
                 width: 100%;
                 justify-content: space-between;
+                max-height: 0;
+                opacity: 0;
+                transition: all .6s linear;
 
                 svg {
                     font-size: 1.2rem;
@@ -119,8 +126,9 @@
                     }
                 }
 
-                .pointWrapper {
-                    display: flex;
+                .pointWrapper{
+                    opacity: 1;
+                    max-height: 2.5rem;
                 }
             }
         }

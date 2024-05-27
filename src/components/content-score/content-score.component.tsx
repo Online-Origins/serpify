@@ -48,7 +48,12 @@ export default function ContentScore({ contentScore }: { contentScore: any }) {
               }}
             />
           </div>
-          <div className={classNames(styles.points, goodOpen && styles.open)}>
+          <div
+            className={classNames(
+              styles.points,
+              goodOpen && styles.open
+            )}
+          >
             <div
               className={styles.pointsHeader}
               onClick={() => setGoodOpen(!goodOpen)}
@@ -56,18 +61,25 @@ export default function ContentScore({ contentScore }: { contentScore: any }) {
               <h4>Good points: {contentScore.points.goodPoints.length}</h4>
               <ArrowForwardIosRounded />
             </div>
-            {contentScore.points.goodPoints.map(
-              (point: string, index: number) => (
-                <div className={styles.pointWrapper} key={index}>
-                  <p className={styles.good}>
-                    <CircleRounded />
-                    {point}
-                  </p>
-                </div>
-              )
-            )}
+            <div className={styles.pointsList}>
+              {contentScore.points.goodPoints.map(
+                (point: string, index: number) => (
+                  <div className={styles.pointWrapper} key={index}>
+                    <p className={styles.good}>
+                      <CircleRounded />
+                      {point}
+                    </p>
+                  </div>
+                )
+              )}
+            </div>
           </div>
-          <div className={classNames(styles.points, minorOpen && styles.open)}>
+          <div
+            className={classNames(
+              styles.points,
+              minorOpen && styles.open
+            )}
+          >
             <div
               className={styles.pointsHeader}
               onClick={() => setMinorOpen(!minorOpen)}
@@ -89,7 +101,11 @@ export default function ContentScore({ contentScore }: { contentScore: any }) {
             )}
           </div>
           <div
-            className={classNames(styles.points, warningOpen && styles.open)}
+            className={classNames(
+              styles.points,
+              warningOpen && styles.open,
+              contentScore.points.warnings.length > 5 && styles.long
+            )}
           >
             <div
               className={styles.pointsHeader}
@@ -110,7 +126,11 @@ export default function ContentScore({ contentScore }: { contentScore: any }) {
             )}
           </div>
           <div
-            className={classNames(styles.points, keywordsOpen && styles.open)}
+            className={classNames(
+              styles.points,
+              keywordsOpen && styles.open,
+              contentScore.subKeywordDensity.length > 4 && styles.long
+            )}
           >
             <div
               className={styles.pointsHeader}
@@ -124,7 +144,9 @@ export default function ContentScore({ contentScore }: { contentScore: any }) {
               ...contentScore.subKeywordDensity,
             ].map((keyword: any, index: number) => (
               <CustomizedTooltip
-                information={`${index == 0 ? "Focus keyword" : "Subkeyword"} density: ${keyword.density.toFixed(2)}%`}
+                information={`${
+                  index == 0 ? "Focus keyword" : "Subkeyword"
+                } density: ${keyword.density.toFixed(2)}%`}
                 key={index}
               >
                 <div
