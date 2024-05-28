@@ -134,7 +134,7 @@ export default function CollectionCard({
         },
         body: JSON.stringify({
           keyword: chosenKeyword,
-          toneofvoice: toneOfVoicebyId,
+          toneofvoice: toneOfVoicebyId?.value,
           language: language?.value,
         }),
       });
