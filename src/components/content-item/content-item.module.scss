@@ -9,6 +9,7 @@
     gap: 1rem;
     transition: .3s all ease-in-out;
     cursor: pointer;
+    justify-content: space-between;
 
     &:hover{
         background-color: $purple_50;
@@ -18,7 +19,7 @@
         display: flex;
         flex-flow: column;
         gap: .5rem;
-        width: 700px;
+        width: 450px;
 
         h4 {
             width: 100%;
@@ -33,10 +34,18 @@
             text-decoration: underline;
             cursor: pointer;
         }
+
+        @media (min-width: 2000px){
+            width: 550px;
+        }
     }
 
     .contentInfo{
-        width: 250px;
+        width: 150px;
+
+        @media (min-width: 2000px) {
+            width: 250px;
+        }
 
         .meterWrapper{
             height: 2rem;

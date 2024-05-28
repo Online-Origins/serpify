@@ -80,7 +80,7 @@ export default function ContentItem({
             language: data[0].language,
             tone_of_voice: data[0].tone_of_voice,
             content_title: data[0].content_title,
-            keywords: data[0].keywords,
+            keywords: data[0].sub_keywords,
             target_audience: data[0].target_audience,
             outlines: data[0].outlines,
           },

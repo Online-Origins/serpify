@@ -16,6 +16,7 @@ export async function POST(request) {
   const keywords = body.keywords || '';
   const language = body.language || '';
   const country = body.country || '';
+
   try {
     const response = await fetch(
       "https://www.googleapis.com/oauth2/v3/token",
@@ -43,12 +44,11 @@ export async function POST(request) {
 
     return NextResponse.json(googleAdsMetrics);
   } catch (error) {
-    // console.error("Error obtaining access token:", error);
     throw error;
   }
 }
 
-async function getGoogleKeywordsMetrics(accessToken, keywords, language, country, retries = 3) {
+async function getGoogleKeywordsMetrics(accessToken, keywords, language, country) {
   const googleAdsRequestData = {
     keywords: keywords,
     keywordPlanNetwork: "GOOGLE_SEARCH_AND_PARTNERS",
@@ -63,29 +63,23 @@ async function getGoogleKeywordsMetrics(accessToken, keywords, language, country
     "login-customer-id": process.env.CUSTOMER_ID,
   };
 
-  let attempt = 0;
-  while (attempt < retries) {
-    try {
-      const response = await fetch(
-        `https://googleads.googleapis.com/v16/customers/${process.env.CUSTOMER_ID}:generateKeywordHistoricalMetrics`,
-        {
-          method: "POST",
-          headers: googleAdsRequestHeaders,
-          body: JSON.stringify(googleAdsRequestData),
-        }
-      );
-
-      // if (!response.ok) {
-      //   throw new Error("Error making Google Ads API request");
-      // }
-
-      const data = await response.json();
-      return data.results;
-    } catch (error) {
-      attempt++;
-      if (attempt === retries) {
-        throw error;
+  try {
+    const response = await fetch(
+      `https://googleads.googleapis.com/v16/customers/${process.env.CUSTOMER_ID}:generateKeywordHistoricalMetrics`,
+      {
+        method: "POST",
+        headers: googleAdsRequestHeaders,
+        body: JSON.stringify(googleAdsRequestData),
       }
-    }
+    );
+
+    // if (!response.ok) {
+    //   throw new Error("Error making Google Ads API request");
+    // }
+
+    const data = await response.json();
+    return data.results;
+  } catch (error) {
+    throw error;
   }
 }

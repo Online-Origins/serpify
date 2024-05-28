@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import styles from "./page.module.scss";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -16,7 +16,7 @@ import CollectionsWrapper from "@/components/collections-wrapper/collections-wra
 
 import languageCodes from "@/json/language-codes.json";
 import countryCodes from "@/json/country-codes.json";
-import { supabase } from "@/app/utils/supabaseClient/server"
+import { supabase } from "@/app/utils/supabaseClient/server";
 
 export default function CollectionsPage() {
   const [popUpOpen, setPopUpOpen] = useState(false);
@@ -28,14 +28,14 @@ export default function CollectionsPage() {
   const [searchVolume, setSearchVolume] = useState<number[]>([0, 100]);
   const [competition, setCompetition] = useState<number[]>([0, 100]);
   const [potential, setPotential] = useState<number[]>([0, 100]);
-  const getCollectionsRef = useRef(false)
+  const getCollectionsRef = useRef(false);
   const [collections, setCollections] = useState<any[]>([]);
   const router = useRouter();
 
   useEffect(() => {
     if (!getCollectionsRef.current) {
       getCollections();
-      getCollectionsRef.current = true
+      getCollectionsRef.current = true;
     }
   }, [getCollectionsRef]);
 
@@ -47,24 +47,24 @@ export default function CollectionsPage() {
   }
 
   const startSearching = () => {
-    const subjectArray = subjectsInput.split(",");
+    const subjectArray = subjectsInput.split(", ");
     const cleanArray = subjectArray.map((subject) =>
       subject.replace(/[&\/\\#+()$~%.";:*?<>{}[\]]/g, "")
     );
+    const uniqueCleanArray = Array.from(new Set(cleanArray));
 
     try {
       localStorage.setItem(
         "filters",
         JSON.stringify({
-          subjects: cleanArray,
+          subjects: uniqueCleanArray,
           language: keywordsLanguage,
           country: keywordsCountry,
           keywordLength: keywordLength,
-          volume: 
-            {
-              min: searchVolumeTranslate(searchVolume[0]),
-              max: searchVolumeTranslate(searchVolume[1]),
-            },
+          volume: {
+            min: searchVolumeTranslate(searchVolume[0]),
+            max: searchVolumeTranslate(searchVolume[1]),
+          },
           competition: { min: competition[0], max: competition[1] },
           potential: { min: potential[0], max: potential[1] },
         })
@@ -102,8 +102,11 @@ export default function CollectionsPage() {
           </Button>
         }
       />
-      {collections.length > 0 ?
-        <CollectionsWrapper collections={collections} /> : <h5>No collections found</h5>}
+      {collections.length > 0 ? (
+        <CollectionsWrapper collections={collections} />
+      ) : (
+        <h5>No collections found</h5>
+      )}
       {popUpOpen && (
         <PopUpWrapper>
           <PopUp

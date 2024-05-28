@@ -7,7 +7,8 @@ const openai = new OpenAI({
 
 export async function POST(request) {
     const body = await request.json();
-    const keywords = body.keywords || '';
+    const subKeywords = body.sub_keywords || '';
+    const keyword = body.keyword || '';
     const language = body.language || '';
     const toneOfVoice = body.toneOfVoice || '';
     const type = body.type || '';
@@ -22,10 +23,10 @@ export async function POST(request) {
             },
             {
                 role: "user",
-                content: `generate a new subtitle with the type ${type}, for a blog with the title "${title}". The blog is in ${language}, has a ${toneOfVoice} tone of voice and already contains the follwing subtitles: ${subtitles}. Only give back a string of the generated subtitle and nothing more.`
+                content: `generate a new subtitle with the type ${type}, for a blog with the title "${title}". The blog is in ${language}, has a ${toneOfVoice} tone of voice and already contains the follwing subtitles: ${subtitles}. The following keyword: "${keyword}", and subkeywords are going to be used in the blog: ${subKeywords.join(',')}. Only give back a string of the generated subtitle and nothing more.`
             }
         ],
-        model: "gpt-3.5-turbo",
+        model: "gpt-4o",
     });
 
     const generatedTitle = response.choices[0].message.content;

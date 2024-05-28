@@ -7,9 +7,7 @@ const openai = new OpenAI({
 
 export async function POST(request) {
     const body = await request.json();
-    const keyword = body.keyword || '';
-    const language = body.language || '';
-    const toneOfVoice = body.toneOfVoice || '';
+    const prompt = body.prompt || "";
 
     const response = await openai.chat.completions.create({
         messages: [
@@ -19,12 +17,12 @@ export async function POST(request) {
             },
             {
                 "role": "user",
-                "content": `Generate a title for a blog with the following focus keyword: "${keyword}". The tone of voice for the blog should be ${toneOfVoice}. Make sure the title is in ${language}. Only give back an string.`
+                "content": `${prompt}`
             }
         ],
         model: "gpt-4o",
     });
 
-    const generatedTitle = response.choices[0].message.content;
-    return NextResponse.json({ generatedTitle });
+    const generatedContent = response.choices[0].message.content.replace(/["#]/g, '').replace(/^\s+/, '');
+    return NextResponse.json({ generatedContent });
 }

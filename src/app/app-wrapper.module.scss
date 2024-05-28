@@ -1,0 +1,58 @@
+@import '@/styles/variables';
+
+.pagesWrapper {
+    width: 100%;
+    max-height: 100%;
+    display: flex;
+    justify-content: center;
+    overflow-x: auto;
+    position: relative;
+
+    .innerWrapper {
+        padding-top: 1rem;
+        min-width: 1100px;
+        width: 1100px;
+        transition-delay: .2s;
+        margin-bottom: 1rem;
+
+        @media (min-width: 2000px) {
+            min-width: 1400px;
+            width: 1400px;
+        }
+    }
+
+    @media (max-width: 1300px) {
+        justify-content: start;
+    }
+
+
+    &.smallerWrapper {
+        @media (max-width: 1550px) {
+            justify-content: start;
+        }
+
+        &.small {
+            justify-content: start;
+        }
+    }
+
+    &.small {
+        overflow-y: hidden;
+
+        @media (max-width: 1680px) {
+            justify-content: start;
+        }
+
+        .innerWrapper {
+            height: calc(100% - 2rem);
+
+            // min-width: 1200px;
+            // width: 1200px;
+
+            // @media (min-width: 2000px) {
+            //     min-width: 1450px;
+            //     width: 1450px;
+            // }
+        }
+    }
+}

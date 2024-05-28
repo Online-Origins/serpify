@@ -1,0 +1,136 @@
+@import '@/styles/variables';
+
+.contentScore {
+    width: 350px;
+    padding-top: 1rem;
+    display: flex;
+    flex-flow: column;
+    height: calc(100% - 1rem);
+    overflow: hidden;
+
+    .analysis {
+        display: flex;
+        flex-flow: column;
+        padding: 1rem 0;
+        padding-right: .5rem;
+        gap: 1rem;
+        align-items: center;
+        overflow-y: scroll;
+        height: 100%;
+
+        .horizontal {
+            display: flex;
+            justify-content: space-between;
+            text-wrap: nowrap;
+            width: 100%;
+        }
+
+        .meterWrapper {
+            width: 200px;
+            height: 100px;
+            position: relative;
+
+            .score {
+                width: 100%;
+            }
+
+            h1 {
+                color: $purple_primary;
+                position: absolute;
+                bottom: 0;
+                margin-bottom: -.2rem;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+        }
+
+        .points {
+            width: 100%;
+            display: flex;
+            flex-flow: column;
+            align-items: flex-start;
+            z-index: 50;
+            position: relative;
+
+            .pointsHeader {
+                display: flex;
+                width: 100%;
+                justify-content: space-between;
+                user-select: none;
+                cursor: pointer;
+                background-color: $white;
+                z-index: 100;
+
+                h4 {
+                    width: 100%;
+                }
+
+                svg {
+                    transition: .6s all ease-in-out;
+                    font-size: 1rem;
+                    rotate: -90deg;
+                }
+            }
+            .pointsList {
+                display: flex;
+                flex-flow: column;
+            }
+
+            .pointWrapper {
+                display: flex;
+                align-items: center;
+                width: 100%;
+                justify-content: space-between;
+                max-height: 0;
+                opacity: 0;
+                transition: all .6s linear;
+
+                svg {
+                    font-size: 1.2rem;
+                }
+
+                p {
+                    display: flex;
+                    gap: .5rem;
+                    padding: .5rem 0;
+
+                    svg {
+                        font-size: .8rem;
+                        margin-top: .15rem;
+                    }
+                }
+            }
+
+            .good {
+                svg {
+                    color: $green;
+                }
+            }
+
+            .minor {
+                svg {
+                    color: $orange;
+                }
+            }
+
+            .warning {
+                svg {
+                    color: $red;
+                }
+            }
+
+            &.open {
+                .pointsHeader {
+                    svg {
+                        rotate: 90deg;
+                    }
+                }
+
+                .pointWrapper{
+                    opacity: 1;
+                    max-height: 2.5rem;
+                }
+            }
+        }
+    }
+}

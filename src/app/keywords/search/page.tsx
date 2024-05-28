@@ -1,11 +1,11 @@
-'use client'
+"use client";
 import PageTitle from "@/components/page-title/page-title.component";
 import InputWrapper from "@/components/ui/input-wrapper/input-wrapper.component";
 import InnerWrapper from "@/components/inner-wrapper/inner-wrapper.component";
 import { useEffect, useRef, useState } from "react";
 import styles from "./page.module.scss";
 
-import { supabase } from "@/app/utils/supabaseClient/server"
+import { supabase } from "@/app/utils/supabaseClient/server";
 import languageCodes from "@/json/language-codes.json";
 import countryCodes from "@/json/country-codes.json";
 
@@ -131,7 +131,7 @@ export default function KeywordSearching() {
         }),
       });
 
-      const data = await response.json();
+      const { generatedKeywordsList } = await response.json();
 
       const response2 = await fetch("/api/googleKeywords", {
         method: "POST",
@@ -139,10 +139,12 @@ export default function KeywordSearching() {
           "Content-Type": "application/x-www-form-urlencoded",
         },
         body: JSON.stringify({
-          keywords: [...filters.subjects, ...data.generatedKeywordsList],
+          keywords: Array.from(
+            new Set([...filters.subjects, ...generatedKeywordsList.keywords])
+          ),
           language: filters.language,
           country: filters.country,
-        })
+        }),
       });
       const GoogleGeneratedKeywords = await response2.json();
 
@@ -230,18 +232,30 @@ export default function KeywordSearching() {
   // Show an amount of keywords according to the "page"
   function showKeywords(keywords: any) {
     let array: any[] = [];
+    if (keywordAmount[0] == 0) {
+      keywords.map((keyword: any) => {
+        filters.subjects.map((subject) => {
+          if (subject == keyword.text) {
+            array.push(keyword);
+          }
+        });
+      });
+    }
     for (
       let x = keywordAmount[0];
       x < keywordAmount[1] && x < keywords.length;
       x++
     ) {
-      array.push(keywords[x]);
+      if (!filters.subjects.includes(keywords[x].text)) {
+        array.push(keywords[x]);
+      }
     }
     setShownKeywords(array);
   }
 
   // Sort the keywords on the sorting type
   function sortKeywords(array: any) {
+    setKeywordAmount([0, 20]);
     if (sorting == "potential") {
       return array.sort(
         (a: any, b: any) =>
@@ -319,6 +333,7 @@ export default function KeywordSearching() {
         subjects: [...prevState.subjects, ...cleanArray],
       }));
       setSubjectInput("");
+      setKeywordAmount([0, 20]);
       isKeywordsGenerated.current = false;
     }
   }
@@ -331,9 +346,13 @@ export default function KeywordSearching() {
       .eq("collection_name", collectionToSave);
     if (data != undefined) {
       if (data?.length > 0) {
+        // Merge the existing with the new keywords
+        const combinedArray = selectedKeywords.concat(data[0].keywords);
+        const uniqueArray = Array.from(new Set(combinedArray));
+
         const { error } = await supabase
           .from("collections")
-          .update({ keywords: selectedKeywords.concat(data[0].keywords) })
+          .update({ keywords: uniqueArray })
           .eq("collection_name", collectionToSave);
         if (error) {
           console.log(error);
@@ -427,25 +446,27 @@ export default function KeywordSearching() {
     <InnerWrapper>
       <PageTitle title={"Search keywords"} goBack={() => router.back()} />
       <div className={styles.filterWrapper}>
-        <InputWrapper
-          type="text"
-          value={subjectInput}
-          onChange={(value: any) => setSubjectInput(value)}
-          className={styles.filterInput}
-          currentValues={filters.subjects}
-          changeCurrentValues={(value: string) => updateSubjectFilters(value)}
-          onKeyDown={(e: any) => {
-            if (e.key == "Enter" && subjectInput != "") {
-              addNewSubjects();
+        <div className={styles.inputWrapping}>
+          <InputWrapper
+            type="text"
+            value={subjectInput}
+            onChange={(value: any) => setSubjectInput(value)}
+            className={styles.filterInput}
+            currentValues={filters.subjects}
+            changeCurrentValues={(value: string) => updateSubjectFilters(value)}
+            onKeyDown={(e: any) => {
+              if (e.key == "Enter" && subjectInput != "") {
+                addNewSubjects();
+              }
+            }}
+            placeholder="Search more subjects..."
+            icon={
+              <div onClick={() => addNewSubjects()}>
+                <SearchRoundedIcon />
+              </div>
             }
-          }}
-          placeholder="Search more subjects..."
-          icon={
-            <div onClick={() => addNewSubjects()}>
-              <SearchRoundedIcon />
-            </div>
-          }
-        />
+          />
+        </div>
         <Button type={"solid"} onClick={() => setFilterPopUpOpen(true)}>
           <p>Filter</p>
           <TuneRoundedIcon />
@@ -461,6 +482,7 @@ export default function KeywordSearching() {
             setSelectedKeywords={setSelectedKeywords}
             searchVolume={searchVolume}
             potentialIndex={potentialIndex}
+            searchSubjects={filters?.subjects}
           />
           <div className={styles.buttonWrapper}>
             <Button

@@ -41,7 +41,6 @@ export default function CreateOutlines() {
     type: string;
     title: string;
     subtitles: any[];
-    text: any[];
   }
   const [contentGeneratedOutlines, setContentGeneratedOutlines] = useState<
     OutlineItem[]
@@ -64,7 +63,7 @@ export default function CreateOutlines() {
         console.log('Web Storage is not supported in this environment.');
       }
     }
-  }, [getContentRef]);
+  }, [getContentRef, contentId]);
 
   useEffect(() => {
     if (
@@ -82,7 +81,7 @@ export default function CreateOutlines() {
       setContentGeneratedOutlines(currentContent[0].outlines);
       setUpdateTitle(currentContent[0].content_title);
     }
-  }, [currentContent, generateTitlesRef, generateOutlines]);
+  }, [currentContent, generateTitlesRef]);
 
   function sortingOutlines(titles: any[]) {
     let array: any[] = [];
@@ -137,7 +136,8 @@ export default function CreateOutlines() {
         },
         body: JSON.stringify({
           title: currentContent[0].content_title,
-          keywords: currentContent[0].keywords,
+          sub_keywords: currentContent[0].sub_keywords,
+          keyword: currentContent[0].keyword,
           language: language?.value,
           audience: currentContent[0].target_audience,
           toneOfVoice: toneOfVoice?.value,
@@ -145,10 +145,7 @@ export default function CreateOutlines() {
       });
 
       const { generatedOutlines } = await response.json();
-      const cleanOutlinesArray = JSON.parse(
-        generatedOutlines.replace(/```json/g, "").replace(/[`]/g, "")
-      );
-      sortingOutlines(cleanOutlinesArray);
+      sortingOutlines(generatedOutlines.subtitles)
       setGenerating(false);
     } catch (error) {
       console.log(error);
@@ -319,7 +316,6 @@ export default function CreateOutlines() {
         type: selectedTitleType,
         title: customTitle,
         subtitles: [],
-        text: [],
       };
 
       sortingOutlines([...contentGeneratedOutlines, newOutlineItem]);
@@ -343,7 +339,7 @@ export default function CreateOutlines() {
       .from("contentItems")
       .update({
         outlines: contentGeneratedOutlines,
-        date_edited: currentDate,
+        edited_on: currentDate(),
         status: "outlines",
         content_title: updateTitle,
       })
@@ -370,7 +366,8 @@ export default function CreateOutlines() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          keywords: currentContent[0].keywords,
+          sub_keywords: currentContent[0].sub_keywords,
+          keyword: currentContent[0].keyword,
           toneofvoice: toneOfVoicebyId?.value,
           language: language?.value,
           type: selectedTitleType,
@@ -392,7 +389,7 @@ export default function CreateOutlines() {
     const { error } = await supabase
       .from("contentItems")
       .update({
-        status: "Creating content",
+        status: "writing",
         outlines: contentGeneratedOutlines,
         date_edited: currentDate,
         content_title: updateTitle,
@@ -420,7 +417,7 @@ export default function CreateOutlines() {
           </Button>,
           <Button key={1} type={"solid"} onClick={() => saveOutline()}>
             <p>Save & close</p> <SaveOutlinedIcon />
-          </Button>,
+          </Button>
         ]}
       />
       {currentContent.length > 0 ? (

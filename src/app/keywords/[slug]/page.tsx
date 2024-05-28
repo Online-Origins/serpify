@@ -1,8 +1,8 @@
-'use client'
+"use client";
 import { useEffect, useRef, useState } from "react";
 import styles from "./page.module.scss";
 
-import { supabase } from "@/app/utils/supabaseClient/server"
+import { supabase } from "@/app/utils/supabaseClient/server";
 import { useParams, useRouter } from "next/navigation";
 
 import PageTitle from "@/components/page-title/page-title.component";
@@ -17,7 +17,10 @@ import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
+import languageCodes from "@/json/language-codes.json";
+import toneOfVoices from "@/json/tone-of-voice.json";
 import InputWrapper from "@/components/ui/input-wrapper/input-wrapper.component";
+import CircularLoader from "@/components/circular-loader/circular-loader.component";
 
 export default function Collection({ params }: { params: { slug: string } }) {
   const activeCollection = params.slug;
@@ -33,6 +36,16 @@ export default function Collection({ params }: { params: { slug: string } }) {
   const [newCollectionName, setNewCollectionName] = useState("");
   const [editPopUpOpen, setEditPopUpOpen] = useState(false);
   const [keywordAmount, setKeywordAmount] = useState([0, 20]);
+  const [popUpOpen, setPopUpOpen] = useState(false);
+  const [chosenKeyword, setChosenKeyword] = useState("");
+  const [popUpStep, setPopUpStep] = useState(1);
+  const [keywordOptions, setKeywordOptions] = useState([]);
+  const [chosenKeywords, setChosenKeywords] = useState([]);
+  const [chosenLanguage, setChosenLanguage] = useState(languageCodes[0].id);
+  const [toneOfVoice, setToneOfVoice] = useState(toneOfVoices[0].id);
+  const [targetAudience, setTargetAudience] = useState("");
+  const [contentTitle, setcontentTitle] = useState("");
+  const [generating, setGenerating] = useState(false);
 
   useEffect(() => {
     if (!getSelectedCollectionRef.current && activeCollection != undefined) {
@@ -48,6 +61,7 @@ export default function Collection({ params }: { params: { slug: string } }) {
       .eq("id", activeCollection);
     if (data) {
       setSelectedCollection(data);
+      setChosenKeyword(data[0].keywords[0]);
     }
   }
 
@@ -95,7 +109,7 @@ export default function Collection({ params }: { params: { slug: string } }) {
         keywords: selectedCollection[0].keywords,
         language: selectedCollection[0].language,
         country: selectedCollection[0].country,
-      })
+      }),
     });
 
     const data = await response.json();
@@ -242,6 +256,77 @@ export default function Collection({ params }: { params: { slug: string } }) {
     }
   }
 
+  function currentDate() {
+    const date = new Date();
+
+    let day = date.getDate();
+    let month = date.getMonth() + 1;
+    let year = date.getFullYear();
+
+    return `${year}-${month}-${day}`;
+  }
+
+  async function createContent() {
+    console.log(selectedCollection[0].collection_name)
+    const inserting = await supabase
+      .from("contentItems")
+      .insert([
+        {
+          collection: selectedCollection[0].id,
+          language: chosenLanguage,
+          sub_keywords: chosenKeywords,
+          tone_of_voice: toneOfVoice,
+          target_audience: targetAudience,
+          content_title: contentTitle,
+          edited_on: currentDate(),
+          status: "outlines",
+          keyword: chosenKeyword,
+        },
+      ])
+      .select();
+    if (inserting.error) {
+      console.log(inserting.error);
+      alert("Something went wrong. Please try again!");
+    } else {
+      if (typeof localStorage !== "undefined") {
+        localStorage.setItem("content_id", inserting.data[0].id);
+      } else {
+        // If neither localStorage nor sessionStorage is supported
+        console.log("Web Storage is not supported in this environment.");
+      }
+      router.push("/content/create/outlines");
+    }
+  }
+
+  async function generateTitle() {
+    setGenerating(true);
+    try {
+      const language = languageCodes.find((lang) => lang.id === chosenLanguage); // Get the language that is combined to the chosen language
+      const toneOfVoicebyId = toneOfVoices.find(
+        (item) => item.id === toneOfVoice
+      ); // Get the tone of voice that is combined to the chosen tone of voice
+
+      const response = await fetch("/api/generateTitle", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          keyword: chosenKeyword,
+          toneofvoice: toneOfVoicebyId,
+          language: language?.value,
+        }),
+      });
+
+      const data = await response.json();
+      setGenerating(false);
+      setcontentTitle(data.generatedTitle.split('"').join("")); //Remove the "" around the generated title
+    } catch (error: any) {
+      alert("Something went wrong. Please try again");
+      setGenerating(false);
+    }
+  }
+
   return (
     <InnerWrapper>
       {selectedCollection && selectedCollection.length > 0 && (
@@ -251,13 +336,22 @@ export default function Collection({ params }: { params: { slug: string } }) {
             title={selectedCollection[0].collection_name}
             goBack={() => router.back()}
             buttons={
-              <Button
-                type={"outline"}
-                onClick={() => deleteCollection(selectedCollection[0].id)}
-              >
-                <p>Delete</p>
-                <DeleteOutlineRoundedIcon />
-              </Button>
+              <div className={styles.buttonsWrapper}>
+                <Button
+                  type={"outline"}
+                  onClick={() => deleteCollection(selectedCollection[0].id)}
+                >
+                  <p>Delete</p>
+                  <DeleteOutlineRoundedIcon />
+                </Button>
+                <Button
+                  type={"solid"}
+                  onClick={() => setPopUpOpen(true)}
+                >
+                  <p>Create content</p>
+                  <ArrowForwardRoundedIcon />
+                </Button>
+              </div>
             }
           />
           {!loading ? (
@@ -352,6 +446,121 @@ export default function Collection({ params }: { params: { slug: string } }) {
             </PopUpWrapper>
           )}
         </>
+      )}
+      {popUpOpen && (
+        <PopUpWrapper>
+          <PopUp
+            title={"New content"}
+            titleButtons={
+              <Button type={"textOnly"} onClick={() => setPopUpOpen(false)}>
+                <p>Close</p>
+                <CloseRoundedIcon />
+              </Button>
+            }
+            buttons={
+              popUpStep == 1 ? (
+                <Button type={"solid"} onClick={() => setPopUpStep(2)}>
+                  <p>Next</p>
+                  <ArrowForwardRoundedIcon />
+                </Button>
+              ) : (
+                <div className={styles.buttonsWrapper}>
+                  <Button type={"outline"} onClick={() => setPopUpStep(1)}>
+                    <ArrowBackRoundedIcon />
+                    <p>Back</p>
+                  </Button>
+                  <Button
+                    type={"solid"}
+                    onClick={() => createContent()}
+                    disabled={contentTitle == ""}
+                  >
+                    <p>Start creating</p>
+                  </Button>
+                </div>
+              )
+            }
+          >
+            {popUpStep == 1 && (
+              <div className={styles.selectingKeywords}>
+                <div className={styles.collectionWrapper}>
+                  <h4>Collection:</h4>
+                  <h5>{selectedCollection[0].collection_name}</h5>
+                </div>
+                <InputWrapper
+                  type="dropdown"
+                  title="Focus keyword:"
+                  required={false}
+                  value={chosenKeyword}
+                  options={selectedCollection[0].keywords}
+                  information="This will be the keyword your content is focused on."
+                  onChange={(value: any) => setChosenKeyword(value)}
+                  placeholder="Which collection do you want to use?"
+                />
+                <InputWrapper
+                  type="vertMultiSelect"
+                  title="Subkeywords to use:"
+                  required={false}
+                  options={selectedCollection[0].keywords.filter(
+                    (option: string) => option != chosenKeyword
+                  )}
+                  defValue={chosenKeywords}
+                  information="Keywords that help by enhancing the relevance, reach, and effectiveness of your main keyword strategy."
+                  onChange={(value: any) => setChosenKeywords(value)}
+                  placeholder="Which collection do you want to use?"
+                />
+              </div>
+            )}
+            {popUpStep == 2 && (
+              <div className={styles.contentSettings}>
+                <InputWrapper
+                  type="autocomplete"
+                  title="Language:"
+                  required={false}
+                  value={chosenLanguage}
+                  options={languageCodes}
+                  onChange={(value: any) =>
+                    setChosenLanguage(
+                      value != null ? value : languageCodes[0].id
+                    )
+                  }
+                  placeholder="In what language should the keywords be?"
+                />
+                <InputWrapper
+                  type="autocomplete"
+                  title="Tone of voice:"
+                  required={false}
+                  value={toneOfVoice}
+                  options={toneOfVoices}
+                  onChange={(value: any) =>
+                    setToneOfVoice(value != null ? value : toneOfVoices[0].id)
+                  }
+                  placeholder="How do you want to tell the information?"
+                />
+                <InputWrapper
+                  type="text"
+                  title="Target adience:"
+                  required={false}
+                  onChange={(value: any) => setTargetAudience(value)}
+                  placeholder="Who do you want to target?"
+                />
+                <InputWrapper
+                  type="generate"
+                  title="Title of your content:"
+                  required={true}
+                  value={contentTitle}
+                  onChange={(value: any) => setcontentTitle(value)}
+                  placeholder="Insert title for the content (or generate with AI)"
+                  generateTitle={() => generateTitle()}
+                />
+              </div>
+            )}
+            {generating && (
+              <div className={styles.loader}>
+                <CircularLoader />
+              </div>
+            )}
+          </PopUp>
+        </PopUpWrapper>
       )}
     </InnerWrapper>
   );

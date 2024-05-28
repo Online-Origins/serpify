@@ -8,6 +8,7 @@ import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import Information from "../information/information.component";
 
 import ArrowDownwardRoundedIcon from "@mui/icons-material/ArrowDownwardRounded";
+import classNames from "classnames";
 
 export default function ContentItemsWrapper({
   contents,
@@ -41,7 +42,7 @@ export default function ContentItemsWrapper({
     setShownContents(sortContents(array));
   }
 
-  function sortContents(array:any) {
+  function sortContents(array: any) {
     const sorted = array.sort((a: any, b: any) => {
       const dateA = new Date(a.date_edited);
       const dateB = new Date(b.date_edited);
@@ -62,16 +63,20 @@ export default function ContentItemsWrapper({
   }, [titleFilter, contents]);
 
   return (
-    <div className={styles.pageWrapper}>
+    <div className={classNames(styles.pageWrapper, !small && styles.bottomExtend)}>
       <div className={styles.topRowWrapper}>
-        <InputWrapper
-          className={styles.input}
-          type="text"
-          value={titleFilter}
-          onChange={(value: string) => setTitleFilter(value)}
-          icon={<SearchRoundedIcon />}
-          placeholder="Search by content title"
-        />
+        <div className={styles.wrappingInput}>
+          {!small && (
+            <InputWrapper
+              className={styles.input}
+              type="text"
+              value={titleFilter}
+              onChange={(value: string) => setTitleFilter(value)}
+              icon={<SearchRoundedIcon />}
+              placeholder="Search by content title"
+            />
+          )}
+        </div>
         <div className={styles.rowItem}>
           <h5>Content score:</h5>
           <Information information="A numerical value that ranges from 0 to 100, which is a metric used to show you how well optimized your content is in the eyes of Google." />

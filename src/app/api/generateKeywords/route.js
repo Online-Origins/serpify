@@ -19,10 +19,11 @@ export async function POST(request) {
             },
             {
                 "role": "user",
-                "content": `Generate 10 meta keywords that are good for SEO and are related to the subjects ${keywords.join(',')}. Make sure that the keywords are in the language with the code ${language} and are ${wordsLength.join(' and ')}. Also check if you can combine the subjects into keywords. Only give back an array with the keywords and nothing more, for code purposes`
+                "content": `Generate 10 meta keywords that are good for SEO and are related to the subjects ${keywords.join(',')}. Make sure that the keywords are in the language with the code ${language} and are ${wordsLength.join(' and ')}. Also check if you can combine the subjects into keywords. Only give back an array in json format with the keywords and nothing more, for code purposes`
             }
         ],
-        model: "gpt-3.5-turbo",
+        model: "gpt-4o",
+        response_format: { type: "json_object" },
     });
 
     const generatedKeywordsJson = response.choices[0].message.content;

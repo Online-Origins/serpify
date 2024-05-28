@@ -5,6 +5,11 @@
 * {
     margin: 0;
     padding: 0;
+
+    &::selection {
+        background-color: $purple_primary;
+        color: $white;
+    }
 }
 
 body {
@@ -78,14 +83,31 @@ a {
     }
 }
 
+.Mui-selected,
+.Mui-focused,
+.MuiAutocomplete-option[aria-selected="true"] {
+    background-color: $purple_50 !important;
+}
+
+.MuiMenuItem-root {
+    &:hover {
+        background-color: $purple_50 !important;
+    }
+}
+
 .scrollbar {
     &::-webkit-scrollbar {
         width: .5rem;
-        position: absolute;
+        height: .5rem;
     }
 
     &::-webkit-scrollbar-thumb {
         background-color: $purple_secundary;
+        border-radius: 1rem;
+    }
+
+    &::-webkit-scrollbar-track {
+        margin: 1rem;
         border-radius: 1rem;
     }
 }
@@ -104,32 +126,67 @@ a {
 
         li {
             display: flex;
-            
+
             padding: .5rem;
             cursor: pointer;
             transition: .3s all ease-in-out;
+
             &:hover {
                 background-color: $purple_primary;
                 color: $white;
                 outline: none;
             }
-            &:focus-visible{
+
+            &:focus-visible {
                 outline: none;
             }
         }
     }
 }
 
-.dropPlace{
+.dropPlace {
     min-height: 1px;
 }
 
-.dropHover{
+.dropHover {
     background-color: rgba($color: $purple_50, $alpha: .5);
 }
 
-.tiptap{
-    &:focus-visible{
+.tiptap {
+    &:focus-visible {
         outline: 0px;
     }
+
+    p.is-empty:first-of-type:before {
+        color: #adb5bd;
+        content: attr(data-placeholder);
+        float: left;
+        height: 0;
+        pointer-events: none;
+    }
+
+
+    img {
+        border: solid 2px rgba($color: $black, $alpha: 0);
+
+        &.ProseMirror-selectednode {
+            border: solid 2px rgba($color: $black, $alpha: .5);
+        }
+    }
+}
+
+div[id^="tippy-"] {
+    width: 800px;
+    z-index: 100 !important;
+
+    .tippy-content,
+    .tippy-box {
+        &:focus-visible {
+            outline: none;
+        }
+    }
+}
+
+.css-1s5lphu-MuiPopper-root-MuiAutocomplete-popper{
+    z-index: 2000;
 }

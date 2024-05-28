@@ -1,0 +1,12 @@
+@import "@/styles/variables.scss";
+
+.homeWrapper{
+    padding-right: 1rem;
+    overflow-y: scroll !important;
+}
+
+.toolWrapper{
+    display: flex;
+    flex-flow: column;
+    gap: 1.5rem;
+}
