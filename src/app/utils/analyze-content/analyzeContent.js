@@ -99,7 +99,6 @@ export function analyzeContent(contentJson) {
         const textWithoutTags = htmlText.replace(/<\/?[^>]+(>|$)/g, " ");
         const matches = textWithoutTags.match(new RegExp(`\\b${keyword}\\w*\\b`, 'gi'));
         const count = matches ? matches.length : 0;
-        console.log(count)
         const percentage = (count / getWordAmount()) * 100;
 
         if (percentage >= 1 && percentage <= 2) {
