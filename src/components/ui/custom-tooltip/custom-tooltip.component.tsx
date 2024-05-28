@@ -1,8 +1,8 @@
 import Tooltip, { TooltipProps, tooltipClasses } from "@mui/material/Tooltip";
 import Fade from "@mui/material/Fade";
 import { styled } from "@mui/material/styles";
-import styles from "./custom-tooltip.module.scss";
 import { useState } from "react";
+import styles from "./custom-tooltip.module.scss";
 
 const CustomToolTip = styled(({ className, ...props }: TooltipProps) => (
   <Tooltip {...props} classes={{ popper: className }} />

@@ -1,6 +1,5 @@
 import SmallTable from "../table/small-table/small-table.component";
 import Button from "../ui/button/button.component";
-import styles from "./collection-card.module.scss";
 import { useRouter } from "next/navigation";
 
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
@@ -16,6 +15,7 @@ import languageCodes from "@/json/language-codes.json";
 import toneOfVoices from "@/json/tone-of-voice.json";
 import InputWrapper from "../ui/input-wrapper/input-wrapper.component";
 import CircularLoader from "../circular-loader/circular-loader.component";
+import styles from "./collection-card.module.scss";
 
 export default function CollectionCard({
   collection,

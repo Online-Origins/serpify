@@ -1,5 +1,3 @@
-import styles from "./content-items-wrapper.module.scss";
-
 import ContentItem from "../content-item/content-item.component";
 import { useEffect, useRef, useState } from "react";
 import InputWrapper from "../ui/input-wrapper/input-wrapper.component";
@@ -9,6 +7,7 @@ import Information from "../information/information.component";
 
 import ArrowDownwardRoundedIcon from "@mui/icons-material/ArrowDownwardRounded";
 import classNames from "classnames";
+import styles from "./content-items-wrapper.module.scss";
 
 export default function ContentItemsWrapper({
   contents,

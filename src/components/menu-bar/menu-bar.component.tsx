@@ -1,6 +1,5 @@
 'use client'
 import ComponentWrapper from "@/components/ui/component-wrapper/component-wrapper.component";
-import styles from "./menu-bar.module.scss";
 import classNames from "classnames";
 
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
@@ -12,6 +11,7 @@ import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from 'next/navigation';
+import styles from "./menu-bar.module.scss";
 
 export default function MenuBar({setSmallNav, smallNav}: {setSmallNav: any, smallNav: boolean}) {
   const pathname = usePathname();

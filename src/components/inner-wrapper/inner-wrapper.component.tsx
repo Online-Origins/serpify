@@ -1,6 +1,6 @@
 import React from "react";
-import styles from "./inner-wrapper.module.scss";
 import classNames from "classnames";
+import styles from "./inner-wrapper.module.scss";
 
 export default function InnerWrapper({
   children,

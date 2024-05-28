@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import "@/styles/global.scss";
 import AppWrapper from "./app-wrapper";
 import { SharedProvider } from "@/context/SharedContext";
 

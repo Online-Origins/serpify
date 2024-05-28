@@ -1,10 +1,10 @@
-import styles from "./dots-menu.module.scss";
 import { useEffect, useRef, useState } from "react";
 
 import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { supabase } from "@/app/utils/supabaseClient/server"
+import styles from "./dots-menu.module.scss";
 
 export default function DotsMenu({
   deleteFunction,

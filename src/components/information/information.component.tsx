@@ -1,5 +1,5 @@
-import styles from './information.module.scss'; 
 import CustomizedTooltip from '../ui/custom-tooltip/custom-tooltip.component';
+import styles from './information.module.scss'; 
 
 export default function Information({ information }: { information: string }) {
   return (

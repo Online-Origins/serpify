@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import styles from "./collections-wrapper.module.scss";
 
 import CollectionCard from "@/components/collection-card/collection-card.component";
 import classNames from "classnames";
 import PopUpWrapper from "../ui/popup-wrapper/popup-wrapper.component";
 import CircularLoader from "../circular-loader/circular-loader.component";
+import styles from "./collections-wrapper.module.scss";
 
 export default function CollectionsWrapper({
   collections,

@@ -1,5 +1,5 @@
-import styles from "./selector.module.scss";
 import classNames from "classnames";
+import styles from "./selector.module.scss";
 
 export default function Selector({
   group,

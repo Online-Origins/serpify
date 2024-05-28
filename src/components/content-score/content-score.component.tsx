@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import PageTitle from "../page-title/page-title.component";
-import styles from "./content-score.module.scss";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 
 import {
@@ -13,6 +12,7 @@ import {
 import classNames from "classnames";
 import CustomizedTooltip from "../ui/custom-tooltip/custom-tooltip.component";
 import GradientSVG from "@/components/gradient-svg/gradient-svg.component";
+import styles from "./content-score.module.scss";
 
 export default function ContentScore({ contentScore }: { contentScore: any }) {
   const [goodOpen, setGoodOpen] = useState(true);

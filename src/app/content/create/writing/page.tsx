@@ -1,6 +1,5 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
-import styles from "./page.module.scss";
 import { supabase } from "@/app/utils/supabaseClient/server";
 import InnerWrapper from "@/components/inner-wrapper/inner-wrapper.component";
 import { useEditor, EditorContent, BubbleMenu } from "@tiptap/react";
@@ -17,6 +16,7 @@ import PopUp from "@/components/ui/popup/popup.component";
 import CircularLoader from "@/components/circular-loader/circular-loader.component";
 import InputWrapper from "@/components/ui/input-wrapper/input-wrapper.component";
 import { SeoCheck } from "seord";
+import styles from "./page.module.scss";
 
 import {
   FormatBold,

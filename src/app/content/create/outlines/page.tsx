@@ -1,6 +1,5 @@
 'use client'
 import { useEffect, useRef, useState } from "react";
-import styles from "./page.module.scss";
 import InnerWrapper from "@/components/inner-wrapper/inner-wrapper.component";
 import PageTitle from "@/components/page-title/page-title.component";
 import Button from "@/components/ui/button/button.component";
@@ -28,6 +27,7 @@ import CircularLoader from "@/components/circular-loader/circular-loader.compone
 import DraggableSubtitle from "@/components/draggable-subtitle/draggable-subtitle.component";
 import CustomizedTooltip from "@/components/ui/custom-tooltip/custom-tooltip.component";
 import { ArrowForwardRounded } from "@mui/icons-material";
+import styles from "./page.module.scss";
 
 export default function CreateOutlines() {
   const router = useRouter();

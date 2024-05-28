@@ -3,7 +3,6 @@ import PageTitle from "@/components/page-title/page-title.component";
 import InputWrapper from "@/components/ui/input-wrapper/input-wrapper.component";
 import InnerWrapper from "@/components/inner-wrapper/inner-wrapper.component";
 import { useEffect, useRef, useState } from "react";
-import styles from "./page.module.scss";
 
 import { supabase } from "@/app/utils/supabaseClient/server";
 import languageCodes from "@/json/language-codes.json";
@@ -24,6 +23,7 @@ import PopUp from "@/components/ui/popup/popup.component";
 import Selector from "@/components/ui/selector/selector.component";
 import { useRouter } from "next/navigation";
 import CircularLoader from "@/components/circular-loader/circular-loader.component";
+import styles from "./page.module.scss";
 
 export default function KeywordSearching() {
   const router = useRouter();

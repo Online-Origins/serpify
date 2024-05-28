@@ -1,6 +1,5 @@
 "use client";
-import PageTitle from "@/components/page-title/page-title.component";
-import styles from "./app-wrapper.module.scss";
+import "@/styles/global.scss";
 import MenuBar from "@/components/menu-bar/menu-bar.component";
 import ComponentWrapper from "@/components/ui/component-wrapper/component-wrapper.component";
 import classNames from "classnames";
@@ -8,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import ContentScore from "@/components/content-score/content-score.component";
 import { useSharedContext } from '@/context/SharedContext';
+import styles from "./app-wrapper.module.scss";
 
 export default function AppWrapper({
   children,

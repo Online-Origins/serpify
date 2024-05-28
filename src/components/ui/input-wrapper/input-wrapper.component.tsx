@@ -1,6 +1,4 @@
 import classNames from "classnames";
-import styles from "./input-wrapper.module.scss";
-
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import Information from "@/components/information/information.component";
 import {
@@ -10,10 +8,10 @@ import {
   Slider,
   TextField,
 } from "@mui/material";
-
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import { useState } from "react";
 import CustomizedTooltip from "../custom-tooltip/custom-tooltip.component";
+import styles from "./input-wrapper.module.scss";
 
 export default function InputWrapper({
   title,

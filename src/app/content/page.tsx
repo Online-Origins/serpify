@@ -1,5 +1,4 @@
 "use client";
-import styles from "./page.module.scss";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/app/utils/supabaseClient/server";
 import { useRouter } from "next/navigation";
@@ -20,6 +19,7 @@ import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import languageCodes from "@/json/language-codes.json";
 import toneOfVoices from "@/json/tone-of-voice.json";
 import CircularLoader from "@/components/circular-loader/circular-loader.component";
+import styles from "./page.module.scss";
 
 export default function ContentOverview() {
   const [popUpOpen, setPopUpOpen] = useState(false);

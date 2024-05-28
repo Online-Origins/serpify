@@ -1,7 +1,6 @@
 import React from "react";
-import styles from "./popup.module.scss";
-
 import PageTitle from "@/components/page-title/page-title.component";
+import styles from "./popup.module.scss";
 
 export default function PopUp({
   buttons,
