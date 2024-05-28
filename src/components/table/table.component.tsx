@@ -17,6 +17,7 @@ export default function Table({
   setSelectedKeywords,
   searchVolume,
   potentialIndex,
+  searchSubjects,
 }: {
   shownKeywords: any;
   sorting?: any;
@@ -25,6 +26,7 @@ export default function Table({
   setSelectedKeywords?: any;
   searchVolume?: any;
   potentialIndex?: any;
+  searchSubjects?: any;
 }) {
   const tableRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -166,6 +168,7 @@ export default function Table({
                 </div>
                 <div className={classNames(styles.item, styles.keyword)}>
                   <p>{keyword.text}</p>
+                  {searchSubjects.includes(keyword.text) && <p className={styles.subject}>Subject</p>}
                 </div>
                 <div className={classNames(styles.item, styles.searchVolume)}>
                   <p>

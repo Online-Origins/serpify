@@ -482,6 +482,7 @@ export default function KeywordSearching() {
             setSelectedKeywords={setSelectedKeywords}
             searchVolume={searchVolume}
             potentialIndex={potentialIndex}
+            searchSubjects={filters?.subjects}
           />
           <div className={styles.buttonWrapper}>
             <Button

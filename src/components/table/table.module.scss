@@ -35,6 +35,14 @@
 
             &.keyword {
                 width: 200%;
+                .subject{
+                    font-size: .8rem;
+                    font-weight: 600;
+                    color: $purple_primary;
+                    height: 100%;
+                    display: flex;
+                    align-items: flex-end;
+                }
             }
 
             &.searchVolume,
