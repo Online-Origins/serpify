@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import styles from "./page.module.scss";
 
 import { supabase } from "@/app/utils/supabaseClient/server";
 import { useParams, useRouter } from "next/navigation";
@@ -21,6 +20,7 @@ import languageCodes from "@/json/language-codes.json";
 import toneOfVoices from "@/json/tone-of-voice.json";
 import InputWrapper from "@/components/ui/input-wrapper/input-wrapper.component";
 import CircularLoader from "@/components/circular-loader/circular-loader.component";
+import styles from "./page.module.scss";
 
 export default function Collection({ params }: { params: { slug: string } }) {
   const activeCollection = params.slug;

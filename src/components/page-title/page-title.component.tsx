@@ -1,7 +1,7 @@
-import styles from "./page-title.module.scss";
 import classNames from "classnames";
 import EditIcon from "@mui/icons-material/Edit";
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
+import styles from "./page-title.module.scss";
 
 export default function PageTitle({
   buttons,

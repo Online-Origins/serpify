@@ -1,10 +1,9 @@
-import styles from "./indication-icon.module.scss";
-
 import KeyboardDoubleArrowUpRoundedIcon from "@mui/icons-material/KeyboardDoubleArrowUpRounded";
 import KeyboardArrowUpRoundedIcon from "@mui/icons-material/KeyboardArrowUpRounded";
 import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
 import HorizontalRuleRoundedIcon from "@mui/icons-material/HorizontalRuleRounded";
 import classNames from "classnames";
+import styles from "./indication-icon.module.scss";
 
 export default function IndicationIcon({ indication, competition }: { indication: any; competition?: boolean }) {
   switch (true) {

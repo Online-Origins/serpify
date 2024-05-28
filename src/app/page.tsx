@@ -1,6 +1,5 @@
 "use client";
 import PageTitle from "@/components/page-title/page-title.component";
-import styles from "./page.module.scss";
 import InnerWrapper from "@/components/inner-wrapper/inner-wrapper.component";
 import Button from "@/components/ui/button/button.component";
 import { ArrowForwardRounded } from "@mui/icons-material";
@@ -12,6 +11,7 @@ import classNames from "classnames";
 import { usePathname, useRouter } from "next/navigation";
 import PopUpWrapper from "@/components/ui/popup-wrapper/popup-wrapper.component";
 import CircularLoader from "@/components/circular-loader/circular-loader.component";
+import styles from "./page.module.scss";
 
 export default function Home() {
   const loadingRef = useRef(true);

@@ -1,13 +1,11 @@
-import styles from "./table.module.scss";
 import classNames from "classnames";
-
 import ArrowDownwardRoundedIcon from "@mui/icons-material/ArrowDownwardRounded";
 import ArrowUpwardRoundedIcon from "@mui/icons-material/ArrowUpwardRounded";
-
 import Information from "@/components/information/information.component";
 import IndicationIcon from "../indication-icon/indication-icon.component";
 import Selector from "../ui/selector/selector.component";
 import { useEffect, useRef, useState } from "react";
+import styles from "./table.module.scss";
 
 export default function Table({
   shownKeywords,

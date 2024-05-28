@@ -1,10 +1,9 @@
 import classNames from "classnames";
-import styles from "./subtitle.module.scss";
-
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded";
 import CustomizedTooltip from "../ui/custom-tooltip/custom-tooltip.component";
 import { useEffect, useState } from "react";
+import styles from "./subtitle.module.scss";
 
 export default function Subtitle({
   title,

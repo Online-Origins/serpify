@@ -1,11 +1,11 @@
 'use client'
 import classNames from "classnames";
-import styles from "./content-item.module.scss";
 import { CircularProgressbar } from "react-circular-progressbar";
 import BorderColorRoundedIcon from "@mui/icons-material/BorderColorRounded";
 import { useRouter } from "next/navigation";
 import DotsMenu from "../dots-menu/dots-menu.component";
 import { supabase } from "@/app/utils/supabaseClient/server"
+import styles from "./content-item.module.scss";
 
 export default function ContentItem({
   content,

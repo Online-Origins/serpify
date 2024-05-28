@@ -1,7 +1,7 @@
-import styles from "./small-table.module.scss";
 import classNames from "classnames";
 import { useEffect, useRef, useState } from "react";
 import IndicationIcon from "@/components/indication-icon/indication-icon.component";
+import styles from "./small-table.module.scss";
 
 export default function SmallTable({
   keywords,
