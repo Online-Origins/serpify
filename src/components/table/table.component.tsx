@@ -28,6 +28,7 @@ export default function Table({
 }) {
   const tableRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const parentScrollRef = useRef<HTMLDivElement>(null);
   const [scroll, setScroll] = useState(false);
 
   function selecting(clickedKeyword: string) {
@@ -69,14 +70,10 @@ export default function Table({
         return "low";
     }
   }
-  const prevShownKeywords = useRef(shownKeywords);
 
   useEffect(() => {
-    // Compare previous shownKeywords with current shownKeywords
-    if (prevShownKeywords.current !== shownKeywords && tableRef.current) {
-      tableRef.current.scrollTop = 0;
-      // Update the previous shownKeywords
-      prevShownKeywords.current = shownKeywords;
+    if (shownKeywords.length > 0 && parentScrollRef.current) {
+      parentScrollRef.current.scrollTop = 0;
     }
   }, [shownKeywords]);
 
@@ -154,6 +151,7 @@ export default function Table({
           "scrollbar",
           scroll && styles.scroll
         )}
+        ref={parentScrollRef}
       >
         <div className={styles.tableContent} ref={scrollRef}>
           {shownKeywords.length > 0 ? (

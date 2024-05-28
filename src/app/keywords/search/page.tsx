@@ -246,7 +246,9 @@ export default function KeywordSearching() {
       x < keywordAmount[1] && x < keywords.length;
       x++
     ) {
-      array.push(keywords[x]);
+      if (!filters.subjects.includes(keywords[x].text)) {
+        array.push(keywords[x]);
+      }
     }
     setShownKeywords(array);
   }
@@ -344,9 +346,13 @@ export default function KeywordSearching() {
       .eq("collection_name", collectionToSave);
     if (data != undefined) {
       if (data?.length > 0) {
+        // Merge the existing with the new keywords
+        const combinedArray = selectedKeywords.concat(data[0].keywords);
+        const uniqueArray = Array.from(new Set(combinedArray));
+
         const { error } = await supabase
           .from("collections")
-          .update({ keywords: selectedKeywords.concat(data[0].keywords) })
+          .update({ keywords: uniqueArray })
           .eq("collection_name", collectionToSave);
         if (error) {
           console.log(error);
