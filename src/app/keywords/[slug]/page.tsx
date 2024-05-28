@@ -313,7 +313,7 @@ export default function Collection({ params }: { params: { slug: string } }) {
         },
         body: JSON.stringify({
           keyword: chosenKeyword,
-          toneofvoice: toneOfVoicebyId,
+          toneofvoice: toneOfVoicebyId?.value,
           language: language?.value,
         }),
       });

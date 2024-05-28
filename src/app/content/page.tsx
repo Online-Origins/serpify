@@ -99,7 +99,7 @@ export default function ContentOverview() {
         },
         body: JSON.stringify({
           keyword: chosenKeyword,
-          toneofvoice: toneOfVoicebyId,
+          toneofvoice: toneOfVoicebyId?.value,
           language: language?.value,
         }),
       });
