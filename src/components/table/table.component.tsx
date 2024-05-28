@@ -166,7 +166,7 @@ export default function Table({
                 </div>
                 <div className={classNames(styles.item, styles.keyword)}>
                   <p>{keyword.text}</p>
-                  {searchSubjects.includes(keyword.text) && <p className={styles.subject}>Subject</p>}
+                  {(searchSubjects && searchSubjects.includes(keyword.text)) ? <p className={styles.subject}>Subject</p> : null}
                 </div>
                 <div className={classNames(styles.item, styles.searchVolume)}>
                   <p>
