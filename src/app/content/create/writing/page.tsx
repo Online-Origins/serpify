@@ -91,7 +91,7 @@ export default function Writing() {
     };
 
     const { analyzedContent } = analyzeContent(contentJson);
-    console.log(analyzedContent);
+    // console.log(analyzedContent);
     setSeoAnalysis(analyzedContent);
     setSharedData(analyzedContent);
   }

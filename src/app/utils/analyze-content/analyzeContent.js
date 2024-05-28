@@ -74,19 +74,23 @@ export function analyzeContent(contentJson) {
     function getSubKeywordDensity() {
         let subKeywordsArray = [];
         const textWithoutTags = htmlText.replace(/<\/?[^>]+(>|$)/g, " ");
-        subKeywords.map((keyword) => {
-            const regex = new RegExp(`\\b${keyword}\\b`, 'gi');
-            // Use match to find all occurrences and count them
-            const matches = textWithoutTags.match(regex);
-            const count = matches ? matches.length : 0;
-            const percentage = (count / getWordAmount()) * 100;
+        if (subKeywords.length > 0) {
+            subKeywords.map((keyword) => {
+                const regex = new RegExp(`\\b${keyword}\\b`, 'gi');
+                // Use match to find all occurrences and count them
+                const matches = textWithoutTags.match(regex);
+                const count = matches ? matches.length : 0;
+                const percentage = (count / getWordAmount()) * 100;
 
-            if (percentage >= 1 && percentage <= 2) {
-                seoScore += (10 / subKeywords.length);
-            }
+                if (percentage >= 1 && percentage <= 2) {
+                    seoScore += (10 / subKeywords.length);
+                }
 
-            subKeywordsArray.push({ keyword: keyword, density: percentage })
-        })
+                subKeywordsArray.push({ keyword: keyword, density: percentage })
+            })
+        } else {
+            seoScore += 10;
+        }
 
         return subKeywordsArray;
     }
