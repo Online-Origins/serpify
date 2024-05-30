@@ -10,15 +10,19 @@ const oauth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_U
 export async function POST(req) {
   const body = await req.json();
   const accessToken = body.accessToken;
+  const refreshToken = body.refreshToken;
   const siteUrl = body.websiteUrl;
+  const startDate = body.startDate;
+  const endDate = body.endDate;
+
     try {
-        oauth2Client.setCredentials({ access_token: accessToken });
+        oauth2Client.setCredentials({ access_token: accessToken, refresh_token: refreshToken });
 
         const searchconsole = google.searchconsole({ version: 'v1', auth: oauth2Client });
 
         const requestBody = {
-            startDate: '2024-01-01',
-            endDate: '2024-01-31',
+            startDate: startDate,
+            endDate: endDate,
             dimensions: ['date'],
         };
 
