@@ -9,6 +9,7 @@
     display: flex;
     flex-flow: column;
     gap: 1rem;
+    border: solid 1px $purple_50;
 
     .cardTitle {
         display: flex;
@@ -16,7 +17,7 @@
         align-items: flex-end;
 
         img {
-            margin-bottom: .3rem;
+            margin-bottom: .2rem;
         }
     }
 }

@@ -5,7 +5,7 @@ import PageTitle from "@/components/page-title/page-title.component";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Statistic from "@/components/statistic/statistic.component";
-import {formatNumber} from "@/app/utils/formatNumber/formatNumber";
+import { formatNumber } from "@/app/utils/formatNumber/formatNumber";
 
 const websiteUrl = "onlineorigins.nl";
 
@@ -23,6 +23,7 @@ export default function AnalyticsPage() {
   const [totalAnalytics, setTotalAnalytics] = useState<AnalyticsData | null>(
     null
   );
+  const loadedData = useRef(false);
 
   // Utility function to get the authorization code from URL
   const getAuthorizationCode = () => {
@@ -32,12 +33,10 @@ export default function AnalyticsPage() {
 
   useEffect(() => {
     const authorizationCode = getAuthorizationCode();
-    const data = localStorage.getItem("webData");
+    const data = sessionStorage.getItem("webData");
 
     if (!gotData.current) {
-      if (data && data.length > 0) {
-        setDomainAnalytics(JSON.parse(data));
-      } else {
+      if (!data) {
         if (authorizationCode) {
           handleExecute();
         } else {
@@ -45,8 +44,11 @@ export default function AnalyticsPage() {
         }
       }
       gotData.current = true;
+    } else if (!loadedData.current && data && data.length > 0) {
+      setDomainAnalytics(JSON.parse(data));
+      loadedData.current = true;
     }
-  }, []);
+  }, [gotData.current]);
 
   useEffect(() => {
     if (domainAnalytics.length > 0) {
@@ -113,7 +115,7 @@ export default function AnalyticsPage() {
           });
 
           const data = await response.json();
-          localStorage.setItem("webData", JSON.stringify(data.rows));
+          sessionStorage.setItem("webData", JSON.stringify(data.rows));
           router.push("/analytics");
         } catch (error) {
           console.error("Error fetching search console data", error);
@@ -154,17 +156,17 @@ export default function AnalyticsPage() {
             <Statistic
               title="Total clicks"
               amount={formatNumber(totalAnalytics.clicks)}
-              information="How many times a user saw a link to your site in search results."
+              information="How often a user clicked through to your site from the Google result pages."
             />
             <Statistic
               title="Average CTR"
               amount={`${totalAnalytics.ctr.toFixed(2)}%`}
-              information="How many times a user saw a link to your site in search results."
+              information="(Click Through Rate) Percentage of impressions that led to a click."
             />
             <Statistic
               title="Average position"
               amount={totalAnalytics.position.toFixed(1)}
-              information="How many times a user saw a link to your site in search results."
+              information="Average position for your site in search results, using the highest position for your site when it appears in search results."
             />
           </div>
         </div>

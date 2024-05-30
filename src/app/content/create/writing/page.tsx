@@ -44,7 +44,7 @@ import {
 import toneOfVoices from "@/json/tone-of-voice.json";
 import languages from "@/json/language-codes.json";
 import { useSharedContext } from "@/context/SharedContext";
-import { analyzeContent } from "@/app/utils/analyze-content/analyzeContent";
+import { analyzeContent } from "@/app/utils/analyzeContent/analyzeContent";
 
 export default function Writing() {
   const router = useRouter();
