@@ -5,7 +5,7 @@ const { OAuth2 } = google.auth;
 // Replace with your client ID, client secret, and redirect URL
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
-const REDIRECT_URL = "http://localhost:3000/analytics";
+const REDIRECT_URL = "http://localhost:3000/";
 
 const oauth2Client = new OAuth2(
     CLIENT_ID,
