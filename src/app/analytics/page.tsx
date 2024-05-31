@@ -4,13 +4,17 @@ import styles from "./page.module.scss";
 import PageTitle from "@/components/page-title/page-title.component";
 import { useEffect, useRef, useState } from "react";
 import DomainStatistics from "@/components/domain-statistics/domain-statistics.component";
+import LineChart from "@/components/line-chart/line-chart.component";
+import InputWrapper from "@/components/ui/input-wrapper/input-wrapper.component";
 
 const websiteUrl = "onlineorigins.nl";
 
 export default function AnalyticsPage() {
   const gotData = useRef(false);
+  const [domainAnalytics, setDomainAnalytics] = useState([]);
   const [currentAccessToken, setCurrentAccessToken] = useState("");
   const [correctUrl, setCorrectUrl] = useState("");
+  const [chartType, setChartType] = useState("impressions");
 
   useEffect(() => {
     const authorizationCode = sessionStorage.getItem("authorizationCode");
@@ -21,6 +25,8 @@ export default function AnalyticsPage() {
         handleExecute(authorizationCode);
       }
       gotData.current = true;
+    } else if (data && data.length > 0) {
+      setDomainAnalytics(JSON.parse(data));
     }
   }, [gotData.current]);
 
@@ -50,13 +56,32 @@ export default function AnalyticsPage() {
   }
 
   return (
-    <InnerWrapper>
-      <PageTitle title={"Website analytics"} />
-      <div className={styles.analyticsWrapper}>
-        <DomainStatistics
-          accessToken={currentAccessToken}
-          correctUrl={correctUrl}
-        />
+    <InnerWrapper className={styles.analyticsWrapper}>
+      <PageTitle
+        title={"Website analytics"}
+        information={
+          "The entirety of our data and analytics infrastructure relies exclusively on Google's platform."
+        }
+      />{" "}
+      <DomainStatistics
+        accessToken={currentAccessToken}
+        correctUrl={correctUrl}
+      />
+      <div className={styles.horizontal}>
+        <div className={styles.chartWrapper}>
+          <div className={styles.titleWrapper}>
+            <h3>Performance</h3>
+            <InputWrapper
+              type="dropdown"
+              small
+              value={chartType}
+              onChange={(value: any) => setChartType(value)}
+              options={["impressions", "clicks", "ctr", "position"]}
+            />
+          </div>
+          <LineChart data={domainAnalytics} type={chartType} />
+        </div>
+        <h5>Hello</h5>
       </div>
     </InnerWrapper>
   );

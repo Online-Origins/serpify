@@ -9,8 +9,6 @@ import { supabase } from "./utils/supabaseClient/server";
 import CollectionsWrapper from "@/components/collections-wrapper/collections-wrapper.component";
 import classNames from "classnames";
 import { usePathname, useRouter } from "next/navigation";
-import PopUpWrapper from "@/components/ui/popup-wrapper/popup-wrapper.component";
-import CircularLoader from "@/components/circular-loader/circular-loader.component";
 import styles from "./page.module.scss";
 import DomainStatistics from "@/components/domain-statistics/domain-statistics.component";
 

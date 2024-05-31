@@ -31,6 +31,7 @@ export default function InputWrapper({
   onKeyDown,
   step,
   marks,
+  small
 }: {
   title?: string;
   required?: boolean;
@@ -49,6 +50,7 @@ export default function InputWrapper({
   onKeyDown?: any;
   step?: number;
   marks?: any;
+  small?: boolean;
 }) {
   const handleChange = (value: string) => {
     if (defValue.includes(value)) {
@@ -223,7 +225,7 @@ export default function InputWrapper({
   };
 
   return (
-    <div className={classNames(styles.wrapper, className)}>
+    <div className={classNames(styles.wrapper, className, small && styles.small)}>
       {title && (
         <div className={styles.titleWrapper}>
           <h4>

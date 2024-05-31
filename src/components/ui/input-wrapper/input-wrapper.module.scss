@@ -6,6 +6,10 @@
     flex-flow: column;
     gap: .5rem;
 
+    &.small{
+        width: max-content;
+    }
+
     .inputWrapper {
         width: calc(100% - 1rem);
         display: flex;
@@ -173,6 +177,10 @@
 
         &:hover {
             outline: solid rgba($color: $purple_primary, $alpha: .5) 2px;
+        }
+
+        &.small {
+            padding: 0;
         }
     }
 
