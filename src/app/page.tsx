@@ -20,60 +20,19 @@ export default function Home() {
   const [contents, setContents] = useState<any[]>([]);
   const router = useRouter();
   const gotData = useRef(false);
-  const [currentAccessToken, setCurrentAccessToken] = useState("");
-  const [correctUrl, setCorrectUrl] = useState("");
-
-  useEffect(() => {
-    const authorizationCode = sessionStorage.getItem("authorizationCode");
-    const data = sessionStorage.getItem("webData");
-
-    if (!gotData.current && !data && authorizationCode) {
-      handleExecute(authorizationCode);
-      gotData.current = true;
-    }
-  }, [gotData.current]);
-
-  async function handleExecute(authorizationCode: any) {
-    try {
-      const tokenResponse = await fetch("/api/exchangeCode", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ code: authorizationCode }),
-      });
-      const { accessToken, entries } = await tokenResponse.json();
-
-      let correctUrl = [""];
-      if (entries) {
-        correctUrl = entries
-          .filter((item: any) => item.siteUrl.includes(websiteUrl))
-          .map((item: any) => item.siteUrl);
-      }
-
-      setCurrentAccessToken(accessToken);
-      setCorrectUrl(correctUrl[0]);
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-  // Utility function to get the authorization code from URL
-  const getAuthorizationCode = () => {
-    const url = window.location.href;
-    return new URL(url).searchParams.get("code");
-  };
+  const [webData, setWebData] = useState([]);
 
   useEffect(() => {
     const authorizationCode = getAuthorizationCode();
+    const webData = sessionStorage.getItem("webData");
 
     if (loadingRef.current) {
       if (!authorizationCode) {
-        if (!sessionStorage.getItem("authorizationCode")) {
+        if (!sessionStorage.getItem("authorizationCode") && !webData) {
           handleAuthorize();
         }
       } else {
-        sessionStorage.setItem("authorizationCode", authorizationCode);
+        handleExecute(authorizationCode);
         router.push("/");
       }
       getCollections();
@@ -96,6 +55,90 @@ export default function Home() {
       console.log("Error while authorizing", error);
     }
   }
+
+  async function handleExecute(authorizationCode: any) {
+    try {
+      const tokenResponse = await fetch("/api/exchangeCode", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ code: authorizationCode }),
+      });
+      const { accessToken, entries } = await tokenResponse.json();
+
+      let correctUrl = [""];
+      if (entries) {
+        correctUrl = entries
+          .filter((item: any) => item.siteUrl.includes(websiteUrl))
+          .map((item: any) => item.siteUrl);
+      }
+
+      const today = new Date();
+      const startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+      const endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
+      fetchData(
+        accessToken,
+        correctUrl[0],
+        startDate,
+        endDate,
+        "date",
+        "webData"
+      );
+      fetchData(
+        accessToken,
+        correctUrl[0],
+        startDate,
+        endDate,
+        "page",
+        "pagesData"
+      );
+
+      sessionStorage.removeItem("authorizationCode");
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async function fetchData(
+    accessToken: string,
+    correctUrl: string,
+    startDate: any,
+    endDate: any,
+    dimension: string,
+    storageType: string
+  ) {
+    try {
+      const response = await fetch("/api/domainData", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          accessToken: accessToken,
+          websiteUrl: correctUrl,
+          startDate: startDate.toISOString().split("T")[0],
+          endDate: endDate.toISOString().split("T")[0],
+          dimension: [dimension],
+        }),
+      });
+
+      const data = await response.json();
+      sessionStorage.setItem(storageType, JSON.stringify(data.rows));
+      if (storageType == "webData"){
+        setWebData(data.rows)
+      }
+    } catch (error) {
+      console.error("Error fetching search console data", error);
+    }
+  }
+
+  // Utility function to get the authorization code from URL
+  const getAuthorizationCode = () => {
+    const url = window.location.href;
+    return new URL(url).searchParams.get("code");
+  };
 
   async function getContents() {
     const { data } = await supabase.from("contentItems").select();
@@ -130,10 +173,7 @@ export default function Home() {
             </Button>
           }
         />
-        <DomainStatistics
-          accessToken={currentAccessToken}
-          correctUrl={correctUrl}
-        />
+        <DomainStatistics firstLoadData={webData} />
       </div>
       <div className={styles.toolWrapper}>
         <PageTitle

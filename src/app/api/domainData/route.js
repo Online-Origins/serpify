@@ -14,6 +14,7 @@ export async function POST(req) {
   const siteUrl = body.websiteUrl;
   const startDate = body.startDate;
   const endDate = body.endDate;
+  const dimension = body.dimension;
 
     try {
         oauth2Client.setCredentials({ access_token: accessToken, refresh_token: refreshToken });
@@ -23,7 +24,7 @@ export async function POST(req) {
         const requestBody = {
             startDate: startDate,
             endDate: endDate,
-            dimensions: ['date'],
+            dimensions: dimension,
         };
 
         const response = await searchconsole.searchanalytics.query({

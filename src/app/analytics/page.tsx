@@ -7,53 +7,18 @@ import DomainStatistics from "@/components/domain-statistics/domain-statistics.c
 import LineChart from "@/components/line-chart/line-chart.component";
 import InputWrapper from "@/components/ui/input-wrapper/input-wrapper.component";
 
-const websiteUrl = "onlineorigins.nl";
-
 export default function AnalyticsPage() {
   const gotData = useRef(false);
   const [domainAnalytics, setDomainAnalytics] = useState([]);
-  const [currentAccessToken, setCurrentAccessToken] = useState("");
-  const [correctUrl, setCorrectUrl] = useState("");
   const [chartType, setChartType] = useState("impressions");
 
   useEffect(() => {
-    const authorizationCode = sessionStorage.getItem("authorizationCode");
-    const data = sessionStorage.getItem("webData");
-
-    if (!gotData.current) {
-      if (!data && authorizationCode) {
-        handleExecute(authorizationCode);
-      }
+    const domainData = sessionStorage.getItem("webData");
+    if (!gotData.current && domainData && domainData.length > 0) {
+      setDomainAnalytics(JSON.parse(domainData));
       gotData.current = true;
-    } else if (data && data.length > 0) {
-      setDomainAnalytics(JSON.parse(data));
     }
   }, [gotData.current]);
-
-  async function handleExecute(authorizationCode: any) {
-    try {
-      const tokenResponse = await fetch("/api/exchangeCode", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ code: authorizationCode }),
-      });
-      const { accessToken, entries } = await tokenResponse.json();
-
-      let correctUrl = [""];
-      if (entries) {
-        correctUrl = entries
-          .filter((item: any) => item.siteUrl.includes(websiteUrl))
-          .map((item: any) => item.siteUrl);
-      }
-
-      setCurrentAccessToken(accessToken);
-      setCorrectUrl(correctUrl[0]);
-    } catch (error) {
-      console.error(error);
-    }
-  }
 
   return (
     <InnerWrapper className={styles.analyticsWrapper}>
@@ -63,10 +28,7 @@ export default function AnalyticsPage() {
           "The entirety of our data and analytics infrastructure relies exclusively on Google's platform."
         }
       />{" "}
-      <DomainStatistics
-        accessToken={currentAccessToken}
-        correctUrl={correctUrl}
-      />
+      <DomainStatistics />
       <div className={styles.horizontal}>
         <div className={styles.chartWrapper}>
           <div className={styles.titleWrapper}>
@@ -81,7 +43,7 @@ export default function AnalyticsPage() {
           </div>
           <LineChart data={domainAnalytics} type={chartType} />
         </div>
-        <h5>Hello</h5>
+        <h5>Analytics for pages</h5>
       </div>
     </InnerWrapper>
   );

@@ -10,13 +10,7 @@ type AnalyticsData = {
   position: number;
 };
 
-export default function DomainStatistics({
-  accessToken,
-  correctUrl,
-}: {
-  accessToken?: string;
-  correctUrl?: string;
-}) {
+export default function DomainStatistics({firstLoadData}: {firstLoadData?:any}) {
   const [domainAnalytics, setDomainAnalytics] = useState<any[]>([]);
   const [totalAnalytics, setTotalAnalytics] = useState<AnalyticsData | null>(
     null
@@ -25,15 +19,13 @@ export default function DomainStatistics({
 
   useEffect(() => {
     const data = sessionStorage.getItem("webData");
-    if (!gotData.current && accessToken != "") {
-      if (!data) {
-        domainData();
-      }
-      gotData.current = true;
-    } else if (data && data.length > 0) {
+    if (!gotData.current && data && data.length > 0) {
       setDomainAnalytics(JSON.parse(data));
+      gotData.current = true;
+    } else if (!gotData.current && firstLoadData.length > 0){
+      setDomainAnalytics(firstLoadData)
     }
-  }, [gotData.current, accessToken]);
+  });
 
   useEffect(() => {
     if (domainAnalytics.length > 0) {
@@ -60,32 +52,6 @@ export default function DomainStatistics({
       totalAmount += item[key] || 0;
     });
     return totalAmount / data.length;
-  }
-
-  async function domainData() {
-    const today = new Date();
-    const startDate = new Date(today.getFullYear(), today.getMonth(), 1);
-    const endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-    try {
-      const response = await fetch("/api/domainData", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          accessToken: accessToken,
-          websiteUrl: correctUrl,
-          startDate: startDate.toISOString().split("T")[0],
-          endDate: endDate.toISOString().split("T")[0],
-        }),
-      });
-
-      const data = await response.json();
-      sessionStorage.setItem("webData", JSON.stringify(data.rows));
-      setDomainAnalytics(data);
-    } catch (error) {
-      console.error("Error fetching search console data", error);
-    }
   }
 
   return totalAnalytics ? (
