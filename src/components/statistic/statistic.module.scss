@@ -1,10 +1,9 @@
 @import '@/styles/variables.scss';
 
 .stat{
-    width: calc(25% - (4.5rem / 4));
     background-color: $white;
     border-radius: 1rem;
-    padding: 1rem 1.5rem;
+    padding: 1rem;
     box-shadow: $shadow;
     display: flex;
     flex-flow: column;

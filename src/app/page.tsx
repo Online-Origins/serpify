@@ -96,6 +96,14 @@ export default function Home() {
         "page",
         "pagesData"
       );
+      fetchData(
+        accessToken,
+        correctUrl[0],
+        startDate,
+        endDate,
+        "query",
+        "queryData"
+      );
 
       sessionStorage.removeItem("authorizationCode");
       router.push("/")

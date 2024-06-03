@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -23,6 +23,19 @@ ChartJS.register(
 );
 
 const LineChart = ({ data, type }: { data: any; type: string }) => {
+  const [aspectRatio, setAspectRatio] = useState(1.5);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setAspectRatio(window.innerWidth < 2000 ? 1.1 : 1.5);
+    };
+
+    handleResize();
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   // Extract dates and clicks from the data
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -63,7 +76,7 @@ const LineChart = ({ data, type }: { data: any; type: string }) => {
         },
       },
     },
-    aspectRatio: 1.5,
+    aspectRatio: aspectRatio,
   };
 
   return <Line data={chartData} options={options} />;
