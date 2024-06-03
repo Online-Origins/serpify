@@ -6,7 +6,7 @@ import classNames from "classnames";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import ContentScore from "@/components/content-score/content-score.component";
-import { useSharedContext } from '@/context/SharedContext';
+import { useSharedContext } from "@/context/SharedContext";
 import styles from "./app-wrapper.module.scss";
 
 export default function AppWrapper({
@@ -16,11 +16,12 @@ export default function AppWrapper({
 }) {
   const pathname = usePathname();
   const [smallNav, setSmallNav] = useState(pathname != "/");
+  const login = pathname == "/login";
   const { sharedData } = useSharedContext();
 
   return (
     <body>
-      <MenuBar smallNav={smallNav} setSmallNav={setSmallNav} />
+      {!login && <MenuBar smallNav={smallNav} setSmallNav={setSmallNav} />}
       <ComponentWrapper
         className={classNames(
           styles.pagesWrapper,
@@ -32,7 +33,9 @@ export default function AppWrapper({
         <div className={styles.innerWrapper}>{children}</div>
       </ComponentWrapper>
       {pathname == "/content/create/writing" && (
-        <ComponentWrapper className={classNames(styles.scoreWrapper, "scrollbar")}>
+        <ComponentWrapper
+          className={classNames(styles.scoreWrapper, "scrollbar")}
+        >
           <ContentScore contentScore={sharedData} />
         </ComponentWrapper>
       )}

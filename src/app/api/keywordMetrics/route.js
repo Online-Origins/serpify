@@ -73,9 +73,9 @@ async function getGoogleKeywordsMetrics(accessToken, keywords, language, country
       }
     );
 
-    // if (!response.ok) {
-    //   throw new Error("Error making Google Ads API request");
-    // }
+    if (!response.ok) {
+      throw new Error("Error making Google Ads API request");
+    }
 
     const data = await response.json();
     return data.results;

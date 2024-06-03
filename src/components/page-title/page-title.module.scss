@@ -31,12 +31,12 @@
 
         .titleWrapper {
             display: flex;
-            align-items: center;
+            align-items: flex-end;
             gap: 1rem;
             text-wrap: nowrap;
 
             svg {
-                margin-top: .5rem;
+                margin-bottom: .5rem;
                 opacity: 0;
             }
 
@@ -47,6 +47,10 @@
                         opacity: 1;
                     }
                 }
+            }
+
+            h5, img{
+                margin-bottom: .25rem;
             }
 
         }

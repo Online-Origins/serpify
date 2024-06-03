@@ -59,7 +59,7 @@ export default function MenuBar({setSmallNav, smallNav}: {setSmallNav: any, smal
               </Link>
             </li>
             <li>
-              <Link className={pathname == "/analytics" ? styles.active : ""} href="/">
+              <Link className={pathname == "/analytics" ? styles.active : ""} href="/analytics">
                 <AssessmentOutlinedIcon />
                 <h4>Website analytics</h4>
               </Link>
