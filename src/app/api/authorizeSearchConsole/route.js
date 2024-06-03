@@ -5,7 +5,7 @@ const { OAuth2 } = google.auth;
 // Replace with your client ID, client secret, and redirect URL
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
-const REDIRECT_URL = "http://localhost:3000/";
+const REDIRECT_URL = "https://serpify-pi.vercel.app/"; // if local, change to localhost
 
 const oauth2Client = new OAuth2(
     CLIENT_ID,
