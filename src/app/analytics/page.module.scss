@@ -1,6 +1,7 @@
-@import '@/styles/variables.scss';
+@import '@/styles/variables';
 
-.analyticsWrapper, .innerAnalytics {
+.analyticsWrapper,
+.innerAnalytics {
     display: flex;
     flex-flow: column;
     gap: 1.5rem;
@@ -13,24 +14,90 @@
         overflow-x: hidden;
         width: 100%;
 
-        .chartWrapper {
+        .analyticsItem {
             background-color: $white;
             display: flex;
             flex-flow: column;
             padding: 1rem;
             border: solid 1px $purple_50;
             border-radius: 1rem;
-            width: calc(100% - 2rem);
             box-shadow: $shadow;
+            gap: 1rem;
 
             canvas {
                 max-width: 100% !important;
             }
 
-            .titleWrapper{
+            .titleWrapper {
                 display: flex;
                 width: 100%;
                 justify-content: space-between;
+            }
+
+            .pagesTable {
+                display: flex;
+                flex-flow: column;
+
+                .row {
+                    display: flex;
+                    border-bottom: solid 2px $purple_50;
+                    justify-content: flex-end;
+
+                    .item {
+                        padding: .75rem .5rem;
+                        display: flex;
+                        align-items: center;
+                        justify-content: flex-end;
+                        gap: .5rem;
+                        text-wrap: nowrap;
+
+                        &:not(:last-of-type) {
+                            border-right: solid 2px $white;
+                        }
+
+                        &.page {
+                            width: 11rem;
+                            justify-content: flex-start;
+
+                            p {
+                                width: max-content;
+                                white-space: nowrap;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                            }
+
+                            @media (min-width: 2000px){
+                                width: 22rem;
+                            }
+                        }
+
+                        &.clicks {
+                            width: 5rem;
+                        }
+
+                        &.impressions {
+                            width: 7rem;
+                        }
+
+                        &.ctr {
+                            width: 4rem;
+                        }
+                    }
+                }
+
+                .firstRow {
+                    background-color: $purple_50;
+                    border-radius: .5rem .5rem 0 0;
+                }
+            }
+
+            .tableButtons{
+                width: 100%;
+                display: flex;
+                justify-content: flex-end;
+                align-items: flex-end;
+                gap: 1rem;
+
             }
         }
     }
