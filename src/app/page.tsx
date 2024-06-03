@@ -19,42 +19,44 @@ export default function Home() {
   const [collections, setCollections] = useState<any[]>([]);
   const [contents, setContents] = useState<any[]>([]);
   const router = useRouter();
-  const gotData = useRef(false);
+  const gottenData = useRef(false);
   const [webData, setWebData] = useState([]);
+  const [role, setRole] = useState("");
+
+  useEffect(() => {
+    if (!gottenData.current) {
+      const sessionWebData = sessionStorage.getItem("webData");
+      if (sessionWebData) {
+        gottenData.current = true;
+      }
+    }
+  });
 
   useEffect(() => {
     const authorizationCode = getAuthorizationCode();
-    const webData = sessionStorage.getItem("webData");
+    const role = sessionStorage.getItem("role");
 
-    if (loadingRef.current) {
-      if (!authorizationCode) {
-        if (!sessionStorage.getItem("authorizationCode") && !webData) {
-          handleAuthorize();
-        }
-      } else {
-        handleExecute(authorizationCode);
-        router.push("/");
+    if (!authorizationCode && !gottenData.current && !role) {
+      if (loadingRef.current) {
+        router.push("/login");
       }
-      getCollections();
-      getContents();
-      loadingRef.current = false;
+    } else if (authorizationCode && !gottenData.current){
+      if (loadingRef.current){
+        handleExecute(authorizationCode);
+        sessionStorage.setItem("role", "user");
+        loadingRef.current = false;
+      }
+    } else if(!authorizationCode && gottenData.current || role == "guest"){
+      if (loadingRef.current){
+        if (role){
+          setRole(role);
+        }
+        getCollections();
+        getContents();
+        loadingRef.current = false;
+      }
     }
-  }, [loadingRef]);
-
-  async function handleAuthorize() {
-    try {
-      const response = await fetch("/api/authorizeSearchConsole", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      });
-      const authUrl = await response.json();
-      window.location.href = authUrl;
-    } catch (error) {
-      console.log("Error while authorizing", error);
-    }
-  }
+  }, [loadingRef.current, gottenData.current]);
 
   async function handleExecute(authorizationCode: any) {
     try {
@@ -96,6 +98,9 @@ export default function Home() {
       );
 
       sessionStorage.removeItem("authorizationCode");
+      router.push("/")
+      loadingRef.current = true;
+      gottenData.current = true;
     } catch (error) {
       console.error(error);
     }
@@ -126,8 +131,8 @@ export default function Home() {
 
       const data = await response.json();
       sessionStorage.setItem(storageType, JSON.stringify(data.rows));
-      if (storageType == "webData"){
-        setWebData(data.rows)
+      if (storageType == "webData") {
+        setWebData(data.rows);
       }
     } catch (error) {
       console.error("Error fetching search console data", error);
@@ -173,7 +178,7 @@ export default function Home() {
             </Button>
           }
         />
-        <DomainStatistics firstLoadData={webData} />
+        {role != "guest" ? <DomainStatistics firstLoadData={webData} /> : <h5>You need to log in with Google for this feature</h5>}
       </div>
       <div className={styles.toolWrapper}>
         <PageTitle

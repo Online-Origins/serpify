@@ -155,7 +155,7 @@ export default function SmallTable({
           <p>Potential</p>
         </div>
       </div>
-      {keywordsData
+      {keywordsData && keywordsData.length > 0
         ? keywordsData.map((keyword: any) => (
             <div className={styles.row} key={keyword.text}>
               <div className={classNames(styles.item, styles.keyword)}>
@@ -189,7 +189,7 @@ export default function SmallTable({
               </div>
             </div>
           ))
-        : ""}
+        : <p>Loading...</p>}
     </div>
   );
 }

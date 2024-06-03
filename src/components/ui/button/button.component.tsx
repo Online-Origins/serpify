@@ -4,13 +4,11 @@ import styles from "./button.module.scss";
 export default function Button({
   children,
   type,
-  link,
   onClick,
   disabled,
 }: {
   children: React.ReactNode;
   type?: String;
-  link?: String;
   onClick?: () => void;
   disabled?: boolean
 }) {

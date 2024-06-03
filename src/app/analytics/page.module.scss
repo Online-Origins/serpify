@@ -1,6 +1,6 @@
 @import '@/styles/variables.scss';
 
-.analyticsWrapper {
+.analyticsWrapper, .innerAnalytics {
     display: flex;
     flex-flow: column;
     gap: 1.5rem;

@@ -11,12 +11,19 @@ export default function AnalyticsPage() {
   const gotData = useRef(false);
   const [domainAnalytics, setDomainAnalytics] = useState([]);
   const [chartType, setChartType] = useState("impressions");
+  const [role, setRole] = useState("");
 
   useEffect(() => {
     const domainData = sessionStorage.getItem("webData");
-    if (!gotData.current && domainData && domainData.length > 0) {
-      setDomainAnalytics(JSON.parse(domainData));
-      gotData.current = true;
+    const role = sessionStorage.getItem("role");
+    if (!gotData.current) {
+      if (role) {
+        setRole(role);
+      }
+      if (domainData && domainData.length > 0) {
+        setDomainAnalytics(JSON.parse(domainData));
+        gotData.current = true;
+      }
     }
   }, [gotData.current]);
 
@@ -28,23 +35,29 @@ export default function AnalyticsPage() {
           "The entirety of our data and analytics infrastructure relies exclusively on Google's platform."
         }
       />{" "}
-      <DomainStatistics />
-      <div className={styles.horizontal}>
-        <div className={styles.chartWrapper}>
-          <div className={styles.titleWrapper}>
-            <h3>Performance</h3>
-            <InputWrapper
-              type="dropdown"
-              small
-              value={chartType}
-              onChange={(value: any) => setChartType(value)}
-              options={["impressions", "clicks", "ctr", "position"]}
-            />
+      {role != "guest" ? (
+        <div className={styles.innerAnalytics}>
+          <DomainStatistics />
+          <div className={styles.horizontal}>
+            <div className={styles.chartWrapper}>
+              <div className={styles.titleWrapper}>
+                <h3>Performance</h3>
+                <InputWrapper
+                  type="dropdown"
+                  small
+                  value={chartType}
+                  onChange={(value: any) => setChartType(value)}
+                  options={["impressions", "clicks", "ctr", "position"]}
+                />
+              </div>
+              <LineChart data={domainAnalytics} type={chartType} />
+            </div>
+            <h5>Analytics for pages</h5>
           </div>
-          <LineChart data={domainAnalytics} type={chartType} />
         </div>
-        <h5>Analytics for pages</h5>
-      </div>
+      ) : (
+        <h5>You need to log in with Google for this feature</h5>
+      )}
     </InnerWrapper>
   );
 }

@@ -22,7 +22,7 @@ export default function DomainStatistics({firstLoadData}: {firstLoadData?:any}) 
     if (!gotData.current && data && data.length > 0) {
       setDomainAnalytics(JSON.parse(data));
       gotData.current = true;
-    } else if (!gotData.current && firstLoadData.length > 0){
+    } else if (!gotData.current && firstLoadData && firstLoadData.length > 0){
       setDomainAnalytics(firstLoadData)
     }
   });
