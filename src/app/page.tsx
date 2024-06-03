@@ -77,8 +77,8 @@ export default function Home() {
       }
 
       const today = new Date();
-      const startDate = new Date(today.getFullYear(), today.getMonth(), 1);
-      const endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+      const startDate = new Date(today.getFullYear(), today.getMonth() - 1, 0);
+      const endDate = new Date(today.getFullYear(), today.getMonth(), 1);
 
       fetchData(
         accessToken,
