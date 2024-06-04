@@ -172,7 +172,7 @@ export default function Home() {
   }
 
   return (
-    <InnerWrapper className={classNames(styles.homeWrapper, "scrollbar")}>
+    <InnerWrapper className={classNames(styles.homeWrapper, "scrollbar noMargin")}>
       <h1>Welcome!</h1>
       <div className={styles.toolWrapper}>
         <PageTitle
