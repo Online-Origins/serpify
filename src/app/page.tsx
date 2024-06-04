@@ -12,8 +12,6 @@ import { usePathname, useRouter } from "next/navigation";
 import styles from "./page.module.scss";
 import DomainStatistics from "@/components/domain-statistics/domain-statistics.component";
 
-const websiteUrl = "onlineorigins.nl";
-
 export default function Home() {
   const loadingRef = useRef(true);
   const [collections, setCollections] = useState<any[]>([]);
@@ -34,21 +32,22 @@ export default function Home() {
 
   useEffect(() => {
     const authorizationCode = getAuthorizationCode();
-    const role = sessionStorage.getItem("role");
+    const role = sessionStorage.getItem("role")
+    const webUrl = sessionStorage.getItem("websiteUrl");
 
     if (!authorizationCode && !gottenData.current && !role) {
       if (loadingRef.current) {
         router.push("/login");
       }
-    } else if (authorizationCode && !gottenData.current){
-      if (loadingRef.current){
-        handleExecute(authorizationCode);
+    } else if (authorizationCode && !gottenData.current && webUrl && webUrl != "") {
+      if (loadingRef.current) {
+        handleExecute(authorizationCode, webUrl);
         sessionStorage.setItem("role", "user");
         loadingRef.current = false;
       }
-    } else if(!authorizationCode && gottenData.current || role == "guest"){
-      if (loadingRef.current){
-        if (role){
+    } else if ((!authorizationCode && gottenData.current) || role == "guest") {
+      if (loadingRef.current) {
+        if (role) {
           setRole(role);
         }
         getCollections();
@@ -58,7 +57,7 @@ export default function Home() {
     }
   }, [loadingRef.current, gottenData.current]);
 
-  async function handleExecute(authorizationCode: any) {
+  async function handleExecute(authorizationCode: any, websiteUrl: string) {
     try {
       const tokenResponse = await fetch("/api/exchangeCode", {
         method: "POST",
@@ -68,6 +67,9 @@ export default function Home() {
         body: JSON.stringify({ code: authorizationCode }),
       });
       const { accessToken, entries } = await tokenResponse.json();
+      
+      sessionStorage.setItem("accessToken", accessToken);
+      sessionStorage.setItem("entries", JSON.stringify(entries));
 
       let correctUrl = [""];
       if (entries) {
@@ -105,8 +107,7 @@ export default function Home() {
         "queryData"
       );
 
-      sessionStorage.removeItem("authorizationCode");
-      router.push("/")
+      router.push("/");
       loadingRef.current = true;
       gottenData.current = true;
     } catch (error) {
@@ -172,7 +173,9 @@ export default function Home() {
   }
 
   return (
-    <InnerWrapper className={classNames(styles.homeWrapper, "scrollbar noMargin")}>
+    <InnerWrapper
+      className={classNames(styles.homeWrapper, "scrollbar noMargin")}
+    >
       <h1>Welcome!</h1>
       <div className={styles.toolWrapper}>
         <PageTitle
@@ -186,7 +189,11 @@ export default function Home() {
             </Button>
           }
         />
-        {role != "guest" ? <DomainStatistics firstLoadData={webData} /> : <h5>You need to log in with Google for this feature</h5>}
+        {role != "guest" ? (
+          <DomainStatistics firstLoadData={webData} />
+        ) : (
+          <h5>You need to log in with Google for this feature</h5>
+        )}
       </div>
       <div className={styles.toolWrapper}>
         <PageTitle

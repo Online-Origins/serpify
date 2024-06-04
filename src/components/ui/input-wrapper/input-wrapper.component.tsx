@@ -31,7 +31,8 @@ export default function InputWrapper({
   onKeyDown,
   step,
   marks,
-  small
+  small,
+  domainDropdown,
 }: {
   title?: string;
   required?: boolean;
@@ -51,6 +52,7 @@ export default function InputWrapper({
   step?: number;
   marks?: any;
   small?: boolean;
+  domainDropdown?: boolean;
 }) {
   const handleChange = (value: string) => {
     if (defValue.includes(value)) {
@@ -139,7 +141,13 @@ export default function InputWrapper({
               <MenuItem
                 key={option.id ? option.id : option}
                 value={option.id ? option.id : option}
+                className={styles.menuItem}
               >
+                {domainDropdown && (
+                  <img
+                    src={`http://www.google.com/s2/favicons?domain=https://${option}`}
+                  />
+                )}
                 {option.value ? option.value : option}
               </MenuItem>
             ))}
@@ -225,7 +233,9 @@ export default function InputWrapper({
   };
 
   return (
-    <div className={classNames(styles.wrapper, className, small && styles.small)}>
+    <div
+      className={classNames(styles.wrapper, className, small && styles.small)}
+    >
       {title && (
         <div className={styles.titleWrapper}>
           <h4>

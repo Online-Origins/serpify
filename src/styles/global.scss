@@ -77,11 +77,16 @@ a {
 }
 
 .MuiInputBase-root {
-
     &::before,
     &::after {
         display: none;
     }
+}
+
+.MuiInput-input{
+    display: flex;
+    align-items: center;
+    gap: .5rem;
 }
 
 .Mui-selected,
@@ -91,6 +96,10 @@ a {
 }
 
 .MuiMenuItem-root {
+    padding: .5rem;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
     &:hover {
         background-color: $purple_50 !important;
     }
