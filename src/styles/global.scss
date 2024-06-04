@@ -60,6 +60,7 @@ h5 {
 }
 
 p,
+a,
 input[type=text] {
     font-size: 1rem;
     font-family: $roboto;
@@ -108,6 +109,13 @@ a {
 
     &::-webkit-scrollbar-track {
         margin: 1rem;
+        border-radius: 1rem;
+    }
+}
+
+.noMargin{
+    &::-webkit-scrollbar-track {
+        margin: 0;
         border-radius: 1rem;
     }
 }

@@ -1,6 +1,5 @@
 "use client";
 import InnerWrapper from "@/components/inner-wrapper/inner-wrapper.component";
-import styles from "./page.module.scss";
 import PageTitle from "@/components/page-title/page-title.component";
 import { useEffect, useRef, useState } from "react";
 import DomainStatistics from "@/components/domain-statistics/domain-statistics.component";
@@ -11,6 +10,8 @@ import Information from "@/components/information/information.component";
 import Button from "@/components/ui/button/button.component";
 
 import { ArrowForwardRounded, ArrowBackRounded } from "@mui/icons-material";
+import styles from "./page.module.scss";
+import Link from "next/link";
 
 export default function AnalyticsPage() {
   const gotData = useRef(false);
@@ -77,14 +78,15 @@ export default function AnalyticsPage() {
     setShownPages(array);
   }
 
-  function showKeywords(pages: any) {
+  function showKeywords(keywords: any) {
+    console.log(keywords.length, keywordsAmount)
     let array: any[] = [];
     for (
       let x = keywordsAmount[0];
-      x < keywordsAmount[1] && x < pages.length;
+      x < keywordsAmount[1] && x < keywords.length;
       x++
     ) {
-      array.push(pages[x]);
+      array.push(keywords[x]);
     }
     setShownKeywords(array);
   }
@@ -98,7 +100,7 @@ export default function AnalyticsPage() {
         }
       />{" "}
       {role != "guest" ? (
-        <div className={classNames(styles.innerAnalytics, "scrollbar")}>
+        <div className={classNames(styles.innerAnalytics, "scrollbar noMargin")}>
           <DomainStatistics />
           <div className={styles.horizontal}>
             <div className={styles.analyticsItem}>
@@ -167,9 +169,9 @@ export default function AnalyticsPage() {
                   shownPages.map((page: any) => (
                     <div className={styles.row} key={page.keys[0]}>
                       <div className={classNames(styles.item, styles.page)}>
-                        <p>
+                        <Link href={page.keys[0]} target="_blank">
                           {page.keys[0].replace("https://onlineorigins.nl", "")}
-                        </p>
+                        </Link>
                       </div>
                       <div className={classNames(styles.item, styles.clicks)}>
                         <p>{page.clicks}</p>
@@ -202,7 +204,7 @@ export default function AnalyticsPage() {
                     <p>Prev.</p>
                   </Button>
                 )}
-                {keywordsAmount[1] < pagesAnalytics.length && (
+                {keywordsAmount[1] < keywordAnalytics.length && (
                   <Button
                     type={"textOnly"}
                     onClick={() =>
