@@ -267,7 +267,6 @@ export default function Collection({ params }: { params: { slug: string } }) {
   }
 
   async function createContent() {
-    console.log(selectedCollection[0].collection_name)
     const inserting = await supabase
       .from("contentItems")
       .insert([

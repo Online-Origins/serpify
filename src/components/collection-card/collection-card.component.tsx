@@ -171,7 +171,6 @@ export default function CollectionCard({
         >
           <p>See collection</p>
         </Button>
-        {/* Needs to be fixed */}
         <Button type={"solid"} onClick={() => setPopUpOpen(true)}>
           <p>Create content</p>
           <ArrowForwardRoundedIcon />

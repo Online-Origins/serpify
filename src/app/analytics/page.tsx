@@ -79,7 +79,6 @@ export default function AnalyticsPage() {
   }
 
   function showKeywords(keywords: any) {
-    console.log(keywords.length, keywordsAmount)
     let array: any[] = [];
     for (
       let x = keywordsAmount[0];
