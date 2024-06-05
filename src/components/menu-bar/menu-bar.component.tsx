@@ -112,7 +112,6 @@ export default function MenuBar({
         startDate,
         endDate,
         "date",
-        "webData",
         setWebData
       );
       fetchData(
@@ -121,7 +120,6 @@ export default function MenuBar({
         startDate,
         endDate,
         "page",
-        "pagesData",
         setPagesData
       );
       fetchData(
@@ -130,7 +128,6 @@ export default function MenuBar({
         startDate,
         endDate,
         "query",
-        "queryData",
         setQueryData
       );
     }
@@ -142,7 +139,6 @@ export default function MenuBar({
     startDate: any,
     endDate: any,
     dimension: string,
-    storageType: string,
     saveData: (data: any) => void
   ) {
     try {

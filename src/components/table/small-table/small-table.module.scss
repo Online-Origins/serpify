@@ -24,7 +24,7 @@
             }
 
             &.keyword {
-                width: 180px;
+                width: 165px;
 
                 p {
                     width: max-content;
@@ -54,13 +54,23 @@
         }
     }
 
+    @media (min-width: 1800px){
+        .row{
+            .item{
+                &.keyword{
+                    width: 100%;
+                }
+            }
+        }
+    }
+
     @media (min-width: 2000px) {
         width: max-content;
 
         .row{
             .item{
                 &.keyword {
-                    width: 6.1rem;
+                    width: 6rem;
                 }
             }
         }
