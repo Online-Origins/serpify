@@ -32,14 +32,19 @@ export default function Home() {
 
   useEffect(() => {
     const authorizationCode = getAuthorizationCode();
-    const role = sessionStorage.getItem("role")
+    const role = sessionStorage.getItem("role");
     const webUrl = sessionStorage.getItem("websiteUrl");
 
     if (!authorizationCode && !gottenData.current && !role) {
       if (loadingRef.current) {
         router.push("/login");
       }
-    } else if (authorizationCode && !gottenData.current && webUrl && webUrl != "") {
+    } else if (
+      authorizationCode &&
+      !gottenData.current &&
+      webUrl &&
+      webUrl != ""
+    ) {
       if (loadingRef.current) {
         handleExecute(authorizationCode, webUrl);
         sessionStorage.setItem("role", "user");
@@ -67,9 +72,8 @@ export default function Home() {
         body: JSON.stringify({ code: authorizationCode }),
       });
       const { accessToken, entries } = await tokenResponse.json();
-      
+
       sessionStorage.setItem("accessToken", accessToken);
-      sessionStorage.setItem("entries", JSON.stringify(entries));
 
       let correctUrl = [""];
       if (entries) {
@@ -79,8 +83,8 @@ export default function Home() {
       }
 
       const today = new Date();
-      const startDate = new Date(today.getFullYear(), today.getMonth() - 1, 0);
-      const endDate = new Date(today.getFullYear(), today.getMonth(), 1);
+      const startDate = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+      const endDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
       fetchData(
         accessToken,

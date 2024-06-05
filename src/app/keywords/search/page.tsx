@@ -63,8 +63,17 @@ export default function KeywordSearching() {
   );
   const [collectionToSave, setCollectionToSave] = useState("");
   const [newCollection, setNewCollection] = useState("");
-  const [keywordAmount, setKeywordAmount] = useState([0, 20]);
+  const [keywordAmount, setKeywordAmount] = useState([0, 15]);
   const [filterPopUpOpen, setFilterPopUpOpen] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+
+  useEffect(() => {
+    if (showAlert) {
+      if (newCollection != "") {
+        setShowAlert(false);
+      }
+    }
+  }, [showAlert, newCollection]);
 
   useEffect(() => {
     if (!getFiltersRef.current) {
@@ -255,7 +264,7 @@ export default function KeywordSearching() {
 
   // Sort the keywords on the sorting type
   function sortKeywords(array: any) {
-    setKeywordAmount([0, 20]);
+    setKeywordAmount([0, 15]);
     if (sorting == "potential") {
       return array.sort(
         (a: any, b: any) =>
@@ -333,7 +342,7 @@ export default function KeywordSearching() {
         subjects: [...prevState.subjects, ...cleanArray],
       }));
       setSubjectInput("");
-      setKeywordAmount([0, 20]);
+      setKeywordAmount([0, 15]);
       isKeywordsGenerated.current = false;
     }
   }
@@ -347,7 +356,9 @@ export default function KeywordSearching() {
     if (data != undefined) {
       if (data?.length > 0) {
         // Merge the existing with the new keywords
-        const combinedArray = selectedKeywords.concat(data[0].keywords);
+        const combinedArray = selectedKeywords
+          .map((keyword: any) => keyword.text)
+          .concat(data[0].keywords);
         const uniqueArray = Array.from(new Set(combinedArray));
 
         const { error } = await supabase
@@ -361,10 +372,14 @@ export default function KeywordSearching() {
           router.push("/keywords");
         }
       } else {
+        selectedKeywords.sort(
+          (a: any, b: any) =>
+            b.keywordMetrics.potential - a.keywordMetrics.potential
+        );
         const { error } = await supabase.from("collections").insert([
           {
             collection_name: collectionToSave,
-            keywords: selectedKeywords,
+            keywords: selectedKeywords.map((keyword: any) => keyword.text),
             language: filters.language,
             country: filters.country,
           },
@@ -381,12 +396,16 @@ export default function KeywordSearching() {
 
   // Add a new collection to the list of collections when an user creates a new one
   function addNewCollection() {
-    setCollections((prevState: any) => [
-      ...prevState,
-      { collection_name: newCollection },
-    ]);
-    setCollectionToSave(newCollection);
-    setNewCollection("");
+    if (newCollection == "") {
+      setShowAlert(true);
+    } else {
+      setCollections((prevState: any) => [
+        ...prevState,
+        { collection_name: newCollection },
+      ]);
+      setCollectionToSave(newCollection);
+      setNewCollection("");
+    }
   }
 
   // Update the subject filters when the user deletes a subject
@@ -445,32 +464,44 @@ export default function KeywordSearching() {
   return (
     <InnerWrapper>
       <PageTitle title={"Search keywords"} goBack={() => router.back()} />
-      <div className={styles.filterWrapper}>
-        <div className={styles.inputWrapping}>
-          <InputWrapper
-            type="text"
-            value={subjectInput}
-            onChange={(value: any) => setSubjectInput(value)}
-            className={styles.filterInput}
-            currentValues={filters.subjects}
-            changeCurrentValues={(value: string) => updateSubjectFilters(value)}
-            onKeyDown={(e: any) => {
-              if (e.key == "Enter" && subjectInput != "") {
-                addNewSubjects();
+      <div className={styles.topWrapper}>
+        <div className={styles.filterWrapper}>
+          <div className={styles.inputWrapping}>
+            <InputWrapper
+              type="text"
+              value={subjectInput}
+              onChange={(value: any) => setSubjectInput(value)}
+              className={styles.filterInput}
+              onKeyDown={(e: any) => {
+                if (e.key == "Enter" && subjectInput != "") {
+                  addNewSubjects();
+                }
+              }}
+              placeholder="Search more subjects..."
+              icon={
+                <div onClick={() => addNewSubjects()}>
+                  <SearchRoundedIcon />
+                </div>
               }
-            }}
-            placeholder="Search more subjects..."
-            icon={
-              <div onClick={() => addNewSubjects()}>
-                <SearchRoundedIcon />
-              </div>
-            }
-          />
+            />
+          </div>
+          <Button type={"solid"} onClick={() => setFilterPopUpOpen(true)}>
+            <p>Filter</p>
+            <TuneRoundedIcon />
+          </Button>
         </div>
-        <Button type={"solid"} onClick={() => setFilterPopUpOpen(true)}>
-          <p>Filter</p>
-          <TuneRoundedIcon />
-        </Button>
+        <div className={styles.subjects}>
+          <h5>Subjects:</h5>
+          {filters.subjects &&
+            filters.subjects.map((value: string) => (
+              <div key={value} className={styles.value}>
+                <p>{value}</p>
+                <div onClick={() => updateSubjectFilters(value)}>
+                  <CloseRoundedIcon />
+                </div>
+              </div>
+            ))}
+        </div>
       </div>
       {!loading ? (
         <div className={styles.outerTableWrapper}>
@@ -498,8 +529,8 @@ export default function KeywordSearching() {
                   type={"textOnly"}
                   onClick={() =>
                     setKeywordAmount([
-                      keywordAmount[0] - 20,
-                      keywordAmount[1] - 20,
+                      keywordAmount[0] - 15,
+                      keywordAmount[1] - 15,
                     ])
                   }
                 >
@@ -511,7 +542,7 @@ export default function KeywordSearching() {
                 <Button
                   type={"textOnly"}
                   onClick={() =>
-                    setKeywordAmount([keywordAmount[1], keywordAmount[1] + 20])
+                    setKeywordAmount([keywordAmount[1], keywordAmount[1] + 15])
                   }
                 >
                   <p>Next</p>
@@ -578,6 +609,7 @@ export default function KeywordSearching() {
                   value={newCollection}
                   onChange={(event) => setNewCollection(event.target.value)}
                 />
+                {showAlert && <p className="error">Name can't be empty!</p>}
               </div>
             </div>
           </PopUp>

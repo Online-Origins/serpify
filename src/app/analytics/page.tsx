@@ -9,7 +9,12 @@ import classNames from "classnames";
 import Information from "@/components/information/information.component";
 import Button from "@/components/ui/button/button.component";
 
-import { ArrowForwardRounded, ArrowBackRounded } from "@mui/icons-material";
+import {
+  ArrowForwardRounded,
+  ArrowBackRounded,
+  ArrowUpwardRounded,
+  ArrowDownwardRounded,
+} from "@mui/icons-material";
 import styles from "./page.module.scss";
 import Link from "next/link";
 
@@ -24,6 +29,8 @@ export default function AnalyticsPage() {
   const [keywordsAmount, setKeywordsAmount] = useState([0, 10]);
   const [chartType, setChartType] = useState("impressions");
   const [role, setRole] = useState("");
+  const [keywordSorting, setKeywordSorting] = useState("clicks");
+  const [pagesSorting, setPagesSorting] = useState("clicks");
 
   useEffect(() => {
     const domainData = sessionStorage.getItem("webData");
@@ -43,8 +50,8 @@ export default function AnalyticsPage() {
         queryData.length > 0
       ) {
         setDomainAnalytics(JSON.parse(domainData));
-        setPagesAnalytics(JSON.parse(pagesData));
-        setKeywordAnalytics(JSON.parse(queryData).sort((a:any, b:any) => b.clicks - a.clicks));
+        setPagesAnalytics(sortPages(JSON.parse(pagesData)));
+        setKeywordAnalytics(sortKeywords(JSON.parse(queryData)));
         gotData.current = true;
       }
     }
@@ -90,16 +97,53 @@ export default function AnalyticsPage() {
     setShownKeywords(array);
   }
 
+  function sortKeywords(array: any) {
+    if (keywordSorting == "position") {
+      return array.sort((a: any, b: any) => a.position - b.position);
+    } else if (keywordSorting == "impressions") {
+      return array.sort((a: any, b: any) => b.impressions - a.impressions);
+    } else if (keywordSorting == "ctr") {
+      return array.sort((a: any, b: any) => b.ctr - a.ctr);
+    } else {
+      return array.sort((a: any, b: any) => b.clicks - a.clicks);
+    }
+  }
+
+  function sortPages(array: any) {
+    if (pagesSorting == "impressions") {
+      return array.sort((a: any, b: any) => b.impressions - a.impressions);
+    } else if (pagesSorting == "ctr") {
+      return array.sort((a: any, b: any) => b.ctr - a.ctr);
+    } else {
+      return array.sort((a: any, b: any) => b.clicks - a.clicks);
+    }
+  }
+
+  useEffect(() => {
+    if (keywordAnalytics.length > 0) {
+      showKeywords(sortKeywords(keywordAnalytics));
+    }
+  }, [keywordSorting]);
+
+  useEffect(() => {
+    if (pagesAnalytics.length > 0) {
+      showPages(sortPages(pagesAnalytics));
+    }
+  }, [pagesSorting]);
+
   return (
     <InnerWrapper className={styles.analyticsWrapper}>
       <PageTitle
         title={"Website analytics"}
         information={
-          "The entirety of our data and analytics infrastructure relies exclusively on Google's platform."
+          "Website Analytics involves tracking and analyzing web traffic data to understand user behavior, improve site performance, and optimize content for better engagement and conversion rates. The entirety of our data and analytics infrastructure relies exclusively on Google's platform."
         }
-      />{" "}
+        smallTitle="(Last month)"
+      />
       {role != "guest" ? (
-        <div className={classNames(styles.innerAnalytics, "scrollbar noMargin")}>
+        <div
+          className={classNames(styles.innerAnalytics, "scrollbar noMargin")}
+        >
           <DomainStatistics />
           <div className={styles.horizontal}>
             <div className={styles.analyticsItem}>
@@ -151,17 +195,26 @@ export default function AnalyticsPage() {
                   <div className={classNames(styles.item, styles.page)}>
                     <p>Page</p>
                   </div>
-                  <div className={classNames(styles.item, styles.clicks)}>
+                  <div
+                    className={classNames(styles.item, styles.clicks, pagesSorting == "clicks" && styles.sorting)}
+                    onClick={() => setPagesSorting("clicks")}
+                  >
+                    <ArrowDownwardRounded />
                     <p>Clicks</p>
-                    <Information information="How often a user clicked through to your site from the Google result pages." />
                   </div>
-                  <div className={classNames(styles.item, styles.impressions)}>
+                  <div
+                    className={classNames(styles.item, styles.impressions, pagesSorting == "impressions" && styles.sorting)}
+                    onClick={() => setPagesSorting("impressions")}
+                  >
+                    <ArrowDownwardRounded />
                     <p>Impressions</p>
-                    <Information information="How many times a user saw a link to your site in search results." />
                   </div>
-                  <div className={classNames(styles.item, styles.ctr)}>
+                  <div
+                    className={classNames(styles.item, styles.ctr, pagesSorting == "ctr" && styles.sorting)}
+                    onClick={() => setPagesSorting("ctr")}
+                  >
+                    <ArrowDownwardRounded />
                     <p>CTR</p>
-                    <Information information="(Click Through Rate) Percentage of impressions that led to a click." />
                   </div>
                 </div>
                 {pagesAnalytics.length > 0 &&
@@ -196,7 +249,10 @@ export default function AnalyticsPage() {
                   <Button
                     type={"textOnly"}
                     onClick={() =>
-                      setKeywordsAmount([keywordsAmount[0] - 10, keywordsAmount[1] - 10])
+                      setKeywordsAmount([
+                        keywordsAmount[0] - 10,
+                        keywordsAmount[1] - 10,
+                      ])
                     }
                   >
                     <ArrowBackRounded />
@@ -207,7 +263,10 @@ export default function AnalyticsPage() {
                   <Button
                     type={"textOnly"}
                     onClick={() =>
-                      setKeywordsAmount([keywordsAmount[1], keywordsAmount[1] + 10])
+                      setKeywordsAmount([
+                        keywordsAmount[1],
+                        keywordsAmount[1] + 10,
+                      ])
                     }
                   >
                     <p>Next</p>
@@ -221,21 +280,33 @@ export default function AnalyticsPage() {
                 <div className={classNames(styles.item, styles.page)}>
                   <p>Keyword</p>
                 </div>
-                <div className={classNames(styles.item, styles.position)}>
-                  <p>Position</p>
-                  <Information information="The average positition of your website in the result page of Google related to the keyword that is used to search." />
+                <div
+                  className={classNames(styles.item, styles.position, keywordSorting == "position" && styles.sorting)}
+                  onClick={() => setKeywordSorting("position")}
+                >
+                  <ArrowUpwardRounded />
+                  <p>Avg. position</p>
                 </div>
-                <div className={classNames(styles.item, styles.clicks)}>
+                <div
+                  className={classNames(styles.item, styles.clicks, keywordSorting == "clicks" && styles.sorting)}
+                  onClick={() => setKeywordSorting("clicks")}
+                >
+                  <ArrowDownwardRounded />
                   <p>Clicks</p>
-                  <Information information="How often a user clicked through to your site from the Google result pages." />
                 </div>
-                <div className={classNames(styles.item, styles.impressions)}>
+                <div
+                  className={classNames(styles.item, styles.impressions, keywordSorting == "impressions" && styles.sorting)}
+                  onClick={() => setKeywordSorting("impressions")}
+                >
+                  <ArrowDownwardRounded />
                   <p>Impressions</p>
-                  <Information information="How many times a user saw a link to your site in search results." />
                 </div>
-                <div className={classNames(styles.item, styles.ctr)}>
+                <div
+                  className={classNames(styles.item, styles.ctr, keywordSorting == "ctr" && styles.sorting)}
+                  onClick={() => setKeywordSorting("ctr")}
+                >
+                  <ArrowDownwardRounded />
                   <p>CTR</p>
-                  <Information information="(Click Through Rate) Percentage of impressions that led to a click." />
                 </div>
               </div>
               {keywordAnalytics.length > 0 &&

@@ -75,14 +75,16 @@
             justify-content: flex-end;
             gap: .5rem;
             text-wrap: nowrap;
+            cursor: pointer;
 
             &:not(:last-of-type) {
                 border-right: solid 2px $white;
             }
 
             &.page {
-                width: 10.5rem;
+                width: 8.5rem;
                 justify-content: flex-start;
+                cursor: default;
 
                 a {
                     width: max-content;
@@ -97,7 +99,7 @@
                 }
 
                 @media (min-width: 2000px) {
-                    width: 21.5rem;
+                    width: 21rem;
                 }
             }
 
@@ -111,6 +113,18 @@
 
             &.ctr {
                 width: 4rem;
+            }
+
+            svg {
+                font-size: 1rem;
+                opacity: 0;
+                transition: .3s all ease-in-out;
+            }
+
+            &.sorting{
+                svg{
+                    opacity: 1;
+                }
             }
         }
     }

@@ -101,6 +101,8 @@ export default function CollectionsPage() {
             <p>Start new research</p> <AddRoundedIcon />
           </Button>
         }
+        information="
+        Keywords are crucial terms for SEO that define content focus. Keyword Research identifies popular, relevant search terms to enhance content visibility and align with user search behavior."
       />
       {collections.length > 0 ? (
         <CollectionsWrapper collections={collections} />

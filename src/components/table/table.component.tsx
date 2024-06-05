@@ -31,12 +31,12 @@ export default function Table({
   const parentScrollRef = useRef<HTMLDivElement>(null);
   const [scroll, setScroll] = useState(false);
 
-  function selecting(clickedKeyword: string) {
-    if (!selectedKeywords.includes(clickedKeyword)) {
+  function selecting(clickedKeyword: any) {
+    if (!selectedKeywords.includes(clickedKeyword.text)) {
       setSelectedKeywords([...selectedKeywords, clickedKeyword]);
     } else {
       setSelectedKeywords(
-        selectedKeywords.filter((index: any) => index !== clickedKeyword)
+        selectedKeywords.filter((index: any) => index !== clickedKeyword.text)
       );
     }
   }
@@ -160,7 +160,7 @@ export default function Table({
                 <div className={classNames(styles.item, styles.select)}>
                   <Selector
                     group={selectedKeywords}
-                    item={keyword.text}
+                    item={keyword}
                     selecting={(value: any) => selecting(value)}
                   />
                 </div>

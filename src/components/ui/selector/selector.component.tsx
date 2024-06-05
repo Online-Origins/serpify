@@ -14,7 +14,8 @@ export default function Selector({
     <div
       className={classNames(
         styles.selector,
-        group.includes(item) && styles.selected
+        group.includes(item) && styles.selected,
+        group.includes(item.text) && styles.selected
       )}
       onClick={() => selecting(item)}
     ></div>

@@ -19,7 +19,7 @@
         display: flex;
         flex-flow: column;
         gap: .5rem;
-        width: 450px;
+        width: 400px;
 
         h4 {
             width: 100%;
@@ -33,6 +33,10 @@
             color: $purple_primary;
             text-decoration: underline;
             cursor: pointer;
+        }
+
+        @media (min-width: 1450px){
+            width: 450px;
         }
 
         @media (min-width: 2000px){

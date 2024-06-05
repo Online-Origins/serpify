@@ -9,27 +9,27 @@
     display: flex;
     background-color: $white;
     justify-content: space-between;
-    align-items: flex-end;
+    align-items: center;
     padding-bottom: 1rem;
     border-bottom: solid 2px $black;
 
     .tools {
         display: flex;
-        gap: 1rem;
+        gap: .25rem;
     }
 
     .toolsWrapper {
         display: flex;
         align-items: center;
-        gap: .5rem;
-        padding-right: 1rem;
+        gap: .25rem;
+        padding-right: .5rem;
 
         &:not(:last-of-type) {
             border-right: solid 1px rgba($color: $black, $alpha: .2);
         }
 
         .typeDropdown {
-            width: 150px;
+            width: 110px;
 
             &::after {
                 display: block;
@@ -43,7 +43,7 @@
             display: flex;
             align-items: center;
             aspect-ratio: 1 / 1;
-            padding: .5rem;
+            padding: .25rem;
             border-radius: .5rem;
             transition: .3s all ease-in-out;
 
@@ -66,9 +66,34 @@
         }
     }
 
-    .buttonWrapper{
+    .buttonWrapper {
         display: flex;
-        gap: 1rem;
+        gap: .5rem;
+    }
+
+    @media (min-width: 1700px) {
+        .toolsWrapper {
+            .tool {
+                padding: .5rem;
+            }
+        }
+    }
+
+    @media (min-width: 2000px) {
+        padding-bottom: 1rem;
+
+        .tools {
+            gap: 1rem;
+        }
+
+        .toolsWrapper {
+            gap: .5rem;
+            padding-right: 1rem;
+
+            .typeDropdown {
+                width: 150px;
+            }
+        }
     }
 }
 
@@ -242,20 +267,21 @@
         box-shadow: $shadow;
         animation: showAni .3s ease-in-out forwards;
 
-        &.bottomPos{
+        &.bottomPos {
             top: auto;
             bottom: 0;
             transform: translateY(100%);
         }
 
         @keyframes showAni {
-        0% {
-            opacity: 0%;
+            0% {
+                opacity: 0%;
+            }
+
+            100% {
+                opacity: 100%;
+            }
         }
-        100% {
-            opacity: 100%;
-        }
-    }    
 
         p {
             margin: 0;
@@ -283,7 +309,7 @@
     }
 }
 
-.bottomButtons{
+.bottomButtons {
     display: flex;
     justify-content: flex-end;
 }
