@@ -121,7 +121,7 @@ export default function KeywordSearching() {
       generateKeywords();
       isKeywordsGenerated.current = true;
     }
-  }, [filters.subjects, generateKeywords]);
+  }, [filters.subjects]);
 
   // Generate keywords
   async function generateKeywords() {
@@ -611,7 +611,7 @@ export default function KeywordSearching() {
                   value={newCollection}
                   onChange={(event) => setNewCollection(event.target.value)}
                 />
-                {showAlert && <p className="error">Name can't be empty!</p>}
+                {showAlert && <p className="error">Name can&quot;t be empty!</p>}
               </div>
             </div>
           </PopUp>
