@@ -8,11 +8,13 @@ import TextFieldsRoundedIcon from "@mui/icons-material/TextFieldsRounded";
 import AssessmentOutlinedIcon from "@mui/icons-material/AssessmentOutlined";
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import styles from "./menu-bar.module.scss";
 import InputWrapper from "../ui/input-wrapper/input-wrapper.component";
+import { supabase } from "@/app/utils/supabaseClient/server";
+import { useSharedContext } from "@/context/SharedContext";
 
 export default function MenuBar({
   setSmallNav,
@@ -22,8 +24,40 @@ export default function MenuBar({
   smallNav: boolean;
 }) {
   const pathname = usePathname();
-  const [domains, setDomains] = useState(["onlineorigins.nl"]);
-  const [currentDomain, setCurrentDomain] = useState(domains[0]);
+  const [domains, setDomains] = useState<string[]>([]);
+  const [currentDomain, setCurrentDomain] = useState<any>("");
+  const loadedDomains = useRef(false);
+  const {
+    currentUrl,
+    setCurrentUrl,
+    webData,
+    setWebData,
+    pagesData,
+    setPagesData,
+    queryData,
+    setQueryData,
+  } = useSharedContext();
+
+  useEffect(() => {
+    const sessionWebData = sessionStorage.getItem("webData");
+    const sessionPagesData = sessionStorage.getItem("pagesData");
+    const sessionQueryData = sessionStorage.getItem("queryData");
+    if (!webData) {
+      if (sessionWebData) {
+        setWebData(JSON.parse(sessionWebData));
+      }
+    }
+    if (!pagesData) {
+      if (sessionPagesData) {
+      setPagesData(JSON.parse(sessionPagesData));
+      }
+    }
+    if (!queryData) {
+      if (sessionQueryData) {
+      setQueryData(JSON.parse(sessionQueryData));
+      }
+    }
+  }, [webData]);
 
   useEffect(() => {
     if (pathname != "/") {
@@ -32,13 +66,122 @@ export default function MenuBar({
   }, [pathname, setSmallNav]);
 
   useEffect(() => {
-    const webUrl = sessionStorage.getItem("websiteUrl");
-    if (webUrl && webUrl != currentDomain) {
-      sessionStorage.setItem("websiteUrl", currentDomain);
-    } else if (!webUrl) {
-      sessionStorage.setItem("websiteUrl", currentDomain);
+    if (currentUrl && currentUrl != currentDomain) {
+      setCurrentUrl(currentDomain);
+      gettingData(currentDomain, undefined, undefined);
     }
   }, [currentDomain]);
+
+  function gettingData(
+    websiteUrl: string,
+    accessToken?: string,
+    passedEntries?: any
+  ) {
+    const pageDomains = JSON.parse(sessionStorage.getItem("entries") || "");
+    const userAccessToken = sessionStorage.getItem("accessToken");
+    if (
+      (pageDomains != "" || passedEntries) &&
+      (userAccessToken !="" || accessToken)
+    ) {
+      const currentToken = userAccessToken || accessToken || "";
+      const entries = pageDomains || passedEntries || [""];
+      let correctUrl = [];
+      if (entries) {
+        correctUrl = entries
+          .filter((item: any) => item.siteUrl.includes(websiteUrl))
+          .map((item: any) => item.siteUrl);
+      }
+      if (correctUrl.length == 0) {
+        alert("The chosen domain isn't activated in your Search console.");
+        return;
+      }
+      const today = new Date();
+      const startDate = new Date(
+        today.getFullYear(),
+        today.getMonth() - 1,
+        today.getDate()
+      );
+      const endDate = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate()
+      );
+      fetchData(
+        currentToken,
+        correctUrl,
+        startDate,
+        endDate,
+        "date",
+        "webData",
+        setWebData
+      );
+      fetchData(
+        currentToken,
+        correctUrl,
+        startDate,
+        endDate,
+        "page",
+        "pagesData",
+        setPagesData
+      );
+      fetchData(
+        currentToken,
+        correctUrl,
+        startDate,
+        endDate,
+        "query",
+        "queryData",
+        setQueryData
+      );
+    }
+  }
+
+  async function fetchData(
+    accessToken: string,
+    correctUrl: string,
+    startDate: any,
+    endDate: any,
+    dimension: string,
+    storageType: string,
+    saveData: (data: any) => void
+  ) {
+    try {
+      const response = await fetch("/api/domainData", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          accessToken: accessToken,
+          websiteUrl: correctUrl,
+          startDate: startDate.toISOString().split("T")[0],
+          endDate: endDate.toISOString().split("T")[0],
+          dimension: [dimension],
+        }),
+      });
+
+      const data = await response.json();
+      saveData(data.rows);
+    } catch (error) {
+      console.error("Error fetching search console data", error);
+    }
+  }
+
+  useEffect(() => {
+    if (!loadedDomains.current) {
+      getDomains();
+      loadedDomains.current = true;
+    }
+  }, [loadedDomains.current]);
+
+  async function getDomains() {
+    const { data } = await supabase.from("domains").select();
+    if (data) {
+      setDomains(data.map((domain: any) => domain.domain));
+      setCurrentDomain(data[0].domain);
+      setCurrentUrl(data[0].domain);
+    }
+  }
 
   return (
     <ComponentWrapper

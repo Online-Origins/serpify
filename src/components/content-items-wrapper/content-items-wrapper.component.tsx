@@ -32,7 +32,7 @@ export default function ContentItemsWrapper({
   function settingContents() {
     let array = [];
     if (small) {
-      for (let x = 0; x < 2 && x < contents.length; x++) {
+      for (let x = 0; x < 3 && x < contents.length; x++) {
         array.push(contents[x]);
       }
     } else {
@@ -51,7 +51,7 @@ export default function ContentItemsWrapper({
   }
 
   useEffect(() => {
-    if (contents.length > 0) {
+    if (contents.length > 0 && !small) {
       const filtered = contents.filter((content: any) =>
         content.content_title
           .toLocaleLowerCase()

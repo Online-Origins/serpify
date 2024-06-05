@@ -1,7 +1,7 @@
 "use client";
 import InnerWrapper from "@/components/inner-wrapper/inner-wrapper.component";
 import PageTitle from "@/components/page-title/page-title.component";
-import { useEffect, useRef, useState } from "react";
+import { use, useEffect, useRef, useState } from "react";
 import DomainStatistics from "@/components/domain-statistics/domain-statistics.component";
 import LineChart from "@/components/line-chart/line-chart.component";
 import InputWrapper from "@/components/ui/input-wrapper/input-wrapper.component";
@@ -17,12 +17,10 @@ import {
 } from "@mui/icons-material";
 import styles from "./page.module.scss";
 import Link from "next/link";
+import { useSharedContext } from "@/context/SharedContext";
 
 export default function AnalyticsPage() {
   const gotData = useRef(false);
-  const [domainAnalytics, setDomainAnalytics] = useState([]);
-  const [pagesAnalytics, setPagesAnalytics] = useState([]);
-  const [keywordAnalytics, setKeywordAnalytics] = useState([]);
   const [shownPages, setShownPages] = useState<any[]>([]);
   const [shownKeywords, setShownKeywords] = useState<any[]>([]);
   const [pagesAmount, setPagesAmount] = useState([0, 10]);
@@ -31,52 +29,30 @@ export default function AnalyticsPage() {
   const [role, setRole] = useState("");
   const [keywordSorting, setKeywordSorting] = useState("clicks");
   const [pagesSorting, setPagesSorting] = useState("clicks");
+  const { pagesData, webData, queryData } = useSharedContext();
 
   useEffect(() => {
-    const domainData = sessionStorage.getItem("webData");
-    const pagesData = sessionStorage.getItem("pagesData");
-    const queryData = sessionStorage.getItem("queryData");
     const role = sessionStorage.getItem("role");
     if (!gotData.current) {
       if (role) {
         setRole(role);
       }
-      if (
-        domainData &&
-        domainData.length > 0 &&
-        pagesData &&
-        pagesData.length > 0 &&
-        queryData &&
-        queryData.length > 0
-      ) {
-        setDomainAnalytics(JSON.parse(domainData));
-        setPagesAnalytics(sortPages(JSON.parse(pagesData)));
-        setKeywordAnalytics(sortKeywords(JSON.parse(queryData)));
-        gotData.current = true;
-      }
     }
   }, [gotData.current]);
 
+
   useEffect(() => {
-    if (pagesAnalytics.length > 0) {
-      showPages(pagesAnalytics);
+    if (pagesData && pagesData.length > 0) {
+      showPages(sortPages(pagesData));
     }
-  }, [pagesAnalytics]);
+  }, [pagesData, pagesAmount, pagesSorting]);
 
   useEffect(() => {
-    showPages(pagesAnalytics);
-  }, [pagesAmount]);
-
-  useEffect(() => {
-    if (keywordAnalytics.length > 0) {
-      showKeywords(keywordAnalytics);
+    if (queryData && queryData.length > 0) {
+      showKeywords(sortKeywords(queryData));
     }
-  }, [keywordAnalytics]);
-
-  useEffect(() => {
-    showKeywords(keywordAnalytics);
-  }, [keywordsAmount]);
-
+  }, [queryData, keywordsAmount, keywordSorting]);
+  
   function showPages(pages: any) {
     let array: any[] = [];
     for (let x = pagesAmount[0]; x < pagesAmount[1] && x < pages.length; x++) {
@@ -119,18 +95,6 @@ export default function AnalyticsPage() {
     }
   }
 
-  useEffect(() => {
-    if (keywordAnalytics.length > 0) {
-      showKeywords(sortKeywords(keywordAnalytics));
-    }
-  }, [keywordSorting]);
-
-  useEffect(() => {
-    if (pagesAnalytics.length > 0) {
-      showPages(sortPages(pagesAnalytics));
-    }
-  }, [pagesSorting]);
-
   return (
     <InnerWrapper className={styles.analyticsWrapper}>
       <PageTitle
@@ -145,31 +109,134 @@ export default function AnalyticsPage() {
           className={classNames(styles.innerAnalytics, "scrollbar noMargin")}
         >
           <DomainStatistics />
-          <div className={styles.horizontal}>
-            <div className={styles.analyticsItem}>
-              <div className={styles.titleWrapper}>
-                <h3>Performance</h3>
-                <InputWrapper
-                  type="dropdown"
-                  small
-                  value={chartType}
-                  onChange={(value: any) => setChartType(value)}
-                  options={["impressions", "clicks", "ctr", "position"]}
-                />
+          {pagesData && (
+            <div className={styles.horizontal}>
+              <div className={styles.analyticsItem}>
+                <div className={styles.titleWrapper}>
+                  <h3>Performance</h3>
+                  <InputWrapper
+                    type="dropdown"
+                    small
+                    value={chartType}
+                    onChange={(value: any) => setChartType(value)}
+                    options={["impressions", "clicks", "ctr", "position"]}
+                  />
+                </div>
+                <LineChart data={webData} type={chartType} />
               </div>
-              <LineChart data={domainAnalytics} type={chartType} />
+              <div className={styles.analyticsItem}>
+                <div className={styles.titleWrapper}>
+                  <h3>Pages</h3>
+                  <div className={styles.tableButtons}>
+                    {pagesAmount[0] > 0 && (
+                      <Button
+                        type={"textOnly"}
+                        onClick={() =>
+                          setPagesAmount([
+                            pagesAmount[0] - 10,
+                            pagesAmount[1] - 10,
+                          ])
+                        }
+                      >
+                        <ArrowBackRounded />
+                        <p>Prev.</p>
+                      </Button>
+                    )}
+                    {pagesAmount[1] < pagesData.length && (
+                      <Button
+                        type={"textOnly"}
+                        onClick={() =>
+                          setPagesAmount([pagesAmount[1], pagesAmount[1] + 10])
+                        }
+                      >
+                        <p>Next</p>
+                        <ArrowForwardRounded />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+                <div className={styles.pagesTable}>
+                  <div className={classNames(styles.firstRow, styles.row)}>
+                    <div className={classNames(styles.item, styles.page)}>
+                      <p>Page</p>
+                    </div>
+                    <div
+                      className={classNames(
+                        styles.item,
+                        styles.clicks,
+                        pagesSorting == "clicks" && styles.sorting
+                      )}
+                      onClick={() => setPagesSorting("clicks")}
+                    >
+                      <ArrowDownwardRounded />
+                      <p>Clicks</p>
+                    </div>
+                    <div
+                      className={classNames(
+                        styles.item,
+                        styles.impressions,
+                        pagesSorting == "impressions" && styles.sorting
+                      )}
+                      onClick={() => setPagesSorting("impressions")}
+                    >
+                      <ArrowDownwardRounded />
+                      <p>Impressions</p>
+                    </div>
+                    <div
+                      className={classNames(
+                        styles.item,
+                        styles.ctr,
+                        pagesSorting == "ctr" && styles.sorting
+                      )}
+                      onClick={() => setPagesSorting("ctr")}
+                    >
+                      <ArrowDownwardRounded />
+                      <p>CTR</p>
+                    </div>
+                  </div>
+                  {pagesData.length > 0 &&
+                    shownPages.map((page: any) => (
+                      <div className={styles.row} key={page.keys[0]}>
+                        <div className={classNames(styles.item, styles.page)}>
+                          <Link href={page.keys[0]} target="_blank">
+                            {page.keys[0].replace(
+                              `https://onlineorigins.nl`,
+                              ""
+                            )}
+                          </Link>
+                        </div>
+                        <div className={classNames(styles.item, styles.clicks)}>
+                          <p>{page.clicks}</p>
+                        </div>
+                        <div
+                          className={classNames(
+                            styles.item,
+                            styles.impressions
+                          )}
+                        >
+                          <p>{page.impressions}</p>
+                        </div>
+                        <div className={classNames(styles.item, styles.ctr)}>
+                          <p>{(page.ctr * 100).toFixed(1)} %</p>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </div>
             </div>
+          )}
+          {queryData && (
             <div className={styles.analyticsItem}>
               <div className={styles.titleWrapper}>
-                <h3>Pages</h3>
+                <h3>Keyword performance</h3>
                 <div className={styles.tableButtons}>
-                  {pagesAmount[0] > 0 && (
+                  {keywordsAmount[0] > 0 && (
                     <Button
                       type={"textOnly"}
                       onClick={() =>
-                        setPagesAmount([
-                          pagesAmount[0] - 10,
-                          pagesAmount[1] - 10,
+                        setKeywordsAmount([
+                          keywordsAmount[0] - 10,
+                          keywordsAmount[1] - 10,
                         ])
                       }
                     >
@@ -177,11 +244,14 @@ export default function AnalyticsPage() {
                       <p>Prev.</p>
                     </Button>
                   )}
-                  {pagesAmount[1] < pagesAnalytics.length && (
+                  {keywordsAmount[1] < queryData.length && (
                     <Button
                       type={"textOnly"}
                       onClick={() =>
-                        setPagesAmount([pagesAmount[1], pagesAmount[1] + 10])
+                        setKeywordsAmount([
+                          keywordsAmount[1],
+                          keywordsAmount[1] + 10,
+                        ])
                       }
                     >
                       <p>Next</p>
@@ -190,149 +260,81 @@ export default function AnalyticsPage() {
                   )}
                 </div>
               </div>
-              <div className={styles.pagesTable}>
+              <div className={classNames(styles.pagesTable, styles.keywords)}>
                 <div className={classNames(styles.firstRow, styles.row)}>
                   <div className={classNames(styles.item, styles.page)}>
-                    <p>Page</p>
+                    <p>Keyword</p>
                   </div>
                   <div
-                    className={classNames(styles.item, styles.clicks, pagesSorting == "clicks" && styles.sorting)}
-                    onClick={() => setPagesSorting("clicks")}
+                    className={classNames(
+                      styles.item,
+                      styles.position,
+                      keywordSorting == "position" && styles.sorting
+                    )}
+                    onClick={() => setKeywordSorting("position")}
+                  >
+                    <ArrowUpwardRounded />
+                    <p>Avg. position</p>
+                  </div>
+                  <div
+                    className={classNames(
+                      styles.item,
+                      styles.clicks,
+                      keywordSorting == "clicks" && styles.sorting
+                    )}
+                    onClick={() => setKeywordSorting("clicks")}
                   >
                     <ArrowDownwardRounded />
                     <p>Clicks</p>
                   </div>
                   <div
-                    className={classNames(styles.item, styles.impressions, pagesSorting == "impressions" && styles.sorting)}
-                    onClick={() => setPagesSorting("impressions")}
+                    className={classNames(
+                      styles.item,
+                      styles.impressions,
+                      keywordSorting == "impressions" && styles.sorting
+                    )}
+                    onClick={() => setKeywordSorting("impressions")}
                   >
                     <ArrowDownwardRounded />
                     <p>Impressions</p>
                   </div>
                   <div
-                    className={classNames(styles.item, styles.ctr, pagesSorting == "ctr" && styles.sorting)}
-                    onClick={() => setPagesSorting("ctr")}
+                    className={classNames(
+                      styles.item,
+                      styles.ctr,
+                      keywordSorting == "ctr" && styles.sorting
+                    )}
+                    onClick={() => setKeywordSorting("ctr")}
                   >
                     <ArrowDownwardRounded />
                     <p>CTR</p>
                   </div>
                 </div>
-                {pagesAnalytics.length > 0 &&
-                  shownPages.map((page: any) => (
-                    <div className={styles.row} key={page.keys[0]}>
+                {queryData.length > 0 &&
+                  shownKeywords.map((keyword: any) => (
+                    <div className={styles.row} key={keyword.keys[0]}>
                       <div className={classNames(styles.item, styles.page)}>
-                        <Link href={page.keys[0]} target="_blank">
-                          {page.keys[0].replace("https://onlineorigins.nl", "")}
-                        </Link>
+                        <p>{keyword.keys[0]}</p>
+                      </div>
+                      <div className={classNames(styles.item, styles.position)}>
+                        <p>{keyword.position.toFixed(1)}</p>
                       </div>
                       <div className={classNames(styles.item, styles.clicks)}>
-                        <p>{page.clicks}</p>
+                        <p>{keyword.clicks}</p>
                       </div>
                       <div
                         className={classNames(styles.item, styles.impressions)}
                       >
-                        <p>{page.impressions}</p>
+                        <p>{keyword.impressions}</p>
                       </div>
                       <div className={classNames(styles.item, styles.ctr)}>
-                        <p>{(page.ctr * 100).toFixed(1)} %</p>
+                        <p>{(keyword.ctr * 100).toFixed(1)} %</p>
                       </div>
                     </div>
                   ))}
               </div>
             </div>
-          </div>
-          <div className={styles.analyticsItem}>
-            <div className={styles.titleWrapper}>
-              <h3>Keyword performance</h3>
-              <div className={styles.tableButtons}>
-                {keywordsAmount[0] > 0 && (
-                  <Button
-                    type={"textOnly"}
-                    onClick={() =>
-                      setKeywordsAmount([
-                        keywordsAmount[0] - 10,
-                        keywordsAmount[1] - 10,
-                      ])
-                    }
-                  >
-                    <ArrowBackRounded />
-                    <p>Prev.</p>
-                  </Button>
-                )}
-                {keywordsAmount[1] < keywordAnalytics.length && (
-                  <Button
-                    type={"textOnly"}
-                    onClick={() =>
-                      setKeywordsAmount([
-                        keywordsAmount[1],
-                        keywordsAmount[1] + 10,
-                      ])
-                    }
-                  >
-                    <p>Next</p>
-                    <ArrowForwardRounded />
-                  </Button>
-                )}
-              </div>
-            </div>
-            <div className={classNames(styles.pagesTable, styles.keywords)}>
-              <div className={classNames(styles.firstRow, styles.row)}>
-                <div className={classNames(styles.item, styles.page)}>
-                  <p>Keyword</p>
-                </div>
-                <div
-                  className={classNames(styles.item, styles.position, keywordSorting == "position" && styles.sorting)}
-                  onClick={() => setKeywordSorting("position")}
-                >
-                  <ArrowUpwardRounded />
-                  <p>Avg. position</p>
-                </div>
-                <div
-                  className={classNames(styles.item, styles.clicks, keywordSorting == "clicks" && styles.sorting)}
-                  onClick={() => setKeywordSorting("clicks")}
-                >
-                  <ArrowDownwardRounded />
-                  <p>Clicks</p>
-                </div>
-                <div
-                  className={classNames(styles.item, styles.impressions, keywordSorting == "impressions" && styles.sorting)}
-                  onClick={() => setKeywordSorting("impressions")}
-                >
-                  <ArrowDownwardRounded />
-                  <p>Impressions</p>
-                </div>
-                <div
-                  className={classNames(styles.item, styles.ctr, keywordSorting == "ctr" && styles.sorting)}
-                  onClick={() => setKeywordSorting("ctr")}
-                >
-                  <ArrowDownwardRounded />
-                  <p>CTR</p>
-                </div>
-              </div>
-              {keywordAnalytics.length > 0 &&
-                shownKeywords.map((keyword: any) => (
-                  <div className={styles.row} key={keyword.keys[0]}>
-                    <div className={classNames(styles.item, styles.page)}>
-                      <p>{keyword.keys[0]}</p>
-                    </div>
-                    <div className={classNames(styles.item, styles.position)}>
-                      <p>{keyword.position.toFixed(1)}</p>
-                    </div>
-                    <div className={classNames(styles.item, styles.clicks)}>
-                      <p>{keyword.clicks}</p>
-                    </div>
-                    <div
-                      className={classNames(styles.item, styles.impressions)}
-                    >
-                      <p>{keyword.impressions}</p>
-                    </div>
-                    <div className={classNames(styles.item, styles.ctr)}>
-                      <p>{(keyword.ctr * 100).toFixed(1)} %</p>
-                    </div>
-                  </div>
-                ))}
-            </div>
-          </div>
+          )}
         </div>
       ) : (
         <h5>You need to log in with Google for this feature</h5>

@@ -126,103 +126,117 @@ export default function KeywordSearching() {
   // Generate keywords
   async function generateKeywords() {
     setLoading(true);
-    try {
-      // Connect with GPT api
-      const response = await fetch("/api/generateKeywords", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          keywords: filters.subjects,
-          language: filters.language,
-          wordsLength: filters.keywordLength,
-        }),
-      });
+    let attempt = 0;
+    const retries = 3;
+    while (attempt < retries) {
+      try {
+        // Connect with GPT api
+        const response = await fetch("/api/generateKeywords", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            keywords: filters.subjects,
+            language: filters.language,
+            wordsLength: filters.keywordLength,
+          }),
+        });
 
-      const { generatedKeywordsList } = await response.json();
+        const { generatedKeywordsList } = await response.json();
 
-      const response2 = await fetch("/api/googleKeywords", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: JSON.stringify({
-          keywords: Array.from(
-            new Set([...filters.subjects, ...generatedKeywordsList.keywords])
-          ),
-          language: filters.language,
-          country: filters.country,
-        }),
-      });
-      const GoogleGeneratedKeywords = await response2.json();
+        const response2 = await fetch("/api/googleKeywords", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: JSON.stringify({
+            keywords: Array.from(
+              new Set([...filters.subjects, ...generatedKeywordsList.keywords])
+            ),
+            language: filters.language,
+            country: filters.country,
+          }),
+        });
+        const GoogleGeneratedKeywords = await response2.json();
 
-      // Filter the keywords with data
-      const filteredKeywords = GoogleGeneratedKeywords.filter(
-        (keyword: any) =>
-          keyword.hasOwnProperty("keywordIdeaMetrics") &&
-          keyword.keywordIdeaMetrics.hasOwnProperty("avgMonthlySearches") &&
-          keyword.keywordIdeaMetrics.hasOwnProperty("competitionIndex") &&
-          keyword.keywordIdeaMetrics.avgMonthlySearches !== null &&
-          keyword.keywordIdeaMetrics.competitionIndex !== null
-      );
+        // Filter the keywords with data
+        const filteredKeywords = GoogleGeneratedKeywords.filter(
+          (keyword: any) =>
+            keyword.hasOwnProperty("keywordIdeaMetrics") &&
+            keyword.keywordIdeaMetrics.hasOwnProperty("avgMonthlySearches") &&
+            keyword.keywordIdeaMetrics.hasOwnProperty("competitionIndex") &&
+            keyword.keywordIdeaMetrics.avgMonthlySearches !== null &&
+            keyword.keywordIdeaMetrics.competitionIndex !== null
+        );
 
-      // Add the potential to the keywords
-      const keywordsWithData = filteredKeywords.map((keywordData: any) => {
-        let potential = null; // default value if keywordIdeaMetrics doesn't exist
+        // Add the potential to the keywords
+        const keywordsWithData = filteredKeywords.map((keywordData: any) => {
+          let potential = null; // default value if keywordIdeaMetrics doesn't exist
 
-        if (keywordData.keywordIdeaMetrics) {
-          potential = potentialIndex(
-            keywordData.keywordIdeaMetrics.avgMonthlySearches,
-            keywordData.keywordIdeaMetrics.competitionIndex
-          );
+          if (keywordData.keywordIdeaMetrics) {
+            potential = potentialIndex(
+              keywordData.keywordIdeaMetrics.avgMonthlySearches,
+              keywordData.keywordIdeaMetrics.competitionIndex
+            );
 
-          // Add potential to keywordIdeaMetrics object
-          keywordData.keywordIdeaMetrics.potential = potential;
+            // Add potential to keywordIdeaMetrics object
+            keywordData.keywordIdeaMetrics.potential = potential;
+          }
+
+          return keywordData;
+        });
+
+        // Map the array to rename keywordIdeaMetrics property
+        const keywordsWithRenamedMetrics = keywordsWithData.map(
+          (keyword: any) => ({
+            ...keyword,
+            keywordMetrics: keyword.keywordIdeaMetrics,
+          })
+        );
+
+        // Filter the keywords to only get keywords with metrics
+        const filterWithUserValue = keywordsWithRenamedMetrics.filter(
+          (keyword: any) =>
+            keyword.keywordMetrics.avgMonthlySearches >= filters.volume.min &&
+            (filters.volume.max != 100000
+              ? keyword.keywordMetrics.avgMonthlySearches <= filters.volume.max
+              : true) &&
+            keyword.keywordMetrics.competitionIndex >=
+              filters.competition.min &&
+            keyword.keywordMetrics.competitionIndex <=
+              filters.competition.max &&
+            keyword.keywordMetrics.potential >= filters.potential.min &&
+            keyword.keywordMetrics.potential <= filters.potential.max
+        );
+
+        // Filter the keywords according to the length og the keywords
+        const filterkeywordLength = filterWithUserValue.filter(
+          (keyword: any) => {
+            const wordCount = keyword.text.split(" ").length;
+            const isShortTail = filters.keywordLength.includes("shorttail");
+            const isLongTail = filters.keywordLength.includes("longtail");
+
+            if (isShortTail && !isLongTail) {
+              return wordCount <= 3;
+            } else if (!isShortTail && isLongTail) {
+              return wordCount > 3;
+            } else {
+              return keyword;
+            }
+          }
+        );
+
+        setGeneratedKeywords(filterkeywordLength);
+        setLoading(false);
+        attempt = 3;
+      } catch (error: any) {
+        attempt++;
+        if (attempt === retries) {
+          throw error;
         }
-
-        return keywordData;
-      });
-
-      // Map the array to rename keywordIdeaMetrics property
-      const keywordsWithRenamedMetrics = keywordsWithData.map(
-        (keyword: any) => ({
-          ...keyword,
-          keywordMetrics: keyword.keywordIdeaMetrics,
-        })
-      );
-
-      // Filter the keywords to only get keywords with metrics
-      const filterWithUserValue = keywordsWithRenamedMetrics.filter(
-        (keyword: any) =>
-          keyword.keywordMetrics.avgMonthlySearches >= filters.volume.min &&
-          keyword.keywordMetrics.avgMonthlySearches <= filters.volume.max &&
-          keyword.keywordMetrics.competitionIndex >= filters.competition.min &&
-          keyword.keywordMetrics.competitionIndex <= filters.competition.max &&
-          keyword.keywordMetrics.potential >= filters.potential.min &&
-          keyword.keywordMetrics.potential <= filters.potential.max
-      );
-
-      // Filter the keywords according to the length og the keywords
-      const filterkeywordLength = filterWithUserValue.filter((keyword: any) => {
-        const wordCount = keyword.text.split(" ").length;
-        const isShortTail = filters.keywordLength.includes("shorttail");
-        const isLongTail = filters.keywordLength.includes("longtail");
-
-        if (isShortTail && !isLongTail) {
-          return wordCount <= 3;
-        } else if (!isShortTail && isLongTail) {
-          return wordCount > 3;
-        } else {
-          return keyword;
-        }
-      });
-
-      setGeneratedKeywords(filterkeywordLength);
-      setLoading(false);
-    } catch (error: any) {
-      alert("Something went wrong. Please try again");
-      isKeywordsGenerated.current = false;
+        isKeywordsGenerated.current = false;
+      }
     }
   }
 
@@ -304,7 +318,7 @@ export default function KeywordSearching() {
         return "100 - 1K";
       case googleVolume >= 1000 && googleVolume < 10000:
         return "1K - 10K";
-      case googleVolume >= 10000 && googleVolume < 100000:
+      case googleVolume >= 10000:
         return "10K - 100K";
       default:
         return googleVolume;

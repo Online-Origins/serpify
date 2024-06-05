@@ -34,7 +34,7 @@ export default function CollectionsWrapper({
 
   return (
     <div className={classNames(styles.collectionsWrapper, "scrollbar", small && styles.small)}>
-      {shownCollections.length > 0 &&
+      {shownCollections.length > 0 ?
         shownCollections
           .filter((collection) => collection) // Filter out undefined or null collections
           .map((collection: any) => (
@@ -45,11 +45,11 @@ export default function CollectionsWrapper({
               setShownCollections={setShownCollections}
               smallWrapper={small}
             />
-          ))}
+          )) : <h5>No Collections found...</h5>}
       {loadingRef.current && (
         <PopUpWrapper>
           <CircularLoader />
-          <p>Loading collections...</p>
+          <p>Loading collections</p>
         </PopUpWrapper>
       )}
     </div>

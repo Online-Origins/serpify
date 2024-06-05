@@ -64,7 +64,7 @@ export default function Table({
         return "medium";
       case googleVolume >= 1000 && googleVolume < 10000:
         return "high";
-      case googleVolume >= 10000 && googleVolume < 100000:
+      case googleVolume >= 10000:
         return "extreme";
       default:
         return "low";
