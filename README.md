@@ -1,5 +1,6 @@
 # Serpify
 
+![Serpify platform](/public/serpify.png)
 
 "Serpify" is a cutting-edge online platform designed to empower users with tools and resources to enhance their online visibility and boost their search engine optimization (SEO) efforts.
 
@@ -18,7 +19,11 @@ Next.js has been chosen as the foundation for our online platform due to its unp
     - Icons
     - Components 
 - OpenAI
-- Google Ads
+- Google API
+    - Ads
+    - Search Console
+- Tiptap rich text editor
+- ChartJS
 
 First, run the development server:
 
