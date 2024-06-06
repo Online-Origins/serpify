@@ -63,7 +63,7 @@ export default function Home() {
       gottenData.current = true;
       router.push("/");
     } catch (error) {
-      console.error(error);
+      alert("Something went wrong while authenticating. Please try again later")
     }
   }
 

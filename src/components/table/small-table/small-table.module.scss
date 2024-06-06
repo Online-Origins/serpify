@@ -54,17 +54,7 @@
         }
     }
 
-    @media (min-width: 1800px){
-        .row{
-            .item{
-                &.keyword{
-                    width: 100%;
-                }
-            }
-        }
-    }
-
-    @media (min-width: 2000px) {
+    @media (min-width: 1800px) {
         width: max-content;
 
         .row{
