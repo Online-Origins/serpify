@@ -41,7 +41,7 @@ export default function Collection({ params }: { params: { slug: string } }) {
   const [popUpOpen, setPopUpOpen] = useState(false);
   const [chosenFocusKeyword, setChosenFocusKeyword] = useState("");
   const [popUpStep, setPopUpStep] = useState(1);
-  
+
   const [chosenKeywords, setChosenFocusKeywords] = useState([]);
   const [chosenLanguage, setChosenLanguage] = useState(languageCodes[0].id);
   const [toneOfVoice, setToneOfVoice] = useState(toneOfVoices[0].id);
@@ -111,41 +111,54 @@ export default function Collection({ params }: { params: { slug: string } }) {
 
   async function getKeywordsData() {
     setLoading(true);
-    const response = await fetch("/api/keywordMetrics", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: JSON.stringify({
-        keywords: selectedCollection[0].keywords,
-        language: selectedCollection[0].language,
-        country: selectedCollection[0].country,
-      }),
-    });
+    let attempt = 0;
+    const retries = 3;
+    while (attempt < retries) {
+      try {
+        const response = await fetch("/api/keywordMetrics", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: JSON.stringify({
+            keywords: selectedCollection[0].keywords,
+            language: selectedCollection[0].language,
+            country: selectedCollection[0].country,
+          }),
+        });
 
-    const data = await response.json();
+        const data = await response.json();
 
-    const updatedData = data.map((keyword: any) => ({
-      ...keyword,
-      keywordMetrics: {
-        ...keyword.keywordMetrics,
-        potential: Math.ceil(
-          potentialIndex(
-            keyword.keywordMetrics.avgMonthlySearches,
-            keyword.keywordMetrics.competitionIndex
-          )
-        ),
-      },
-    }));
-    setKeywordsData(updatedData);
+        const updatedData = data.map((keyword: any) => ({
+          ...keyword,
+          keywordMetrics: {
+            ...keyword.keywordMetrics,
+            potential: Math.ceil(
+              potentialIndex(
+                keyword.keywordMetrics.avgMonthlySearches,
+                keyword.keywordMetrics.competitionIndex
+              )
+            ),
+          },
+        }));
+        setKeywordsData(updatedData);
 
-    setLoading(false);
+        setLoading(false);
 
-    let array: string[] = [];
-    updatedData.map((keyword: any) => {
-      array.push(keyword);
-    });
-    setSelectedKeywords(array);
+        let array: string[] = [];
+        updatedData.map((keyword: any) => {
+          array.push(keyword);
+        });
+        setSelectedKeywords(array);
+        attempt = 3;
+      } catch (error) {
+        attempt++;
+        if (attempt === retries) {
+          alert("Something went wrong. Please try again later.");
+          router.back();
+        }
+      }
+    }
   }
 
   function searchVolumeString(googleVolume: number) {
@@ -456,7 +469,10 @@ export default function Collection({ params }: { params: { slug: string } }) {
                       <ArrowForwardRoundedIcon />
                     </Button>
                   )}
-                  <Button type={"outline"} onClick={() => setAddPopUpOpen(true)}>
+                  <Button
+                    type={"outline"}
+                    onClick={() => setAddPopUpOpen(true)}
+                  >
                     <p>Add keywords</p>
                     <AddOutlined />
                   </Button>

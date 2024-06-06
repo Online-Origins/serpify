@@ -52,6 +52,8 @@ export default function SmallTable({
   async function getKeywordsData() {
     let attempt = 0;
     const retries = 3;
+    const timeout = (ms:any) => new Promise(resolve => setTimeout(resolve, ms));
+  
     while (attempt < retries) {
       try {
         const response = await fetch("/api/keywordMetrics", {
@@ -65,17 +67,21 @@ export default function SmallTable({
             country: country,
           }),
         });
-
+  
         const data = await response.json();
+        attempt = retries;  // or simply `break;` to exit the loop
         return data;
       } catch (error) {
         attempt++;
         if (attempt === retries) {
-          throw error;
+          alert("Something went wrong. Please try again later.");
+        } else {
+          await timeout(250);  // wait for 250ms before retrying
         }
       }
     }
   }
+  
 
   function searchVolume(googleVolume: number) {
     switch (true) {
