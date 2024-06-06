@@ -17,7 +17,7 @@ export default function Selector({
       className={classNames(
         styles.selector,
         group.includes(item) && styles.selected,
-        !string && group.find((keyword:any) => keyword.text == item.text) && styles.selected
+        (!string && group.find((keyword:any) => keyword.text == item.text)) && styles.selected
       )}
       onClick={() => selecting(item)}
     ></div>

@@ -19,8 +19,7 @@ export default function Home() {
   const gottenData = useRef(false);
   const [role, setRole] = useState("");
   const gotSearchConsoleData = useRef(false);
-  const { currentUrl, webData, setWebData, setPagesData, setQueryData } =
-    useSharedContext();
+  const { currentUrl, setWebData, setPagesData, setQueryData } = useSharedContext();
 
   useEffect(() => {
     const authorizationCode = getAuthorizationCode();
@@ -40,8 +39,8 @@ export default function Home() {
         handleExecute(authorizationCode, currentUrl);
         sessionStorage.setItem("role", "user");
       }
-    } else if (role && role == "guest"){
-      setRole(role)
+    } else if (role && role == "guest") {
+      setRole(role);
     }
   }, [currentUrl, loadingRef.current, gottenData.current]);
 
@@ -54,9 +53,10 @@ export default function Home() {
         },
         body: JSON.stringify({ code: authorizationCode }),
       });
-      const { accessToken, entries } = await tokenResponse.json();
+      const { accessToken, entries, refreshToken } = await tokenResponse.json();
 
       sessionStorage.setItem("accessToken", accessToken);
+      sessionStorage.setItem("refreshToken", refreshToken);
       sessionStorage.setItem("entries", JSON.stringify(entries));
 
       gettingData(websiteUrl, accessToken, entries);
@@ -140,6 +140,7 @@ export default function Home() {
     storageType: string,
     saveData: (data: any) => void
   ) {
+    const refreshToken = sessionStorage.getItem("refreshToken");
     try {
       const response = await fetch("/api/domainData", {
         method: "POST",
@@ -152,6 +153,7 @@ export default function Home() {
           startDate: startDate.toISOString().split("T")[0],
           endDate: endDate.toISOString().split("T")[0],
           dimension: [dimension],
+          refreshToken: refreshToken,
         }),
       });
 

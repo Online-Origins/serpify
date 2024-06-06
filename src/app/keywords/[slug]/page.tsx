@@ -39,10 +39,10 @@ export default function Collection({ params }: { params: { slug: string } }) {
   const [editPopUpOpen, setEditPopUpOpen] = useState(false);
   const [keywordAmount, setKeywordAmount] = useState([0, 20]);
   const [popUpOpen, setPopUpOpen] = useState(false);
-  const [chosenKeyword, setChosenKeyword] = useState("");
+  const [chosenFocusKeyword, setChosenFocusKeyword] = useState("");
   const [popUpStep, setPopUpStep] = useState(1);
-  const [keywordOptions, setKeywordOptions] = useState([]);
-  const [chosenKeywords, setChosenKeywords] = useState([]);
+  
+  const [chosenKeywords, setChosenFocusKeywords] = useState([]);
   const [chosenLanguage, setChosenLanguage] = useState(languageCodes[0].id);
   const [toneOfVoice, setToneOfVoice] = useState(toneOfVoices[0].id);
   const [targetAudience, setTargetAudience] = useState("");
@@ -72,7 +72,7 @@ export default function Collection({ params }: { params: { slug: string } }) {
       .eq("id", activeCollection);
     if (data) {
       setSelectedCollection(data);
-      setChosenKeyword(data[0].keywords[0]);
+      setChosenFocusKeyword(data[0].keywords[0]);
     }
   }
 
@@ -143,7 +143,7 @@ export default function Collection({ params }: { params: { slug: string } }) {
 
     let array: string[] = [];
     updatedData.map((keyword: any) => {
-      array.push(keyword.text);
+      array.push(keyword);
     });
     setSelectedKeywords(array);
   }
@@ -290,7 +290,7 @@ export default function Collection({ params }: { params: { slug: string } }) {
           content_title: contentTitle,
           edited_on: currentDate(),
           status: "outlines",
-          keyword: chosenKeyword,
+          keyword: chosenFocusKeyword,
         },
       ])
       .select();
@@ -322,7 +322,7 @@ export default function Collection({ params }: { params: { slug: string } }) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          keyword: chosenKeyword,
+          keyword: chosenFocusKeyword,
           toneofvoice: toneOfVoicebyId?.value,
           language: language?.value,
         }),
@@ -547,10 +547,10 @@ export default function Collection({ params }: { params: { slug: string } }) {
                   type="dropdown"
                   title="Focus keyword:"
                   required={false}
-                  value={chosenKeyword}
+                  value={chosenFocusKeyword}
                   options={selectedCollection[0].keywords}
                   information="This will be the keyword your content is focused on."
-                  onChange={(value: any) => setChosenKeyword(value)}
+                  onChange={(value: any) => setChosenFocusKeyword(value)}
                   placeholder="Which collection do you want to use?"
                 />
                 <InputWrapper
@@ -558,11 +558,11 @@ export default function Collection({ params }: { params: { slug: string } }) {
                   title="Subkeywords to use:"
                   required={false}
                   options={selectedCollection[0].keywords.filter(
-                    (option: string) => option != chosenKeyword
+                    (option: string) => option != chosenFocusKeyword
                   )}
                   defValue={chosenKeywords}
                   information="Keywords that help by enhancing the relevance, reach, and effectiveness of your main keyword strategy."
-                  onChange={(value: any) => setChosenKeywords(value)}
+                  onChange={(value: any) => setChosenFocusKeywords(value)}
                   placeholder="Which collection do you want to use?"
                 />
               </div>

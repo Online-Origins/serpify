@@ -18,7 +18,6 @@ export default function InputWrapper({
   required,
   onChange,
   className,
-  currentValues,
   icon,
   value,
   type,
@@ -27,18 +26,17 @@ export default function InputWrapper({
   placeholder,
   options,
   generateTitle,
-  changeCurrentValues,
   onKeyDown,
   step,
   marks,
   small,
   domainDropdown,
+  disabled
 }: {
   title?: string;
   required?: boolean;
   onChange: any;
   className?: any;
-  currentValues?: any;
   icon?: React.ReactNode;
   value?: any;
   type: string;
@@ -47,12 +45,12 @@ export default function InputWrapper({
   placeholder?: string;
   options?: any;
   generateTitle?: any;
-  changeCurrentValues?: any;
   onKeyDown?: any;
   step?: number;
   marks?: any;
   small?: boolean;
   domainDropdown?: boolean;
+  disabled?: boolean;
 }) {
   const handleChange = (value: string) => {
     if (defValue.includes(value)) {
@@ -122,6 +120,7 @@ export default function InputWrapper({
             onChange={(event) => onChange(event.target.value)}
             className={styles.dropdown}
             variant="standard"
+            disabled={disabled}
           >
             {options.map((option: any) => (
               <MenuItem

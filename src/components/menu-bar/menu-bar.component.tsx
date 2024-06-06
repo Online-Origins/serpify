@@ -38,6 +38,7 @@ export default function MenuBar({
     setQueryData,
   } = useSharedContext();
 
+
   useEffect(() => {
     const sessionWebData = sessionStorage.getItem("webData");
     const sessionPagesData = sessionStorage.getItem("pagesData");
@@ -147,6 +148,7 @@ export default function MenuBar({
     dimension: string,
     saveData: (data: any) => void
   ) {
+    const refreshToken = sessionStorage.getItem("refreshToken");
     try {
       const response = await fetch("/api/domainData", {
         method: "POST",
@@ -159,6 +161,7 @@ export default function MenuBar({
           startDate: startDate.toISOString().split("T")[0],
           endDate: endDate.toISOString().split("T")[0],
           dimension: [dimension],
+          refreshToken: refreshToken
         }),
       });
 
@@ -209,6 +212,7 @@ export default function MenuBar({
             options={domains}
             className={styles.dropdown}
             domainDropdown
+            disabled={pathname != "/" && pathname != "/keywords" && pathname != "/content" && pathname != "/analytics"}
           />
         </div>
         <div className={styles.mainMenu}>

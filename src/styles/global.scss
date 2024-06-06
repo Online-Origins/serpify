@@ -105,6 +105,10 @@ a {
     }
 }
 
+.Mui-disabled{
+    cursor: not-allowed !important;
+}
+
 .scrollbar {
     &::-webkit-scrollbar {
         width: .5rem;

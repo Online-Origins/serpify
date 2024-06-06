@@ -43,7 +43,7 @@ export default function ContentItemsWrapper({ small }: { small?: boolean }) {
       setCollections(data);
     }
   }
-  
+
   async function getDomains() {
     const { data } = await supabase.from("domains").select();
     if (data) {
@@ -53,12 +53,20 @@ export default function ContentItemsWrapper({ small }: { small?: boolean }) {
 
   useEffect(() => {
     if (currentUrl && domains.length > 0) {
-      const currentDomainId = domains.find((domain:any) => domain.domain == currentUrl);
-      const domainContents = contents.filter((content: any) => content.domain == currentDomainId.id);
-
-      setShownContents(settingContents(domainContents))
+      const currentDomainId = domains.find(
+        (domain: any) => domain.domain == currentUrl
+      );
+      const domainContents = contents.filter(
+        (content: any) => content.domain == currentDomainId.id
+      );
+      const filtered = domainContents.filter((content: any) =>
+        content.content_title
+          .toLocaleLowerCase()
+          .includes(titleFilter.toLocaleLowerCase())
+      );
+      setShownContents(settingContents(filtered));
     }
-  }, [currentUrl, domains])
+  }, [currentUrl, domains, titleFilter]);
 
   function settingContents(con: any) {
     let array = [];
@@ -80,17 +88,6 @@ export default function ContentItemsWrapper({ small }: { small?: boolean }) {
     });
     return sorted;
   }
-
-  useEffect(() => {
-    if (contents.length > 0 && !small) {
-      const filtered = contents.filter((content: any) =>
-        content.content_title
-          .toLocaleLowerCase()
-          .includes(titleFilter.toLocaleLowerCase())
-      );
-      setShownContents(sortContents(filtered));
-    }
-  }, [titleFilter, contents]);
 
   return (
     <div

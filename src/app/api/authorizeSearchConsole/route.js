@@ -17,7 +17,8 @@ export async function POST() {
     try {
         const authUrl = oauth2Client.generateAuthUrl({
             access_type: 'offline',
-            scope: ['https://www.googleapis.com/auth/webmasters.readonly']
+            scope: ['https://www.googleapis.com/auth/webmasters'],
+            prompt: 'consent'
         });
 
         return NextResponse.json(authUrl)
