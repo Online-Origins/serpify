@@ -19,8 +19,7 @@ export async function POST(req, res) {
         const searchconsole = google.searchconsole({ version: 'v1', auth: oauth2Client });
         const response = await searchconsole.sites.list();
 
-
-        return NextResponse.json({ accessToken: tokens.access_token, entries: response.data.siteEntry, refreshToken: tokens.refresh_token});
+        return NextResponse.json({ accessToken: tokens.access_token, entries: response.data.siteEntry});
     } catch (error) {
         console.error(error);
         return res.status(500).json({ error: 'Internal Server Error' });

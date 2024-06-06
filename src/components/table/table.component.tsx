@@ -32,11 +32,11 @@ export default function Table({
   const [scroll, setScroll] = useState(false);
 
   function selecting(clickedKeyword: any) {
-    if (!selectedKeywords.includes(clickedKeyword.text)) {
+    if (!selectedKeywords.find((keyword:any) => keyword.text == clickedKeyword.text)) {
       setSelectedKeywords([...selectedKeywords, clickedKeyword]);
     } else {
       setSelectedKeywords(
-        selectedKeywords.filter((index: any) => index !== clickedKeyword.text)
+        selectedKeywords.filter((index: any) => index.text != clickedKeyword.text)
       );
     }
   }

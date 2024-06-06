@@ -8,37 +8,68 @@ import Information from "../information/information.component";
 import ArrowDownwardRoundedIcon from "@mui/icons-material/ArrowDownwardRounded";
 import classNames from "classnames";
 import styles from "./content-items-wrapper.module.scss";
+import { useSharedContext } from "@/context/SharedContext";
+import { supabase } from "@/app/utils/supabaseClient/server";
 
-export default function ContentItemsWrapper({
-  contents,
-  collections,
-  small,
-}: {
-  contents: any;
-  collections: any;
-  small?: boolean;
-}) {
+export default function ContentItemsWrapper({ small }: { small?: boolean }) {
   const [shownContents, setShownContents] = useState<any[]>([]);
   const showingContentsRef = useRef(false);
   const [titleFilter, setTitleFilter] = useState("");
+  const { currentUrl } = useSharedContext();
+  const [contents, setContents] = useState<any[]>([]);
+  const [collections, setCollections] = useState<any[]>([]);
+  const [domains, setDomains] = useState<any[]>([]);
 
   useEffect(() => {
-    if (showingContentsRef.current == false && contents.length > 0) {
-      settingContents();
-      showingContentsRef.current = true;
-    }
-  }, [contents, settingContents, showingContentsRef]);
+    getContents();
+    getCollections();
+    getDomains();
+  }, []);
 
-  function settingContents() {
+  async function getContents() {
+    const { data } = await supabase.from("contentItems").select();
+    if (data) {
+      data.sort(
+        (a, b) =>
+          new Date(b.edited_on).getTime() - new Date(a.edited_on).getTime()
+      );
+      setContents(data);
+    }
+  }
+
+  async function getCollections() {
+    const { data } = await supabase.from("collections").select();
+    if (data) {
+      setCollections(data);
+    }
+  }
+  
+  async function getDomains() {
+    const { data } = await supabase.from("domains").select();
+    if (data) {
+      setDomains(data);
+    }
+  }
+
+  useEffect(() => {
+    if (currentUrl && domains.length > 0) {
+      const currentDomainId = domains.find((domain:any) => domain.domain == currentUrl);
+      const domainContents = contents.filter((content: any) => content.domain == currentDomainId.id);
+
+      setShownContents(settingContents(domainContents))
+    }
+  }, [currentUrl, domains])
+
+  function settingContents(con: any) {
     let array = [];
     if (small) {
-      for (let x = 0; x < 3 && x < contents.length; x++) {
-        array.push(contents[x]);
+      for (let x = 0; x < 3 && x < con.length; x++) {
+        array.push(con[x]);
       }
     } else {
-      array = contents;
+      array = con;
     }
-    setShownContents(sortContents(array));
+    return sortContents(array);
   }
 
   function sortContents(array: any) {
@@ -62,7 +93,9 @@ export default function ContentItemsWrapper({
   }, [titleFilter, contents]);
 
   return (
-    <div className={classNames(styles.pageWrapper, !small && styles.bottomExtend)}>
+    <div
+      className={classNames(styles.pageWrapper, !small && styles.bottomExtend)}
+    >
       <div className={styles.topRowWrapper}>
         <div className={styles.wrappingInput}>
           {!small && (
@@ -97,6 +130,7 @@ export default function ContentItemsWrapper({
               shownContents={shownContents}
               setShownContents={setShownContents}
               sortContents={sortContents}
+              smallWrapper={small}
             />
           ))
         ) : (

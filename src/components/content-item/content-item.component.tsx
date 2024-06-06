@@ -13,12 +13,14 @@ export default function ContentItem({
   shownContents,
   setShownContents,
   sortContents,
+  smallWrapper,
 }: {
   content: any;
   collections: any;
   shownContents: any;
   setShownContents: any;
   sortContents: any;
+  smallWrapper?: boolean;
 }) {
   const router = useRouter();
 
@@ -83,10 +85,11 @@ export default function ContentItem({
             keywords: data[0].sub_keywords,
             target_audience: data[0].target_audience,
             outlines: data[0].outlines,
+            domain: data[0].domain
           },
         ])
         .select();
-      if (!inserting.error) {
+      if (!inserting.error && (smallWrapper ? shownContents.length < 3 : true)) {
         setShownContents(sortContents([...shownContents, inserting.data[0]]));
       }
     }

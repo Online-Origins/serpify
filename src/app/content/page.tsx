@@ -168,7 +168,7 @@ export default function ContentOverview() {
         Creating SEO content involves integrating targeted keywords, producing high-quality, relevant material, and optimizing structure to enhance visibility and engagement, ultimately boosting search engine rankings and user experience."
       />
       {getContentsRef.current ? (
-        <ContentItemsWrapper contents={contents} collections={collections} />
+        <ContentItemsWrapper />
       ) : (
         <h5>Loading...</h5>
       )}

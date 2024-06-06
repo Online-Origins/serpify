@@ -49,12 +49,12 @@ export default function MenuBar({
     }
     if (!pagesData) {
       if (sessionPagesData) {
-      setPagesData(JSON.parse(sessionPagesData));
+        setPagesData(JSON.parse(sessionPagesData));
       }
     }
     if (!queryData) {
       if (sessionQueryData) {
-      setQueryData(JSON.parse(sessionQueryData));
+        setQueryData(JSON.parse(sessionQueryData));
       }
     }
   }, [webData]);
@@ -67,8 +67,11 @@ export default function MenuBar({
 
   useEffect(() => {
     if (currentUrl && currentUrl != currentDomain) {
+      const role = sessionStorage.getItem("role");
       setCurrentUrl(currentDomain);
-      gettingData(currentDomain, undefined, undefined);
+      if (role && role != "guest") {
+        gettingData(currentDomain, undefined, undefined);
+      }
     }
   }, [currentDomain]);
 
@@ -81,7 +84,7 @@ export default function MenuBar({
     const userAccessToken = sessionStorage.getItem("accessToken");
     if (
       (pageDomains != "" || passedEntries) &&
-      (userAccessToken !="" || accessToken)
+      (userAccessToken != "" || accessToken)
     ) {
       const currentToken = userAccessToken || accessToken || "";
       const entries = pageDomains || passedEntries || [""];
@@ -93,6 +96,9 @@ export default function MenuBar({
       }
       if (correctUrl.length == 0) {
         alert("The chosen domain isn't activated in your Search console.");
+        setWebData([]);
+        setPagesData([]);
+        setQueryData([]);
         return;
       }
       const today = new Date();

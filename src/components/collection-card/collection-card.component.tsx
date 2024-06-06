@@ -66,10 +66,11 @@ export default function CollectionCard({
             keywords: data[0].keywords,
             language: data[0].language,
             country: data[0].country,
+            domain: data[0].domain
           },
         ])
         .select();
-      if (!inserting.error && !smallWrapper) {
+      if (!inserting.error && (smallWrapper ? shownCollections.length < 3 : true)) {
         setShownCollections([
           ...shownCollections,
           { ...data[0], id: inserting.data[0].id },

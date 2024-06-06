@@ -15,19 +15,12 @@ import { useSharedContext } from "@/context/SharedContext";
 
 export default function Home() {
   const loadingRef = useRef(true);
-  const [collections, setCollections] = useState<any[]>([]);
-  const [contents, setContents] = useState<any[]>([]);
   const router = useRouter();
   const gottenData = useRef(false);
   const [role, setRole] = useState("");
   const gotSearchConsoleData = useRef(false);
-  const {
-    currentUrl,
-    webData,
-    setWebData,
-    setPagesData,
-    setQueryData,
-  } = useSharedContext();
+  const { currentUrl, webData, setWebData, setPagesData, setQueryData } =
+    useSharedContext();
 
   useEffect(() => {
     const authorizationCode = getAuthorizationCode();
@@ -47,16 +40,10 @@ export default function Home() {
         handleExecute(authorizationCode, currentUrl);
         sessionStorage.setItem("role", "user");
       }
+    } else if (role && role == "guest"){
+      setRole(role)
     }
   }, [currentUrl, loadingRef.current, gottenData.current]);
-
-  useEffect(() => {
-    if (gotSearchConsoleData.current || (webData && webData.length > 0)) {
-      getCollections();
-      getContents();
-      loadingRef.current = true;
-    }
-  }, [gotSearchConsoleData.current, webData]);
 
   async function handleExecute(authorizationCode: any, websiteUrl: string) {
     try {
@@ -89,7 +76,7 @@ export default function Home() {
     const userAccessToken = sessionStorage.getItem("accessToken");
     if (
       (pageDomains != "" || passedEntries) &&
-      (userAccessToken !="" || accessToken)
+      (userAccessToken != "" || accessToken)
     ) {
       const currentToken = userAccessToken || accessToken || "";
       const entries = pageDomains || passedEntries || [""];
@@ -183,24 +170,6 @@ export default function Home() {
     return new URL(url).searchParams.get("code");
   };
 
-  async function getContents() {
-    const { data } = await supabase.from("contentItems").select();
-    if (data) {
-      data.sort(
-        (a, b) =>
-          new Date(b.edited_on).getTime() - new Date(a.edited_on).getTime()
-      );
-      setContents(data);
-    }
-  }
-
-  async function getCollections() {
-    const { data } = await supabase.from("collections").select();
-    if (data) {
-      setCollections(data);
-    }
-  }
-
   return (
     <InnerWrapper
       className={classNames(styles.homeWrapper, "scrollbar noMargin")}
@@ -235,11 +204,7 @@ export default function Home() {
             </Button>
           }
         />
-        <ContentItemsWrapper
-          contents={contents}
-          collections={collections}
-          small
-        />
+        <ContentItemsWrapper small />
       </div>
       <div className={styles.toolWrapper}>
         <PageTitle
@@ -252,7 +217,7 @@ export default function Home() {
             </Button>
           }
         />
-        <CollectionsWrapper collections={collections} small />
+        <CollectionsWrapper small />
       </div>
     </InnerWrapper>
   );

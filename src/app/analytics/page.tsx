@@ -8,7 +8,6 @@ import InputWrapper from "@/components/ui/input-wrapper/input-wrapper.component"
 import classNames from "classnames";
 import Information from "@/components/information/information.component";
 import Button from "@/components/ui/button/button.component";
-
 import {
   ArrowForwardRounded,
   ArrowBackRounded,
@@ -29,7 +28,7 @@ export default function AnalyticsPage() {
   const [role, setRole] = useState("");
   const [keywordSorting, setKeywordSorting] = useState("clicks");
   const [pagesSorting, setPagesSorting] = useState("clicks");
-  const { pagesData, webData, queryData } = useSharedContext();
+  const { pagesData, webData, queryData, currentUrl } = useSharedContext();
 
   useEffect(() => {
     const role = sessionStorage.getItem("role");
@@ -39,7 +38,6 @@ export default function AnalyticsPage() {
       }
     }
   }, [gotData.current]);
-
 
   useEffect(() => {
     if (pagesData && pagesData.length > 0) {
@@ -52,7 +50,7 @@ export default function AnalyticsPage() {
       showKeywords(sortKeywords(queryData));
     }
   }, [queryData, keywordsAmount, keywordSorting]);
-  
+
   function showPages(pages: any) {
     let array: any[] = [];
     for (let x = pagesAmount[0]; x < pagesAmount[1] && x < pages.length; x++) {
@@ -199,10 +197,10 @@ export default function AnalyticsPage() {
                       <div className={styles.row} key={page.keys[0]}>
                         <div className={classNames(styles.item, styles.page)}>
                           <Link href={page.keys[0]} target="_blank">
-                            {page.keys[0].replace(
-                              `https://onlineorigins.nl`,
-                              ""
-                            )}
+                            {page.keys[0]
+                              .replace(`https://`, "")
+                              .replace(`www.`, "")
+                              .replace(currentUrl, "")}
                           </Link>
                         </div>
                         <div className={classNames(styles.item, styles.clicks)}>

@@ -9,13 +9,13 @@
     }
 
     &.small {
-        &div[class^="collection-card_"]:last-of-type:not(:only-of-type){
+        div[class^="collection-card_"]:not(:nth-child(-n+2)){
             display: none;
         }
 
         @media (min-width: 2000px) {
-            div[class^="collection-card_"]:last-of-type{
-                display: flex;
+            div[class^="collection-card_"]{
+                display: flex !important;
             }
         }
     }

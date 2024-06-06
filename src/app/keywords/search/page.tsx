@@ -24,6 +24,7 @@ import Selector from "@/components/ui/selector/selector.component";
 import { useRouter } from "next/navigation";
 import CircularLoader from "@/components/circular-loader/circular-loader.component";
 import styles from "./page.module.scss";
+import { useSharedContext } from "@/context/SharedContext";
 
 export default function KeywordSearching() {
   const router = useRouter();
@@ -58,14 +59,14 @@ export default function KeywordSearching() {
   const isKeywordsGenerated = useRef(false);
   const [loading, setLoading] = useState(false);
   const [collectionsPopUpOpen, setCollectionsPopUpOpen] = useState(false);
-  const [collections, setCollections] = useState<{ collection_name: string }[]>(
-    []
-  );
+  const [collections, setCollections] = useState<string[]>([]);
   const [collectionToSave, setCollectionToSave] = useState("");
   const [newCollection, setNewCollection] = useState("");
   const [keywordAmount, setKeywordAmount] = useState([0, 15]);
   const [filterPopUpOpen, setFilterPopUpOpen] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
+  const { currentUrl } = useSharedContext();
+  const [currentDomain, setCurrentDomain] = useState();
 
   useEffect(() => {
     if (showAlert) {
@@ -103,16 +104,35 @@ export default function KeywordSearching() {
   }
 
   useEffect(() => {
-    getCollections();
-  }, []);
+    if (currentUrl) {
+      getCollections();
+    }
+  }, [currentUrl]);
 
   async function getCollections() {
-    const { data } = await supabase
-      .from("collections")
-      .select("collection_name");
+    const { data } = await supabase.from("collections").select();
     if (data) {
-      setCollections(data);
+      const { domains } = await getDomains();
+      if (domains) {
+        const currentDomainId = domains.find(
+          (domain: any) => domain.domain == currentUrl
+        );
+        setCurrentDomain(currentDomainId.id)
+        setCollections(
+          data
+            .filter((item: any) => item.domain == currentDomainId.id)
+            .map((item: any) => item.collection_name)
+        );
+      }
     }
+  }
+
+  async function getDomains() {
+    const { data } = await supabase.from("domains").select();
+    if (data) {
+      return { domains: data };
+    }
+    return { domains: [] };
   }
 
   // Generate keywords if the user filled in the subjects
@@ -384,6 +404,7 @@ export default function KeywordSearching() {
             keywords: selectedKeywords.map((keyword: any) => keyword.text),
             language: filters.language,
             country: filters.country,
+            domain: currentDomain
           },
         ]);
         if (error) {
@@ -403,7 +424,7 @@ export default function KeywordSearching() {
     } else {
       setCollections((prevState: any) => [
         ...prevState,
-        { collection_name: newCollection },
+        newCollection
       ]);
       setCollectionToSave(newCollection);
       setNewCollection("");
@@ -586,16 +607,14 @@ export default function KeywordSearching() {
           >
             <div>
               {collections.map((collection) => (
-                <div
-                  key={collection.collection_name}
-                  className={styles.collection}
-                >
+                <div key={collection} className={styles.collection}>
                   <Selector
+                    string
                     group={collectionToSave}
-                    item={collection.collection_name}
+                    item={collection}
                     selecting={(value: any) => setCollectionToSave(value)}
                   />
-                  <p>{collection.collection_name}</p>
+                  <p>{collection}</p>
                 </div>
               ))}
               <div className={styles.newCollectionInput}>
@@ -611,7 +630,9 @@ export default function KeywordSearching() {
                   value={newCollection}
                   onChange={(event) => setNewCollection(event.target.value)}
                 />
-                {showAlert && <p className="error">Name can&quot;t be empty!</p>}
+                {showAlert && (
+                  <p className="error">Name can&quot;t be empty!</p>
+                )}
               </div>
             </div>
           </PopUp>

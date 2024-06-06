@@ -25,6 +25,8 @@ export default function DomainStatistics() {
         ctr: collectAverage("ctr", webData) * 100,
         position: collectAverage("position", webData),
       });
+    } else {
+      setTotalAnalytics(null);
     }
   }, [webData]);
 
@@ -68,6 +70,6 @@ export default function DomainStatistics() {
       />
     </div>
   ) : (
-    <h5>Loading...</h5>
+    <h5>No analytics found.</h5>
   );
 }
