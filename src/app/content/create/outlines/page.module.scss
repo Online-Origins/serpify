@@ -86,7 +86,10 @@
                 background-color: $purple_50;
                 border: none;
                 font-size: 1rem;
-                width: 800px;
+                width: 500px;
+                @media (min-width: 2000px){
+                    width: 800px;
+                }
 
                 &:focus {
                     outline: none;

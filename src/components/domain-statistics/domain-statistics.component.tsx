@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import Statistic from "../statistic/statistic.component";
 import styles from "./domain-statistics.module.scss";
 import { formatNumber } from "@/app/utils/formatNumber/formatNumber";
+import { useSharedContext } from "@/context/SharedContext";
 
 type AnalyticsData = {
   clicks: number;
@@ -10,33 +11,24 @@ type AnalyticsData = {
   position: number;
 };
 
-export default function DomainStatistics({firstLoadData}: {firstLoadData?:any}) {
-  const [domainAnalytics, setDomainAnalytics] = useState<any[]>([]);
+export default function DomainStatistics() {
   const [totalAnalytics, setTotalAnalytics] = useState<AnalyticsData | null>(
     null
   );
-  const gotData = useRef(false);
+  const {webData} = useSharedContext();
 
   useEffect(() => {
-    const data = sessionStorage.getItem("webData");
-    if (!gotData.current && data && data.length > 0) {
-      setDomainAnalytics(JSON.parse(data));
-      gotData.current = true;
-    } else if (!gotData.current && firstLoadData && firstLoadData.length > 0){
-      setDomainAnalytics(firstLoadData)
-    }
-  });
-
-  useEffect(() => {
-    if (domainAnalytics.length > 0) {
+    if (webData && webData.length > 0) {
       setTotalAnalytics({
-        clicks: collectTotal("clicks", domainAnalytics),
-        impressions: collectTotal("impressions", domainAnalytics),
-        ctr: collectAverage("ctr", domainAnalytics) * 100,
-        position: collectAverage("position", domainAnalytics),
+        clicks: collectTotal("clicks", webData),
+        impressions: collectTotal("impressions", webData),
+        ctr: collectAverage("ctr", webData) * 100,
+        position: collectAverage("position", webData),
       });
+    } else {
+      setTotalAnalytics(null);
     }
-  }, [domainAnalytics]);
+  }, [webData]);
 
   function collectTotal(key: string, data: any[]) {
     let totalAmount = 0;
@@ -78,6 +70,6 @@ export default function DomainStatistics({firstLoadData}: {firstLoadData?:any}) 
       />
     </div>
   ) : (
-    <h5>Loading...</h5>
+    <h5>No analytics found.</h5>
   );
 }

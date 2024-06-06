@@ -27,7 +27,7 @@ const LineChart = ({ data, type }: { data: any; type: string }) => {
 
   useEffect(() => {
     const handleResize = () => {
-      setAspectRatio(window.innerWidth < 2000 ? 1.1 : 1.5);
+      setAspectRatio(window.innerWidth < 1800 ? 1.1 : 1.5);
     };
 
     handleResize();
@@ -51,8 +51,8 @@ const LineChart = ({ data, type }: { data: any; type: string }) => {
         data: selectedData,
         fill: false,
         borderColor: "#6210CC",
-        tension: 0.1,
-        pointBorderColor: "rgba(0,0,0,0)",
+        tension: 0.2,
+        pointBorderColor: "rgba(0,0,0,1)",
       },
     ],
   };

@@ -18,9 +18,11 @@ import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import languageCodes from "@/json/language-codes.json";
 import toneOfVoices from "@/json/tone-of-voice.json";
+import countryCodes from "@/json/country-codes.json";
 import InputWrapper from "@/components/ui/input-wrapper/input-wrapper.component";
 import CircularLoader from "@/components/circular-loader/circular-loader.component";
 import styles from "./page.module.scss";
+import { AddOutlined, SearchRounded } from "@mui/icons-material";
 
 export default function Collection({ params }: { params: { slug: string } }) {
   const activeCollection = params.slug;
@@ -37,15 +39,24 @@ export default function Collection({ params }: { params: { slug: string } }) {
   const [editPopUpOpen, setEditPopUpOpen] = useState(false);
   const [keywordAmount, setKeywordAmount] = useState([0, 20]);
   const [popUpOpen, setPopUpOpen] = useState(false);
-  const [chosenKeyword, setChosenKeyword] = useState("");
+  const [chosenFocusKeyword, setChosenFocusKeyword] = useState("");
   const [popUpStep, setPopUpStep] = useState(1);
-  const [keywordOptions, setKeywordOptions] = useState([]);
-  const [chosenKeywords, setChosenKeywords] = useState([]);
+  
+  const [chosenKeywords, setChosenFocusKeywords] = useState([]);
   const [chosenLanguage, setChosenLanguage] = useState(languageCodes[0].id);
   const [toneOfVoice, setToneOfVoice] = useState(toneOfVoices[0].id);
   const [targetAudience, setTargetAudience] = useState("");
   const [contentTitle, setcontentTitle] = useState("");
   const [generating, setGenerating] = useState(false);
+  const [moreFilters, setMoreFilters] = useState(false);
+  const [subjectsInput, setSubjectsInput] = useState("");
+  const [keywordsLanguage, setKeywordsLanguage] = useState(languageCodes[0].id);
+  const [keywordsCountry, setKeywordsCountry] = useState(countryCodes[0].id);
+  const [keywordLength, setKeywordLength] = useState(["shorttail", "longtail"]);
+  const [searchVolume, setSearchVolume] = useState<number[]>([0, 100]);
+  const [competition, setCompetition] = useState<number[]>([0, 100]);
+  const [potential, setPotential] = useState<number[]>([0, 100]);
+  const [addPopUpOpen, setAddPopUpOpen] = useState(false);
 
   useEffect(() => {
     if (!getSelectedCollectionRef.current && activeCollection != undefined) {
@@ -61,7 +72,7 @@ export default function Collection({ params }: { params: { slug: string } }) {
       .eq("id", activeCollection);
     if (data) {
       setSelectedCollection(data);
-      setChosenKeyword(data[0].keywords[0]);
+      setChosenFocusKeyword(data[0].keywords[0]);
     }
   }
 
@@ -132,12 +143,12 @@ export default function Collection({ params }: { params: { slug: string } }) {
 
     let array: string[] = [];
     updatedData.map((keyword: any) => {
-      array.push(keyword.text);
+      array.push(keyword);
     });
     setSelectedKeywords(array);
   }
 
-  function searchVolume(googleVolume: number) {
+  function searchVolumeString(googleVolume: number) {
     switch (true) {
       case googleVolume >= 10 && googleVolume < 100:
         return "10 - 100";
@@ -153,7 +164,7 @@ export default function Collection({ params }: { params: { slug: string } }) {
   }
 
   function potentialIndex(googleVolume: number, competition: number) {
-    const search = searchVolume(googleVolume);
+    const search = searchVolumeString(googleVolume);
 
     switch (true) {
       case search == "10 - 100":
@@ -267,7 +278,6 @@ export default function Collection({ params }: { params: { slug: string } }) {
   }
 
   async function createContent() {
-    console.log(selectedCollection[0].collection_name)
     const inserting = await supabase
       .from("contentItems")
       .insert([
@@ -280,7 +290,7 @@ export default function Collection({ params }: { params: { slug: string } }) {
           content_title: contentTitle,
           edited_on: currentDate(),
           status: "outlines",
-          keyword: chosenKeyword,
+          keyword: chosenFocusKeyword,
         },
       ])
       .select();
@@ -312,7 +322,7 @@ export default function Collection({ params }: { params: { slug: string } }) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          keyword: chosenKeyword,
+          keyword: chosenFocusKeyword,
           toneofvoice: toneOfVoicebyId?.value,
           language: language?.value,
         }),
@@ -324,6 +334,52 @@ export default function Collection({ params }: { params: { slug: string } }) {
     } catch (error: any) {
       alert("Something went wrong. Please try again");
       setGenerating(false);
+    }
+  }
+
+  const startSearching = () => {
+    const subjectArray = subjectsInput.split(", ");
+    const cleanArray = subjectArray.map((subject) =>
+      subject.replace(/[&\/\\#+()$~%.";:*?<>{}[\]]/g, "")
+    );
+    const uniqueCleanArray = Array.from(new Set(cleanArray));
+
+    try {
+      localStorage.setItem(
+        "filters",
+        JSON.stringify({
+          subjects: uniqueCleanArray,
+          language: keywordsLanguage,
+          country: keywordsCountry,
+          keywordLength: keywordLength,
+          volume: {
+            min: searchVolumeTranslate(searchVolume[0]),
+            max: searchVolumeTranslate(searchVolume[1]),
+          },
+          competition: { min: competition[0], max: competition[1] },
+          potential: { min: potential[0], max: potential[1] },
+        })
+      );
+      router.push("/keywords/search");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  function searchVolumeTranslate(filterValue: number) {
+    switch (true) {
+      case filterValue == 0:
+        return 10;
+      case filterValue == 25:
+        return 100;
+      case filterValue == 50:
+        return 1000;
+      case filterValue == 75:
+        return 10000;
+      case filterValue == 100:
+        return 100000;
+      default:
+        return 0;
     }
   }
 
@@ -344,10 +400,7 @@ export default function Collection({ params }: { params: { slug: string } }) {
                   <p>Delete</p>
                   <DeleteOutlineRoundedIcon />
                 </Button>
-                <Button
-                  type={"solid"}
-                  onClick={() => setPopUpOpen(true)}
-                >
+                <Button type={"solid"} onClick={() => setPopUpOpen(true)}>
                   <p>Create content</p>
                   <ArrowForwardRoundedIcon />
                 </Button>
@@ -362,7 +415,7 @@ export default function Collection({ params }: { params: { slug: string } }) {
                 setSorting={setSorting}
                 selectedKeywords={selectedKeywords}
                 setSelectedKeywords={setSelectedKeywords}
-                searchVolume={searchVolume}
+                searchVolume={searchVolumeString}
                 potentialIndex={potentialIndex}
               />
               <div className={styles.buttonWrapper}>
@@ -403,6 +456,10 @@ export default function Collection({ params }: { params: { slug: string } }) {
                       <ArrowForwardRoundedIcon />
                     </Button>
                   )}
+                  <Button type={"outline"} onClick={() => setAddPopUpOpen(true)}>
+                    <p>Add keywords</p>
+                    <AddOutlined />
+                  </Button>
                 </div>
               </div>
             </div>
@@ -490,10 +547,10 @@ export default function Collection({ params }: { params: { slug: string } }) {
                   type="dropdown"
                   title="Focus keyword:"
                   required={false}
-                  value={chosenKeyword}
+                  value={chosenFocusKeyword}
                   options={selectedCollection[0].keywords}
                   information="This will be the keyword your content is focused on."
-                  onChange={(value: any) => setChosenKeyword(value)}
+                  onChange={(value: any) => setChosenFocusKeyword(value)}
                   placeholder="Which collection do you want to use?"
                 />
                 <InputWrapper
@@ -501,11 +558,11 @@ export default function Collection({ params }: { params: { slug: string } }) {
                   title="Subkeywords to use:"
                   required={false}
                   options={selectedCollection[0].keywords.filter(
-                    (option: string) => option != chosenKeyword
+                    (option: string) => option != chosenFocusKeyword
                   )}
                   defValue={chosenKeywords}
                   information="Keywords that help by enhancing the relevance, reach, and effectiveness of your main keyword strategy."
-                  onChange={(value: any) => setChosenKeywords(value)}
+                  onChange={(value: any) => setChosenFocusKeywords(value)}
                   placeholder="Which collection do you want to use?"
                 />
               </div>
@@ -559,6 +616,179 @@ export default function Collection({ params }: { params: { slug: string } }) {
                 <CircularLoader />
               </div>
             )}
+          </PopUp>
+        </PopUpWrapper>
+      )}
+      {addPopUpOpen && (
+        <PopUpWrapper>
+          <PopUp
+            title={"Keyword research"}
+            titleButtons={
+              <Button type={"textOnly"} onClick={() => setAddPopUpOpen(false)}>
+                <p>Close</p>
+                <CloseRoundedIcon />
+              </Button>
+            }
+            buttons={
+              <Button
+                type={"solid"}
+                onClick={startSearching}
+                disabled={subjectsInput == ""}
+              >
+                <p>Start searching</p>
+                <SearchRounded />
+              </Button>
+            }
+          >
+            <InputWrapper
+              type="text"
+              title="Subjects:"
+              required={true}
+              onChange={(value: any) => setSubjectsInput(value)}
+              placeholder="For what subject do you want keywords?"
+            />
+            {moreFilters && (
+              <div className={styles.filters}>
+                <div className={styles.multiDropdown}>
+                  <InputWrapper
+                    type="autocomplete"
+                    title="Country:"
+                    required={false}
+                    value={keywordsCountry}
+                    options={countryCodes}
+                    onChange={(value: any) =>
+                      setKeywordsCountry(
+                        value != null ? value : countryCodes[0].id
+                      )
+                    }
+                    placeholder="Which country do you want to target?"
+                  />
+                  <InputWrapper
+                    type="autocomplete"
+                    title="Language:"
+                    required={false}
+                    value={keywordsLanguage}
+                    options={languageCodes}
+                    onChange={(value: any) =>
+                      setKeywordsLanguage(
+                        value != null ? value : languageCodes[0].id
+                      )
+                    }
+                    placeholder="In what language should the keywords be?"
+                  />
+                </div>
+                <InputWrapper
+                  type="multiSelect"
+                  title="Length of the keywords:"
+                  required={false}
+                  onChange={(value: any) =>
+                    value.length == 0
+                      ? alert("You need to select at least one")
+                      : setKeywordLength(value)
+                  }
+                  defValue={keywordLength}
+                  information="Short-tail keywords are broad, general, and popular terms with high search volume and competition. Longtail keywords are more specific, niche, and targeted multi-word terms with lower search volume and lower competition."
+                />
+                <InputWrapper
+                  type="slider"
+                  title="Search volume:"
+                  information="Search volume is the number of times, on average, that users enter a particular search query into a search engine each month."
+                  defValue={[0, 100]}
+                  onChange={(value: any) => setSearchVolume(value)}
+                  step={25}
+                  marks={[
+                    {
+                      value: 0,
+                      label: "10",
+                    },
+                    {
+                      value: 25,
+                      label: "100",
+                    },
+                    {
+                      value: 50,
+                      label: "1K",
+                    },
+                    {
+                      value: 75,
+                      label: "10K",
+                    },
+                    {
+                      value: 100,
+                      label: "100K",
+                    },
+                  ]}
+                />
+                <InputWrapper
+                  type="slider"
+                  title="Competition:"
+                  information="The degree of competition of the position for a keyword."
+                  defValue={[0, 100]}
+                  onChange={(value: any) => setCompetition(value)}
+                  step={25}
+                  marks={[
+                    {
+                      value: 0,
+                      label: "0",
+                    },
+                    {
+                      value: 25,
+                      label: "25",
+                    },
+                    {
+                      value: 50,
+                      label: "50",
+                    },
+                    {
+                      value: 75,
+                      label: "75",
+                    },
+                    {
+                      value: 100,
+                      label: "100",
+                    },
+                  ]}
+                />
+                <InputWrapper
+                  type="slider"
+                  title="Potential:"
+                  information="The ability of a particular keyword or key phrase to drive traffic, engagement, or conversions."
+                  defValue={[0, 100]}
+                  onChange={(value: any) => setPotential(value)}
+                  step={25}
+                  marks={[
+                    {
+                      value: 0,
+                      label: "0",
+                    },
+                    {
+                      value: 25,
+                      label: "25",
+                    },
+                    {
+                      value: 50,
+                      label: "50",
+                    },
+                    {
+                      value: 75,
+                      label: "75",
+                    },
+                    {
+                      value: 100,
+                      label: "100",
+                    },
+                  ]}
+                />
+              </div>
+            )}
+            <Button
+              type={"textOnly"}
+              onClick={() => setMoreFilters(!moreFilters)}
+            >
+              <p className={styles.underline}>
+                {moreFilters ? "Close filters" : "More filters"}
+              </p>
+            </Button>
           </PopUp>
         </PopUpWrapper>
       )}

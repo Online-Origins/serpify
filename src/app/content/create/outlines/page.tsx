@@ -520,7 +520,7 @@ export default function CreateOutlines() {
                 <AutoAwesomeIcon />
               </Button>
               <Button type={"solid"} onClick={() => nextContentStep()}>
-                <p>Next</p>
+                <p>Write content</p>
                 <ArrowForwardRounded />
               </Button>
             </div>

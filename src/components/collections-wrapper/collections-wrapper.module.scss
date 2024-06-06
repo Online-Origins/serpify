@@ -2,6 +2,7 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1.5rem;
+    padding-bottom: 1.5rem;
     overflow-x: hidden;
 
     @media (min-width: 2000px) {
@@ -9,13 +10,13 @@
     }
 
     &.small {
-        div[class^="collection-card_"]:last-of-type:not(:only-child){
+        div[class^="collection-card_"]:not(:nth-child(-n+2)){
             display: none;
         }
 
         @media (min-width: 2000px) {
-            div[class^="collection-card_"]:last-of-type{
-                display: flex;
+            div[class^="collection-card_"]{
+                display: flex !important;
             }
         }
     }

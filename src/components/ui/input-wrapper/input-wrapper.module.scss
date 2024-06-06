@@ -6,7 +6,7 @@
     flex-flow: column;
     gap: .5rem;
 
-    &.small{
+    &.small {
         width: max-content;
     }
 
@@ -47,48 +47,6 @@
         display: flex;
         gap: 1rem;
         align-items: center;
-    }
-
-    .valuesWrapper{
-        max-width: 400px;
-    }
-
-    .currentValues {
-        display: flex;
-        overflow-x: auto;
-        width: 100%;
-        gap: .5rem;
-        padding-bottom: .2rem;
-
-        &::-webkit-scrollbar {
-            height: .3rem;
-        }
-
-        &::-webkit-scrollbar-thumb {
-            background-color: $purple_primary;
-            border-radius: .5rem;
-        }
-
-        .value {
-                background-color: $purple_primary;
-                color: $white;
-                padding: .3rem;
-                height: max-content;
-                border-radius: .5rem;
-                display: flex;
-                align-items: center;
-                gap: .5rem;
-                text-wrap: nowrap;
-
-                p {
-                    font-size: .8rem;
-                }
-
-                svg {
-                    font-size: .8rem;
-                    margin-bottom: -.1rem;
-                }
-            }
     }
 
     input[type=text] {
@@ -142,7 +100,7 @@
             max-height: 15rem;
             overflow-x: hidden;
             overflow-y: scroll;
-            
+
             label {
                 cursor: pointer;
                 width: 100%;
@@ -182,6 +140,7 @@
         &.small {
             padding: 0;
         }
+
     }
 
     .autocomplete {

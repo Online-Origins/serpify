@@ -24,6 +24,7 @@ import Selector from "@/components/ui/selector/selector.component";
 import { useRouter } from "next/navigation";
 import CircularLoader from "@/components/circular-loader/circular-loader.component";
 import styles from "./page.module.scss";
+import { useSharedContext } from "@/context/SharedContext";
 
 export default function KeywordSearching() {
   const router = useRouter();
@@ -58,13 +59,22 @@ export default function KeywordSearching() {
   const isKeywordsGenerated = useRef(false);
   const [loading, setLoading] = useState(false);
   const [collectionsPopUpOpen, setCollectionsPopUpOpen] = useState(false);
-  const [collections, setCollections] = useState<{ collection_name: string }[]>(
-    []
-  );
+  const [collections, setCollections] = useState<string[]>([]);
   const [collectionToSave, setCollectionToSave] = useState("");
   const [newCollection, setNewCollection] = useState("");
-  const [keywordAmount, setKeywordAmount] = useState([0, 20]);
+  const [keywordAmount, setKeywordAmount] = useState([0, 15]);
   const [filterPopUpOpen, setFilterPopUpOpen] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const { currentUrl } = useSharedContext();
+  const [currentDomain, setCurrentDomain] = useState();
+
+  useEffect(() => {
+    if (showAlert) {
+      if (newCollection != "") {
+        setShowAlert(false);
+      }
+    }
+  }, [showAlert, newCollection]);
 
   useEffect(() => {
     if (!getFiltersRef.current) {
@@ -94,16 +104,35 @@ export default function KeywordSearching() {
   }
 
   useEffect(() => {
-    getCollections();
-  }, []);
+    if (currentUrl) {
+      getCollections();
+    }
+  }, [currentUrl]);
 
   async function getCollections() {
-    const { data } = await supabase
-      .from("collections")
-      .select("collection_name");
+    const { data } = await supabase.from("collections").select();
     if (data) {
-      setCollections(data);
+      const { domains } = await getDomains();
+      if (domains) {
+        const currentDomainId = domains.find(
+          (domain: any) => domain.domain == currentUrl
+        );
+        setCurrentDomain(currentDomainId.id)
+        setCollections(
+          data
+            .filter((item: any) => item.domain == currentDomainId.id)
+            .map((item: any) => item.collection_name)
+        );
+      }
     }
+  }
+
+  async function getDomains() {
+    const { data } = await supabase.from("domains").select();
+    if (data) {
+      return { domains: data };
+    }
+    return { domains: [] };
   }
 
   // Generate keywords if the user filled in the subjects
@@ -112,7 +141,7 @@ export default function KeywordSearching() {
       generateKeywords();
       isKeywordsGenerated.current = true;
     }
-  }, [filters.subjects, generateKeywords]);
+  }, [filters.subjects]);
 
   // Generate keywords
   async function generateKeywords() {
@@ -187,7 +216,9 @@ export default function KeywordSearching() {
       const filterWithUserValue = keywordsWithRenamedMetrics.filter(
         (keyword: any) =>
           keyword.keywordMetrics.avgMonthlySearches >= filters.volume.min &&
-          keyword.keywordMetrics.avgMonthlySearches <= filters.volume.max &&
+          (filters.volume.max != 100000
+            ? keyword.keywordMetrics.avgMonthlySearches <= filters.volume.max
+            : true) &&
           keyword.keywordMetrics.competitionIndex >= filters.competition.min &&
           keyword.keywordMetrics.competitionIndex <= filters.competition.max &&
           keyword.keywordMetrics.potential >= filters.potential.min &&
@@ -212,8 +243,8 @@ export default function KeywordSearching() {
       setGeneratedKeywords(filterkeywordLength);
       setLoading(false);
     } catch (error: any) {
-      alert("Something went wrong. Please try again");
       isKeywordsGenerated.current = false;
+      throw error;
     }
   }
 
@@ -255,7 +286,7 @@ export default function KeywordSearching() {
 
   // Sort the keywords on the sorting type
   function sortKeywords(array: any) {
-    setKeywordAmount([0, 20]);
+    setKeywordAmount([0, 15]);
     if (sorting == "potential") {
       return array.sort(
         (a: any, b: any) =>
@@ -295,7 +326,7 @@ export default function KeywordSearching() {
         return "100 - 1K";
       case googleVolume >= 1000 && googleVolume < 10000:
         return "1K - 10K";
-      case googleVolume >= 10000 && googleVolume < 100000:
+      case googleVolume >= 10000:
         return "10K - 100K";
       default:
         return googleVolume;
@@ -333,7 +364,7 @@ export default function KeywordSearching() {
         subjects: [...prevState.subjects, ...cleanArray],
       }));
       setSubjectInput("");
-      setKeywordAmount([0, 20]);
+      setKeywordAmount([0, 15]);
       isKeywordsGenerated.current = false;
     }
   }
@@ -347,7 +378,9 @@ export default function KeywordSearching() {
     if (data != undefined) {
       if (data?.length > 0) {
         // Merge the existing with the new keywords
-        const combinedArray = selectedKeywords.concat(data[0].keywords);
+        const combinedArray = selectedKeywords
+          .map((keyword: any) => keyword.text)
+          .concat(data[0].keywords);
         const uniqueArray = Array.from(new Set(combinedArray));
 
         const { error } = await supabase
@@ -361,12 +394,17 @@ export default function KeywordSearching() {
           router.push("/keywords");
         }
       } else {
+        selectedKeywords.sort(
+          (a: any, b: any) =>
+            b.keywordMetrics.potential - a.keywordMetrics.potential
+        );
         const { error } = await supabase.from("collections").insert([
           {
             collection_name: collectionToSave,
-            keywords: selectedKeywords,
+            keywords: selectedKeywords.map((keyword: any) => keyword.text),
             language: filters.language,
             country: filters.country,
+            domain: currentDomain
           },
         ]);
         if (error) {
@@ -381,12 +419,16 @@ export default function KeywordSearching() {
 
   // Add a new collection to the list of collections when an user creates a new one
   function addNewCollection() {
-    setCollections((prevState: any) => [
-      ...prevState,
-      { collection_name: newCollection },
-    ]);
-    setCollectionToSave(newCollection);
-    setNewCollection("");
+    if (newCollection == "") {
+      setShowAlert(true);
+    } else {
+      setCollections((prevState: any) => [
+        ...prevState,
+        newCollection
+      ]);
+      setCollectionToSave(newCollection);
+      setNewCollection("");
+    }
   }
 
   // Update the subject filters when the user deletes a subject
@@ -445,32 +487,44 @@ export default function KeywordSearching() {
   return (
     <InnerWrapper>
       <PageTitle title={"Search keywords"} goBack={() => router.back()} />
-      <div className={styles.filterWrapper}>
-        <div className={styles.inputWrapping}>
-          <InputWrapper
-            type="text"
-            value={subjectInput}
-            onChange={(value: any) => setSubjectInput(value)}
-            className={styles.filterInput}
-            currentValues={filters.subjects}
-            changeCurrentValues={(value: string) => updateSubjectFilters(value)}
-            onKeyDown={(e: any) => {
-              if (e.key == "Enter" && subjectInput != "") {
-                addNewSubjects();
+      <div className={styles.topWrapper}>
+        <div className={styles.filterWrapper}>
+          <div className={styles.inputWrapping}>
+            <InputWrapper
+              type="text"
+              value={subjectInput}
+              onChange={(value: any) => setSubjectInput(value)}
+              className={styles.filterInput}
+              onKeyDown={(e: any) => {
+                if (e.key == "Enter" && subjectInput != "") {
+                  addNewSubjects();
+                }
+              }}
+              placeholder="Search more subjects..."
+              icon={
+                <div onClick={() => addNewSubjects()}>
+                  <SearchRoundedIcon />
+                </div>
               }
-            }}
-            placeholder="Search more subjects..."
-            icon={
-              <div onClick={() => addNewSubjects()}>
-                <SearchRoundedIcon />
-              </div>
-            }
-          />
+            />
+          </div>
+          <Button type={"solid"} onClick={() => setFilterPopUpOpen(true)}>
+            <p>Filter</p>
+            <TuneRoundedIcon />
+          </Button>
         </div>
-        <Button type={"solid"} onClick={() => setFilterPopUpOpen(true)}>
-          <p>Filter</p>
-          <TuneRoundedIcon />
-        </Button>
+        <div className={styles.subjects}>
+          <h5>Subjects:</h5>
+          {filters.subjects &&
+            filters.subjects.map((value: string) => (
+              <div key={value} className={styles.value}>
+                <p>{value}</p>
+                <div onClick={() => updateSubjectFilters(value)}>
+                  <CloseRoundedIcon />
+                </div>
+              </div>
+            ))}
+        </div>
       </div>
       {!loading ? (
         <div className={styles.outerTableWrapper}>
@@ -498,8 +552,8 @@ export default function KeywordSearching() {
                   type={"textOnly"}
                   onClick={() =>
                     setKeywordAmount([
-                      keywordAmount[0] - 20,
-                      keywordAmount[1] - 20,
+                      keywordAmount[0] - 15,
+                      keywordAmount[1] - 15,
                     ])
                   }
                 >
@@ -511,7 +565,7 @@ export default function KeywordSearching() {
                 <Button
                   type={"textOnly"}
                   onClick={() =>
-                    setKeywordAmount([keywordAmount[1], keywordAmount[1] + 20])
+                    setKeywordAmount([keywordAmount[1], keywordAmount[1] + 15])
                   }
                 >
                   <p>Next</p>
@@ -553,16 +607,14 @@ export default function KeywordSearching() {
           >
             <div>
               {collections.map((collection) => (
-                <div
-                  key={collection.collection_name}
-                  className={styles.collection}
-                >
+                <div key={collection} className={styles.collection}>
                   <Selector
+                    string
                     group={collectionToSave}
-                    item={collection.collection_name}
+                    item={collection}
                     selecting={(value: any) => setCollectionToSave(value)}
                   />
-                  <p>{collection.collection_name}</p>
+                  <p>{collection}</p>
                 </div>
               ))}
               <div className={styles.newCollectionInput}>
@@ -578,6 +630,9 @@ export default function KeywordSearching() {
                   value={newCollection}
                   onChange={(event) => setNewCollection(event.target.value)}
                 />
+                {showAlert && (
+                  <p className="error">Name can&quot;t be empty!</p>
+                )}
               </div>
             </div>
           </PopUp>

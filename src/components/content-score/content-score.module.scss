@@ -1,12 +1,20 @@
 @import '@/styles/variables';
 
 .contentScore {
-    width: 350px;
+    width: 240px;
     padding-top: 1rem;
     display: flex;
     flex-flow: column;
     height: calc(100% - 1rem);
     overflow: hidden;
+
+    @media (min-width: 1325px){
+        width: 300px;
+    }
+
+    @media (min-width: 1700px){
+        width: 350px;
+    }
 
     .analysis {
         display: flex;
@@ -92,7 +100,7 @@
                 p {
                     display: flex;
                     gap: .5rem;
-                    padding: .5rem 0;
+                    padding: .25rem 0;
 
                     svg {
                         font-size: .8rem;
@@ -128,7 +136,7 @@
 
                 .pointWrapper{
                     opacity: 1;
-                    max-height: 2.5rem;
+                    max-height: 5rem;
                 }
             }
         }

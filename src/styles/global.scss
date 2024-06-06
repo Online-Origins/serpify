@@ -77,11 +77,16 @@ a {
 }
 
 .MuiInputBase-root {
-
     &::before,
     &::after {
         display: none;
     }
+}
+
+.MuiInput-input{
+    display: flex;
+    align-items: center;
+    gap: .5rem;
 }
 
 .Mui-selected,
@@ -91,9 +96,17 @@ a {
 }
 
 .MuiMenuItem-root {
+    padding: .5rem;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
     &:hover {
         background-color: $purple_50 !important;
     }
+}
+
+.Mui-disabled{
+    cursor: not-allowed !important;
 }
 
 .scrollbar {
@@ -197,4 +210,9 @@ div[id^="tippy-"] {
 
 .css-1s5lphu-MuiPopper-root-MuiAutocomplete-popper{
     z-index: 2000 !important;
+}
+
+.error{
+    color: $red;
+    text-wrap: nowrap;
 }

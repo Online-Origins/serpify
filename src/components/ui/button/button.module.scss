@@ -54,7 +54,7 @@
     }
 
     &.disabled {
-        pointer-events: none;
         opacity: .1;
+        cursor: not-allowed !important;
     }
 }

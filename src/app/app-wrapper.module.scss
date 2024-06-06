@@ -10,24 +10,29 @@
 
     .innerWrapper {
         padding-top: 1rem;
-        min-width: 1100px;
-        width: 1100px;
+        min-width: 1050px;
+        width: 1050px;
         transition-delay: .2s;
         margin-bottom: 1rem;
+        
+        @media (min-width: 1450px){
+            min-width: 1100px;
+            width: 1100px;
+        }
 
-        @media (min-width: 2000px) {
+        @media (min-width: 1800px) {
             min-width: 1450px;
             width: 1450px;
         }
     }
 
-    @media (max-width: 1300px) {
+    @media (max-width: 1230px) {
         justify-content: start;
     }
 
 
     &.smallerWrapper {
-        @media (max-width: 1550px) {
+        @media (max-width: 1450px) {
             justify-content: start;
         }
 
@@ -39,20 +44,29 @@
     &.small {
         overflow-y: hidden;
 
-        @media (max-width: 1680px) {
-            justify-content: start;
+        @media (max-width: 1250px) {
+            justify-content: start !important;
         }
 
         .innerWrapper {
             height: calc(100% - 2rem);
+            min-width: 780px;
+            width: 780px;
 
-            // min-width: 1200px;
-            // width: 1200px;
+            @media (min-width: 1300px){
+                min-width: 100%;
+                width: 100%;
+            }
 
-            // @media (min-width: 2000px) {
-            //     min-width: 1450px;
-            //     width: 1450px;
-            // }
+            @media (min-width: 1700px) {
+                min-width: 1100px;
+                width: 1100px;
+            }            
+
+            @media (min-width: 2000px) {
+                min-width: 1300px;
+                width: 1300px;
+            }
         }
     }
 }

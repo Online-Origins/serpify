@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/app/utils/supabaseClient/server";
 import { useRouter } from "next/navigation";
+import { useSharedContext } from "@/context/SharedContext";
 
 import PageTitle from "@/components/page-title/page-title.component";
 import InnerWrapper from "@/components/inner-wrapper/inner-wrapper.component";
@@ -37,6 +38,8 @@ export default function ContentOverview() {
   const [contentTitle, setcontentTitle] = useState("");
   const [generating, setGenerating] = useState(false);
   const router = useRouter();
+  const { currentUrl } = useSharedContext();
+  const [currentDomain, setCurrentDomain] = useState();
 
   useEffect(() => {
     if (!getContentsRef.current) {
@@ -58,7 +61,7 @@ export default function ContentOverview() {
     );
     if (filtered.length > 0) {
       setKeywordOptions(filtered[0].keywords);
-      setChosenKeyword(filtered[0].keywords[0])
+      setChosenKeyword(filtered[0].keywords[0]);
     }
   }, [chosenCollection]);
 
@@ -76,12 +79,28 @@ export default function ContentOverview() {
   async function getCollections() {
     const { data } = await supabase.from("collections").select();
     if (data) {
-      const collectionsUpdatedKey = data.map((collection) => ({
-        ...collection,
-        value: collection.collection_name,
-      }));
-      setCollections(collectionsUpdatedKey);
+      const { domains } = await getDomains();
+      if (domains) {
+        const currentDomainId = domains.find(
+          (domain: any) => domain.domain == currentUrl
+        );
+        setCurrentDomain(currentDomainId.id);
+        const filteredCollections = data.filter((item: any) => item.domain == currentDomainId.id)
+          const collectionsUpdatedKey = filteredCollections.map((collection) => ({
+            ...collection,
+            value: collection.collection_name,
+          }));
+          setCollections(collectionsUpdatedKey);
+        }    
+      }
+  }
+
+  async function getDomains() {
+    const { data } = await supabase.from("domains").select();
+    if (data) {
+      return { domains: data };
     }
+    return { domains: [] };
   }
 
   async function generateTitle() {
@@ -136,7 +155,8 @@ export default function ContentOverview() {
           content_title: contentTitle,
           edited_on: currentDate(),
           status: "outlines",
-          keyword: chosenKeyword
+          keyword: chosenKeyword,
+          domain: currentDomain
         },
       ])
       .select();
@@ -164,12 +184,10 @@ export default function ContentOverview() {
             <p>Create new content</p> <AddRoundedIcon />
           </Button>
         }
+        information="
+        Creating SEO content involves integrating targeted keywords, producing high-quality, relevant material, and optimizing structure to enhance visibility and engagement, ultimately boosting search engine rankings and user experience."
       />
-      {getContentsRef.current ? (
-        <ContentItemsWrapper contents={contents} collections={collections} />
-      ) : (
-        <h5>Loading...</h5>
-      )}
+      {getContentsRef.current ? <ContentItemsWrapper /> : <h5>Loading...</h5>}
       {popUpOpen && (
         <PopUpWrapper>
           <PopUp
@@ -228,7 +246,9 @@ export default function ContentOverview() {
                   type="vertMultiSelect"
                   title="Subkeywords to use:"
                   required={false}
-                  options={keywordOptions.filter((option) => option != chosenKeyword)}
+                  options={keywordOptions.filter(
+                    (option) => option != chosenKeyword
+                  )}
                   defValue={chosenKeywords}
                   information="Keywords that help by enhancing the relevance, reach, and effectiveness of your main keyword strategy."
                   onChange={(value: any) => setChosenKeywords(value)}

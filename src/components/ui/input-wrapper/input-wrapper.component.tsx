@@ -18,7 +18,6 @@ export default function InputWrapper({
   required,
   onChange,
   className,
-  currentValues,
   icon,
   value,
   type,
@@ -27,17 +26,17 @@ export default function InputWrapper({
   placeholder,
   options,
   generateTitle,
-  changeCurrentValues,
   onKeyDown,
   step,
   marks,
-  small
+  small,
+  domainDropdown,
+  disabled
 }: {
   title?: string;
   required?: boolean;
   onChange: any;
   className?: any;
-  currentValues?: any;
   icon?: React.ReactNode;
   value?: any;
   type: string;
@@ -46,11 +45,12 @@ export default function InputWrapper({
   placeholder?: string;
   options?: any;
   generateTitle?: any;
-  changeCurrentValues?: any;
   onKeyDown?: any;
   step?: number;
   marks?: any;
   small?: boolean;
+  domainDropdown?: boolean;
+  disabled?: boolean;
 }) {
   const handleChange = (value: string) => {
     if (defValue.includes(value)) {
@@ -67,20 +67,6 @@ export default function InputWrapper({
       case type == "text":
         return (
           <div className={styles.inputWrapper}>
-            {currentValues && (
-              <div className={styles.valuesWrapper}>
-                <div className={styles.currentValues}>
-                  {currentValues.map((value: string) => (
-                    <div key={value} className={styles.value}>
-                      <p>{value}</p>
-                      <div onClick={() => changeCurrentValues(value)}>
-                        <CloseRoundedIcon />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
             <input
               type="text"
               value={value}
@@ -134,12 +120,19 @@ export default function InputWrapper({
             onChange={(event) => onChange(event.target.value)}
             className={styles.dropdown}
             variant="standard"
+            disabled={disabled}
           >
             {options.map((option: any) => (
               <MenuItem
                 key={option.id ? option.id : option}
                 value={option.id ? option.id : option}
+                className={styles.menuItem}
               >
+                {domainDropdown && (
+                  <img
+                    src={`http://www.google.com/s2/favicons?domain=https://${option}`}
+                  />
+                )}
                 {option.value ? option.value : option}
               </MenuItem>
             ))}
@@ -225,7 +218,9 @@ export default function InputWrapper({
   };
 
   return (
-    <div className={classNames(styles.wrapper, className, small && styles.small)}>
+    <div
+      className={classNames(styles.wrapper, className, small && styles.small)}
+    >
       {title && (
         <div className={styles.titleWrapper}>
           <h4>

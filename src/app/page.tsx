@@ -8,29 +8,18 @@ import { useEffect, useRef, useState } from "react";
 import { supabase } from "./utils/supabaseClient/server";
 import CollectionsWrapper from "@/components/collections-wrapper/collections-wrapper.component";
 import classNames from "classnames";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import styles from "./page.module.scss";
 import DomainStatistics from "@/components/domain-statistics/domain-statistics.component";
-
-const websiteUrl = "onlineorigins.nl";
+import { useSharedContext } from "@/context/SharedContext";
 
 export default function Home() {
   const loadingRef = useRef(true);
-  const [collections, setCollections] = useState<any[]>([]);
-  const [contents, setContents] = useState<any[]>([]);
   const router = useRouter();
   const gottenData = useRef(false);
-  const [webData, setWebData] = useState([]);
   const [role, setRole] = useState("");
-
-  useEffect(() => {
-    if (!gottenData.current) {
-      const sessionWebData = sessionStorage.getItem("webData");
-      if (sessionWebData) {
-        gottenData.current = true;
-      }
-    }
-  });
+  const gotSearchConsoleData = useRef(false);
+  const { currentUrl, setWebData, setPagesData, setQueryData } = useSharedContext();
 
   useEffect(() => {
     const authorizationCode = getAuthorizationCode();
@@ -40,25 +29,22 @@ export default function Home() {
       if (loadingRef.current) {
         router.push("/login");
       }
-    } else if (authorizationCode && !gottenData.current){
-      if (loadingRef.current){
-        handleExecute(authorizationCode);
+    } else if (
+      authorizationCode &&
+      !gottenData.current &&
+      currentUrl &&
+      currentUrl != ""
+    ) {
+      if (loadingRef.current) {
+        handleExecute(authorizationCode, currentUrl);
         sessionStorage.setItem("role", "user");
-        loadingRef.current = false;
       }
-    } else if(!authorizationCode && gottenData.current || role == "guest"){
-      if (loadingRef.current){
-        if (role){
-          setRole(role);
-        }
-        getCollections();
-        getContents();
-        loadingRef.current = false;
-      }
+    } else if (role && role == "guest") {
+      setRole(role);
     }
-  }, [loadingRef.current, gottenData.current]);
+  }, [currentUrl, loadingRef.current, gottenData.current]);
 
-  async function handleExecute(authorizationCode: any) {
+  async function handleExecute(authorizationCode: any, websiteUrl: string) {
     try {
       const tokenResponse = await fetch("/api/exchangeCode", {
         method: "POST",
@@ -67,50 +53,81 @@ export default function Home() {
         },
         body: JSON.stringify({ code: authorizationCode }),
       });
-      const { accessToken, entries } = await tokenResponse.json();
+      const { accessToken, entries, refreshToken } = await tokenResponse.json();
 
-      let correctUrl = [""];
+      sessionStorage.setItem("accessToken", accessToken);
+      sessionStorage.setItem("refreshToken", refreshToken);
+      sessionStorage.setItem("entries", JSON.stringify(entries));
+
+      gettingData(websiteUrl, accessToken, entries);
+      gottenData.current = true;
+      router.push("/");
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  function gettingData(
+    websiteUrl: string,
+    accessToken?: string,
+    passedEntries?: any
+  ) {
+    const pageDomains = JSON.parse(sessionStorage.getItem("entries") || "");
+    const userAccessToken = sessionStorage.getItem("accessToken");
+    if (
+      (pageDomains != "" || passedEntries) &&
+      (userAccessToken != "" || accessToken)
+    ) {
+      const currentToken = userAccessToken || accessToken || "";
+      const entries = pageDomains || passedEntries || [""];
+      let correctUrl = [];
       if (entries) {
         correctUrl = entries
           .filter((item: any) => item.siteUrl.includes(websiteUrl))
           .map((item: any) => item.siteUrl);
       }
-
+      if (correctUrl.length == 0) {
+        alert("The chosen domain isn't activated in your Search console.");
+        return;
+      }
       const today = new Date();
-      const startDate = new Date(today.getFullYear(), today.getMonth() - 1, 0);
-      const endDate = new Date(today.getFullYear(), today.getMonth(), 1);
-
+      const startDate = new Date(
+        today.getFullYear(),
+        today.getMonth() - 1,
+        today.getDate()
+      );
+      const endDate = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate()
+      );
       fetchData(
-        accessToken,
-        correctUrl[0],
+        currentToken,
+        correctUrl,
         startDate,
         endDate,
         "date",
-        "webData"
+        "webData",
+        setWebData
       );
       fetchData(
-        accessToken,
-        correctUrl[0],
+        currentToken,
+        correctUrl,
         startDate,
         endDate,
         "page",
-        "pagesData"
+        "pagesData",
+        setPagesData
       );
       fetchData(
-        accessToken,
-        correctUrl[0],
+        currentToken,
+        correctUrl,
         startDate,
         endDate,
         "query",
-        "queryData"
+        "queryData",
+        setQueryData
       );
-
-      sessionStorage.removeItem("authorizationCode");
-      router.push("/")
-      loadingRef.current = true;
-      gottenData.current = true;
-    } catch (error) {
-      console.error(error);
     }
   }
 
@@ -120,8 +137,10 @@ export default function Home() {
     startDate: any,
     endDate: any,
     dimension: string,
-    storageType: string
+    storageType: string,
+    saveData: (data: any) => void
   ) {
+    const refreshToken = sessionStorage.getItem("refreshToken");
     try {
       const response = await fetch("/api/domainData", {
         method: "POST",
@@ -134,14 +153,14 @@ export default function Home() {
           startDate: startDate.toISOString().split("T")[0],
           endDate: endDate.toISOString().split("T")[0],
           dimension: [dimension],
+          refreshToken: refreshToken,
         }),
       });
 
       const data = await response.json();
-      sessionStorage.setItem(storageType, JSON.stringify(data.rows));
-      if (storageType == "webData") {
-        setWebData(data.rows);
-      }
+      saveData(data.rows);
+      sessionStorage.setItem(storageType, JSON.stringify(data.rows)); // Store as back-up for when user refresh
+      gotSearchConsoleData.current = true;
     } catch (error) {
       console.error("Error fetching search console data", error);
     }
@@ -153,26 +172,10 @@ export default function Home() {
     return new URL(url).searchParams.get("code");
   };
 
-  async function getContents() {
-    const { data } = await supabase.from("contentItems").select();
-    if (data) {
-      data.sort(
-        (a, b) =>
-          new Date(b.edited_on).getTime() - new Date(a.edited_on).getTime()
-      );
-      setContents(data);
-    }
-  }
-
-  async function getCollections() {
-    const { data } = await supabase.from("collections").select();
-    if (data) {
-      setCollections(data);
-    }
-  }
-
   return (
-    <InnerWrapper className={classNames(styles.homeWrapper, "scrollbar noMargin")}>
+    <InnerWrapper
+      className={classNames(styles.homeWrapper, "scrollbar noMargin")}
+    >
       <h1>Welcome!</h1>
       <div className={styles.toolWrapper}>
         <PageTitle
@@ -186,7 +189,11 @@ export default function Home() {
             </Button>
           }
         />
-        {role != "guest" ? <DomainStatistics firstLoadData={webData} /> : <h5>You need to log in with Google for this feature</h5>}
+        {role != "guest" ? (
+          <DomainStatistics />
+        ) : (
+          <h5>You need to log in with Google for this feature</h5>
+        )}
       </div>
       <div className={styles.toolWrapper}>
         <PageTitle
@@ -199,15 +206,7 @@ export default function Home() {
             </Button>
           }
         />
-        {!loadingRef.current ? (
-          <ContentItemsWrapper
-            contents={contents}
-            collections={collections}
-            small
-          />
-        ) : (
-          <h5>Loading...</h5>
-        )}
+        <ContentItemsWrapper small />
       </div>
       <div className={styles.toolWrapper}>
         <PageTitle
@@ -220,11 +219,7 @@ export default function Home() {
             </Button>
           }
         />
-        {!loadingRef.current ? (
-          <CollectionsWrapper collections={collections} small />
-        ) : (
-          <h5>Loading...</h5>
-        )}
+        <CollectionsWrapper small />
       </div>
     </InnerWrapper>
   );
