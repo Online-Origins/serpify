@@ -91,7 +91,7 @@ export default function ContentItemsWrapper({ small }: { small?: boolean }) {
 
   return (
     <div
-      className={classNames(styles.pageWrapper, !small && styles.bottomExtend)}
+      className={classNames(styles.pageWrapper, "scrollbar", !small && styles.bottomExtend)}
     >
       <div className={styles.topRowWrapper}>
         <div className={styles.wrappingInput}>
