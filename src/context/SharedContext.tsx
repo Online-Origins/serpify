@@ -27,7 +27,7 @@ export const SharedProvider = ({ children }: { children: ReactNode }) => {
   const [webData, setWebData] = useState();
   const [pagesData, setPagesData] = useState();
   const [queryData, setQueryData] = useState();
-  const [availableDomains, setAvailableDomains] = useState();
+  const [availableDomains, setAvailableDomains] = useState<any[]>([]);
 
   return (
     <SharedContext.Provider
