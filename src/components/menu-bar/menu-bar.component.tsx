@@ -24,7 +24,6 @@ export default function MenuBar({
   smallNav: boolean;
 }) {
   const pathname = usePathname();
-  const [domains, setDomains] = useState<string[]>([]);
   const [currentDomain, setCurrentDomain] = useState<any>("");
   const loadedDomains = useRef(false);
   const {
@@ -36,8 +35,10 @@ export default function MenuBar({
     setPagesData,
     queryData,
     setQueryData,
+    availableDomains,
+    setAvailableDomains
   } = useSharedContext();
-
+  const [domains, setDomains] = useState<string[]>([]);
 
   useEffect(() => {
     const sessionWebData = sessionStorage.getItem("webData");
@@ -161,7 +162,7 @@ export default function MenuBar({
           startDate: startDate.toISOString().split("T")[0],
           endDate: endDate.toISOString().split("T")[0],
           dimension: [dimension],
-          refreshToken: refreshToken
+          refreshToken: refreshToken,
         }),
       });
 
@@ -179,12 +180,24 @@ export default function MenuBar({
     }
   }, [loadedDomains.current]);
 
+  useEffect(() => {
+    if (currentUrl && !availableDomains.includes(currentUrl)){
+      setCurrentDomain(availableDomains[0]);
+    } else if (availableDomains.length > domains.length){
+      setCurrentDomain(availableDomains[availableDomains.length - 1])
+      setDomains(availableDomains)
+    }
+  }, [availableDomains])
+
+
   async function getDomains() {
     const { data } = await supabase.from("domains").select();
     if (data) {
-      setDomains(data.map((domain: any) => domain.domain));
-      setCurrentDomain(data[0].domain);
-      setCurrentUrl(data[0].domain);
+      const sorted = data.sort((a:any, b:any) =>  a.id - b.id);
+      setAvailableDomains(sorted.map((domain: any) => domain.domain));
+      setDomains(sorted.map((domain: any) => domain.domain));
+      setCurrentDomain(sorted[0].domain);
+      setCurrentUrl(sorted[0].domain);
     }
   }
 
@@ -209,10 +222,16 @@ export default function MenuBar({
             small
             value={currentDomain}
             onChange={(value: any) => setCurrentDomain(value)}
-            options={domains}
+            options={availableDomains}
             className={styles.dropdown}
             domainDropdown
-            disabled={pathname != "/" && pathname != "/keywords" && pathname != "/content" && pathname != "/analytics"}
+            disabled={
+              pathname != "/" &&
+              pathname != "/keywords" &&
+              pathname != "/content" &&
+              pathname != "/analytics" &&
+              pathname != "/settings"
+            }
           />
         </div>
         <div className={styles.mainMenu}>
@@ -265,11 +284,14 @@ export default function MenuBar({
               <h4>Close menu</h4>
             </a>
           </li>
-          <li className={pathname == "/settings" ? styles.active : ""}>
-            <a>
+          <li>
+            <Link
+              className={pathname == "/settings" ? styles.active : ""}
+              href="/settings"
+            >
               <SettingsOutlinedIcon />
               <h4>Settings</h4>
-            </a>
+            </Link>
           </li>
         </ul>
       </div>
