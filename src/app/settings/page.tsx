@@ -140,11 +140,11 @@ export default function ProjectSettings() {
         title={"Project management"}
         goBack={() => router.back()}
         buttons={[
-          <Button type={"outline"} onClick={() => deleteProject()}>
+          <Button key={0} type={"outline"} onClick={() => deleteProject()}>
             <p>Delete</p>
             <DeleteOutline />
           </Button>,
-          <Button type={"solid"} onClick={() => setPopUpOpen(true)}>
+          <Button key={1} type={"solid"} onClick={() => setPopUpOpen(true)}>
             <p>Create project</p>
             <AddOutlined />
           </Button>,
