@@ -19,7 +19,8 @@ export default function Home() {
   const gottenData = useRef(false);
   const [role, setRole] = useState("");
   const gotSearchConsoleData = useRef(false);
-  const { currentUrl, setWebData, setPagesData, setQueryData } = useSharedContext();
+  const { currentUrl, setWebData, setPagesData, setQueryData } =
+    useSharedContext();
 
   useEffect(() => {
     const authorizationCode = getAuthorizationCode();
@@ -37,9 +38,8 @@ export default function Home() {
     ) {
       if (loadingRef.current) {
         handleExecute(authorizationCode, currentUrl);
-        sessionStorage.setItem("role", "user");
       }
-    } else if (role && role == "guest") {
+    } else if (role) {
       setRole(role);
     }
   }, [currentUrl, loadingRef.current, gottenData.current]);
@@ -63,7 +63,9 @@ export default function Home() {
       gottenData.current = true;
       router.push("/");
     } catch (error) {
-      alert("Something went wrong while authenticating. Please try again later")
+      alert(
+        "Something went wrong while authenticating. Please try again later"
+      );
     }
   }
 
@@ -160,8 +162,11 @@ export default function Home() {
       const data = await response.json();
       saveData(data.rows);
       sessionStorage.setItem(storageType, JSON.stringify(data.rows)); // Store as back-up for when user refresh
+      sessionStorage.setItem("role", "user");
       gotSearchConsoleData.current = true;
     } catch (error) {
+      sessionStorage.setItem("role", "unauthorized");
+      setRole("unauthorized");
       console.error("Error fetching search console data", error);
     }
   }
@@ -189,10 +194,16 @@ export default function Home() {
             </Button>
           }
         />
-        {role != "guest" ? (
-          <DomainStatistics />
-        ) : (
+        {role != "guest" && role != "unauthorized" && <DomainStatistics />}
+        {role == "guest" && (
           <h5>You need to log in with Google for this feature</h5>
+        )}
+        {role == "unauthorized" && (
+          <h5>
+            You need to enable this domain in your Google Search console. Check{" "}
+            <a href="https://www.youtube.com/watch?v=OT7gotTCR7s">here</a> how
+            to do this.
+          </h5>
         )}
       </div>
       <div className={styles.toolWrapper}>

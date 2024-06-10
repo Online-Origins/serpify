@@ -82,6 +82,10 @@
             .pointsList {
                 display: flex;
                 flex-flow: column;
+                transition: .3s all linear;
+                transition-delay: .2s;
+                gap: 0;
+                width: 100%;
             }
 
             .pointWrapper {
@@ -132,6 +136,10 @@
                     svg {
                         rotate: 90deg;
                     }
+                }
+
+                .pointsList{
+                    gap: .25rem;
                 }
 
                 .pointWrapper{

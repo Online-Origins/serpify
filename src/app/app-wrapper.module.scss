@@ -14,11 +14,6 @@
         width: 1050px;
         transition-delay: .2s;
         margin-bottom: 1rem;
-        
-        @media (min-width: 1450px){
-            min-width: 1100px;
-            width: 1100px;
-        }
 
         @media (min-width: 1800px) {
             min-width: 1450px;

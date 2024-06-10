@@ -32,6 +32,13 @@ h4,
 h5 {
     font-family: $lexend_deca;
     font-weight: 700;
+
+    a{
+        font-family: $lexend_deca;
+        font-weight: 700;
+        color: $purple_primary;
+        text-decoration: underline;
+    }
 }
 
 h1 {

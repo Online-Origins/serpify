@@ -450,6 +450,7 @@ export default function CreateOutlines() {
                               setContentGeneratedOutlines
                             }
                             contentGeneratedOutlines={contentGeneratedOutlines}
+                            language={currentContent[0].language}
                           />
                         ))
                       : ""}

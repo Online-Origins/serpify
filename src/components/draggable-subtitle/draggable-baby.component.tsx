@@ -8,6 +8,7 @@ export default function DraggableBaby({
   setContentGeneratedOutlines,
   contentGeneratedOutlines,
   grantParentId,
+  language,
 }: {
   title: any;
   index: any;
@@ -15,6 +16,7 @@ export default function DraggableBaby({
   setContentGeneratedOutlines: any;
   contentGeneratedOutlines: any;
   grantParentId: any;
+  language: string;
 }) {
   return (
     <Draggable key={index} draggableId={title.id.toString()} index={index}>
@@ -31,6 +33,7 @@ export default function DraggableBaby({
             onChange={(value: string, id: number) =>
               handleTitleChange(id, value)
             }
+            language={language}
             removeTitle={(e: number) =>
               setContentGeneratedOutlines(
                 contentGeneratedOutlines.map((grandParent: any) => {
