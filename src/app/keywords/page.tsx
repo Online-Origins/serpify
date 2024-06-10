@@ -131,7 +131,8 @@ export default function CollectionsPage() {
               title="Subjects:"
               required={true}
               onChange={(value: any) => setSubjectsInput(value)}
-              placeholder="For what subject do you want keywords?"
+              information="For what subjects do you want to search keywords?"
+              placeholder="Enter your subjects and devide them by a comma"
             />
             {moreFilters && (
               <div className={styles.filters}>

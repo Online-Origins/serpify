@@ -26,17 +26,17 @@ export default function AppWrapper({
         className={classNames(
           styles.pagesWrapper,
           !smallNav && styles.smallerWrapper,
-          pathname == "/content/create/writing" && styles.small,
+          pathname.includes("/content/create/writing") && styles.small,
           "scrollbar"
         )}
       >
         <div className={styles.innerWrapper}>{children}</div>
       </ComponentWrapper>
-      {pathname == "/content/create/writing" && (
+      {pathname.includes("/content/create/writing") && (
         <ComponentWrapper
           className={classNames(styles.scoreWrapper, "scrollbar")}
         >
-          <ContentScore contentScore={sharedData} />
+            <ContentScore contentScore={sharedData} />
         </ComponentWrapper>
       )}
     </body>

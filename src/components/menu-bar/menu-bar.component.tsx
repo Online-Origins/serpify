@@ -36,7 +36,7 @@ export default function MenuBar({
     queryData,
     setQueryData,
     availableDomains,
-    setAvailableDomains
+    setAvailableDomains,
   } = useSharedContext();
   const [domains, setDomains] = useState<string[]>([]);
 
@@ -102,42 +102,43 @@ export default function MenuBar({
         setPagesData([]);
         setQueryData([]);
         return;
+      } else {
+        const today = new Date();
+        const startDate = new Date(
+          today.getFullYear(),
+          today.getMonth() - 1,
+          today.getDate()
+        );
+        const endDate = new Date(
+          today.getFullYear(),
+          today.getMonth(),
+          today.getDate()
+        );
+        fetchData(
+          currentToken,
+          correctUrl,
+          startDate,
+          endDate,
+          "date",
+          setWebData
+        );
+        fetchData(
+          currentToken,
+          correctUrl,
+          startDate,
+          endDate,
+          "page",
+          setPagesData
+        );
+        fetchData(
+          currentToken,
+          correctUrl,
+          startDate,
+          endDate,
+          "query",
+          setQueryData
+        );
       }
-      const today = new Date();
-      const startDate = new Date(
-        today.getFullYear(),
-        today.getMonth() - 1,
-        today.getDate()
-      );
-      const endDate = new Date(
-        today.getFullYear(),
-        today.getMonth(),
-        today.getDate()
-      );
-      fetchData(
-        currentToken,
-        correctUrl,
-        startDate,
-        endDate,
-        "date",
-        setWebData
-      );
-      fetchData(
-        currentToken,
-        correctUrl,
-        startDate,
-        endDate,
-        "page",
-        setPagesData
-      );
-      fetchData(
-        currentToken,
-        correctUrl,
-        startDate,
-        endDate,
-        "query",
-        setQueryData
-      );
     }
   }
 
@@ -167,7 +168,7 @@ export default function MenuBar({
       });
 
       const data = await response.json();
-      saveData(data.rows);
+      saveData(data.rows ? data.rows : []);
     } catch (error) {
       console.error("Error fetching search console data", error);
     }
@@ -181,19 +182,18 @@ export default function MenuBar({
   }, [loadedDomains.current]);
 
   useEffect(() => {
-    if (currentUrl && !availableDomains.includes(currentUrl)){
+    if (currentUrl && !availableDomains.includes(currentUrl)) {
       setCurrentDomain(availableDomains[0]);
-    } else if (availableDomains.length > domains.length){
-      setCurrentDomain(availableDomains[availableDomains.length - 1])
-      setDomains(availableDomains)
+    } else if (availableDomains.length > domains.length) {
+      setCurrentDomain(availableDomains[availableDomains.length - 1]);
+      setDomains(availableDomains);
     }
-  }, [availableDomains])
-
+  }, [availableDomains]);
 
   async function getDomains() {
     const { data } = await supabase.from("domains").select();
     if (data) {
-      const sorted = data.sort((a:any, b:any) =>  a.id - b.id);
+      const sorted = data.sort((a: any, b: any) => a.id - b.id);
       setAvailableDomains(sorted.map((domain: any) => domain.domain));
       setDomains(sorted.map((domain: any) => domain.domain));
       setCurrentDomain(sorted[0].domain);

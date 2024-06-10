@@ -15,7 +15,6 @@ import PopUpWrapper from "@/components/ui/popup-wrapper/popup-wrapper.component"
 import PopUp from "@/components/ui/popup/popup.component";
 import CircularLoader from "@/components/circular-loader/circular-loader.component";
 import InputWrapper from "@/components/ui/input-wrapper/input-wrapper.component";
-import { SeoCheck } from "seord";
 import styles from "./page.module.scss";
 
 import {
@@ -39,6 +38,8 @@ import {
   Spellcheck,
   Moving,
   CloseFullscreenRounded,
+  ContentCopyRounded,
+  CheckCircle,
 } from "@mui/icons-material";
 
 import toneOfVoices from "@/json/tone-of-voice.json";
@@ -71,6 +72,17 @@ export default function Writing() {
   });
   const [seoAnalysis, setSeoAnalysis] = useState<any>();
   const { setSharedData } = useSharedContext();
+  const [copyMessage, setCopyMessage] = useState(false);
+
+  useEffect(() => {
+    if (copyMessage) {
+      const timer = setTimeout(() => {
+        setCopyMessage(false);
+      }, 2500);
+
+      return () => clearTimeout(timer);
+    }
+  }, [copyMessage]);
 
   // If the editor updates then update the content score
   useEffect(() => {
@@ -448,7 +460,7 @@ export default function Writing() {
           // When the user didn't make a selection from a paragraph
           if (currentNode.textContent != "" && option != "grammar") {
             // The generated text needs to replace the text in te current element if the current element is not empty and if the user didn't chose the grammar option
-            gptPrompt += `The newly generated will replace this text: "${currentNode.textContent}". `;
+            gptPrompt += `The text will be an addition on the existing text: "${currentNode.textContent}". `;
           } else if (currentNode.textContent == "") {
             gptPrompt += `The text is for a blog with the title "${
               contentInfo.title
@@ -552,10 +564,9 @@ export default function Writing() {
       setAiInput("");
 
       const { generatedContent } = await response.json();
-
       if (editor?.state.selection.empty) {
-        // Replace the user selected text
-        replaceText(generatedContent);
+        // Replace the user selected texteditor
+        editor?.chain().focus().insertContent(generatedContent).run();
       } else {
         // Add the new generated text into the current selected element of the editor
         editor
@@ -820,7 +831,8 @@ export default function Writing() {
               <div
                 ref={optionsRef}
                 className={styles.inputOptions}
-                onClick={() => setOpenOptions(!openOptions)}
+                onMouseEnter={() => setOpenOptions(true)}
+                onMouseLeave={() => setOpenOptions(false)}
               >
                 <MoreVert />
                 {openOptions && (
@@ -830,26 +842,36 @@ export default function Writing() {
                       bubbleDistance < 175 && styles.bottomPos
                     )}
                   >
-                    <p
-                      onClick={() => generateTitleContent(undefined, "improve")}
-                    >
-                      <Moving /> Improve
-                    </p>
-                    <p
-                      onClick={() => generateTitleContent(undefined, "shorten")}
-                    >
-                      <CloseFullscreenRounded /> Shorten
-                    </p>
-                    <p
-                      onClick={() => generateTitleContent(undefined, "expand")}
-                    >
-                      <Expand /> Expand
-                    </p>
-                    <p
-                      onClick={() => generateTitleContent(undefined, "grammar")}
-                    >
-                      <Spellcheck /> Correct spelling & grammar
-                    </p>
+                    <div className={styles.innerOptionsMenu}>
+                      <p
+                        onClick={() =>
+                          generateTitleContent(undefined, "improve")
+                        }
+                      >
+                        <Moving /> Improve
+                      </p>
+                      <p
+                        onClick={() =>
+                          generateTitleContent(undefined, "shorten")
+                        }
+                      >
+                        <CloseFullscreenRounded /> Shorten
+                      </p>
+                      <p
+                        onClick={() =>
+                          generateTitleContent(undefined, "expand")
+                        }
+                      >
+                        <Expand /> Expand
+                      </p>
+                      <p
+                        onClick={() =>
+                          generateTitleContent(undefined, "grammar")
+                        }
+                      >
+                        <Spellcheck /> Correct spelling & grammar
+                      </p>
+                    </div>
                   </div>
                 )}
               </div>
@@ -862,6 +884,21 @@ export default function Writing() {
           <Button type={"outline"} onClick={() => generateAllContent()}>
             <p>Generate all</p>
             <AutoAwesome />
+          </Button>
+          <Button
+            type={"solid"}
+            onClick={() => {
+              if (editor) {
+                const clipboardItem = new ClipboardItem({
+                  "text/html": new Blob([editor?.getHTML()], { type: "text/html" }),
+                });
+                navigator.clipboard.write([clipboardItem]);
+                setCopyMessage(true);
+              }
+            }}
+          >
+            <p>Copy content</p>
+            <ContentCopyRounded />
           </Button>
         </div>
       )}
@@ -911,6 +948,12 @@ export default function Writing() {
           <p>Generating text...</p>
         </PopUpWrapper>
       )}
+      <div
+        className={classNames(styles.copyMessage, copyMessage && styles.show)}
+      >
+        <CheckCircle />
+        <h5>Content copied to clipboard</h5>
+      </div>
     </InnerWrapper>
   );
 }

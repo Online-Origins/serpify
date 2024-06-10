@@ -31,6 +31,7 @@
         padding: .5rem .25rem;
         border-radius: .5rem;
         background-color: rgba($color: $purple_50, $alpha: 0);
+        overflow-y: hidden;
 
         &:focus {
             outline: none;
@@ -44,13 +45,19 @@
 
         color: red;
     }
+    
+    .generate{
+        transition: .3s all ease-in-out;
+        opacity: 0;
+        cursor: pointer;
+    }
 
     &:hover{
         cursor: grab;
         .title{
             background-color: $purple_50;
         }
-        .delete{
+        .delete, .generate{
             opacity: 1;
         }
     }

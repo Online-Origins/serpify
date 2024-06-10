@@ -21,6 +21,7 @@ import languageCodes from "@/json/language-codes.json";
 import toneOfVoices from "@/json/tone-of-voice.json";
 import CircularLoader from "@/components/circular-loader/circular-loader.component";
 import styles from "./page.module.scss";
+import { AutoAwesome } from "@mui/icons-material";
 
 export default function ContentOverview() {
   const [popUpOpen, setPopUpOpen] = useState(false);
@@ -40,14 +41,13 @@ export default function ContentOverview() {
   const router = useRouter();
   const { currentUrl } = useSharedContext();
   const [currentDomain, setCurrentDomain] = useState();
+  const [possibleTitles, setPossibleTitles] = useState<string[]>([]);
 
   useEffect(() => {
-    if (!getContentsRef.current) {
-      getContents();
+    if (currentUrl) {
       getCollections();
-      getContentsRef.current = true;
     }
-  }, []);
+  }, [currentUrl]);
 
   useEffect(() => {
     if (collections.length > 0) {
@@ -65,17 +65,6 @@ export default function ContentOverview() {
     }
   }, [chosenCollection]);
 
-  async function getContents() {
-    const { data } = await supabase.from("contentItems").select();
-    if (data) {
-      data.sort(
-        (a, b) =>
-          new Date(b.edited_on).getTime() - new Date(a.edited_on).getTime()
-      );
-      setContents(data);
-    }
-  }
-
   async function getCollections() {
     const { data } = await supabase.from("collections").select();
     if (data) {
@@ -85,14 +74,16 @@ export default function ContentOverview() {
           (domain: any) => domain.domain == currentUrl
         );
         setCurrentDomain(currentDomainId.id);
-        const filteredCollections = data.filter((item: any) => item.domain == currentDomainId.id)
-          const collectionsUpdatedKey = filteredCollections.map((collection) => ({
-            ...collection,
-            value: collection.collection_name,
-          }));
-          setCollections(collectionsUpdatedKey);
-        }    
+        const filteredCollections = data.filter(
+          (item: any) => item.domain == currentDomainId.id
+        );
+        const collectionsUpdatedKey = filteredCollections.map((collection) => ({
+          ...collection,
+          value: collection.collection_name,
+        }));
+        setCollections(collectionsUpdatedKey);
       }
+    }
   }
 
   async function getDomains() {
@@ -124,6 +115,25 @@ export default function ContentOverview() {
       });
 
       const data = await response.json();
+
+      let possibleTitles = [];
+
+      while (possibleTitles.length < 3) {
+        const possibleRespone = await fetch("/api/generateTitle", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            keyword: chosenKeyword,
+            toneofvoice: toneOfVoicebyId?.value,
+            language: language?.value,
+          }),
+        });
+        const possibleData = await possibleRespone.json();
+        possibleTitles.push(possibleData.generatedTitle.split('"').join(""));
+      }
+      setPossibleTitles(possibleTitles);
       setGenerating(false);
       setcontentTitle(data.generatedTitle.split('"').join("")); //Remove the "" around the generated title
     } catch (error: any) {
@@ -156,7 +166,7 @@ export default function ContentOverview() {
           edited_on: currentDate(),
           status: "outlines",
           keyword: chosenKeyword,
-          domain: currentDomain
+          domain: currentDomain,
         },
       ])
       .select();
@@ -187,7 +197,7 @@ export default function ContentOverview() {
         information="
         Creating SEO content involves integrating targeted keywords, producing high-quality, relevant material, and optimizing structure to enhance visibility and engagement, ultimately boosting search engine rankings and user experience."
       />
-      {getContentsRef.current ? <ContentItemsWrapper /> : <h5>Loading...</h5>}
+      <ContentItemsWrapper />
       {popUpOpen && (
         <PopUpWrapper>
           <PopUp
@@ -298,6 +308,28 @@ export default function ContentOverview() {
                   placeholder="Insert title for the content (or generate with AI)"
                   generateTitle={() => generateTitle()}
                 />
+                {possibleTitles.length > 0 && (
+                  <div className={styles.possibleTitles}>
+                    <h5>Possible titles:</h5>
+                    {possibleTitles.map((title: string) => (
+                      <div
+                        key={title}
+                        className={styles.possibleTitle}
+                        onClick={() => {
+                          setcontentTitle(title);
+                          setPossibleTitles(
+                            possibleTitles.filter(
+                              (item: string) => item != title
+                            )
+                          );
+                        }}
+                      >
+                        <AutoAwesome />
+                        <p>{title}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
             {generating && (

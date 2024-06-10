@@ -102,7 +102,7 @@ export default function AnalyticsPage() {
         }
         smallTitle="(Last month)"
       />
-      {role != "guest" ? (
+      {role != "guest" && role != "unauthorized" && (
         <div
           className={classNames(styles.innerAnalytics, "scrollbar noMargin")}
         >
@@ -334,8 +334,16 @@ export default function AnalyticsPage() {
             </div>
           )}
         </div>
-      ) : (
+      )}
+      {role == "guest" && (
         <h5>You need to log in with Google for this feature</h5>
+      )}
+      {role == "unauthorized" && (
+        <h5>
+          You need to enable this domain in your Google Search console. Check{" "}
+          <a href="https://www.youtube.com/watch?v=OT7gotTCR7s">here</a> how to
+          do this.
+        </h5>
       )}
     </InnerWrapper>
   );

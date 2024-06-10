@@ -30,7 +30,7 @@ export default function Collection({ params }: { params: { slug: string } }) {
   const [keywordsData, setKeywordsData] = useState<any[]>([]);
   const [shownKeywords, setShownKeywords] = useState<any[]>([]);
   const [selectedCollection, setSelectedCollection] = useState<any>([]);
-  const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
+  const [selectedKeywords, setSelectedKeywords] = useState<any[]>([]);
   const [sorting, setSorting] = useState("potential");
   const getSelectedCollectionRef = useRef(false);
   const isGettingData = useRef(false);
@@ -50,8 +50,8 @@ export default function Collection({ params }: { params: { slug: string } }) {
   const [generating, setGenerating] = useState(false);
   const [moreFilters, setMoreFilters] = useState(false);
   const [subjectsInput, setSubjectsInput] = useState("");
-  const [keywordsLanguage, setKeywordsLanguage] = useState(languageCodes[0].id);
-  const [keywordsCountry, setKeywordsCountry] = useState(countryCodes[0].id);
+  const [keywordsLanguage, setKeywordsLanguage] = useState<number>();
+  const [keywordsCountry, setKeywordsCountry] = useState<number>();
   const [keywordLength, setKeywordLength] = useState(["shorttail", "longtail"]);
   const [searchVolume, setSearchVolume] = useState<number[]>([0, 100]);
   const [competition, setCompetition] = useState<number[]>([0, 100]);
@@ -71,6 +71,8 @@ export default function Collection({ params }: { params: { slug: string } }) {
       .select()
       .eq("id", activeCollection);
     if (data) {
+      setKeywordsLanguage(parseInt(data[0].language));
+      setKeywordsCountry(parseInt(data[0].country))
       setSelectedCollection(data);
       setChosenFocusKeyword(data[0].keywords[0]);
     }
@@ -169,7 +171,7 @@ export default function Collection({ params }: { params: { slug: string } }) {
         return "100 - 1K";
       case googleVolume >= 1000 && googleVolume < 10000:
         return "1K - 10K";
-      case googleVolume >= 10000 && googleVolume < 100000:
+      case googleVolume >= 10000:
         return "10K - 100K";
       default:
         return googleVolume;
@@ -210,7 +212,7 @@ export default function Collection({ params }: { params: { slug: string } }) {
   async function updateCollection() {
     const { error } = await supabase
       .from("collections")
-      .update({ keywords: selectedKeywords })
+      .update({ keywords: selectedKeywords.map((selectedKeyword) => selectedKeyword.text)})
       .eq("id", activeCollection);
     if (error) {
       console.log(error);
@@ -219,7 +221,7 @@ export default function Collection({ params }: { params: { slug: string } }) {
     let array: any[] = [];
     keywordsData.map((keyword: any) => {
       selectedKeywords.map((selectedKeyword) => {
-        if (keyword.text == selectedKeyword) {
+        if (keyword.text == selectedKeyword.text) {
           array.push(keyword);
         }
       });
@@ -596,7 +598,7 @@ export default function Collection({ params }: { params: { slug: string } }) {
                       value != null ? value : languageCodes[0].id
                     )
                   }
-                  placeholder="In what language should the keywords be?"
+                  placeholder="In what language should the content be?"
                 />
                 <InputWrapper
                   type="autocomplete"
@@ -661,7 +663,8 @@ export default function Collection({ params }: { params: { slug: string } }) {
               title="Subjects:"
               required={true}
               onChange={(value: any) => setSubjectsInput(value)}
-              placeholder="For what subject do you want keywords?"
+              information="For what subjects do you want to search keywords?"
+              placeholder="Enter your subjects and devide them by a comma"
             />
             {moreFilters && (
               <div className={styles.filters}>
