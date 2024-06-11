@@ -1,10 +1,10 @@
-'use client'
+"use client";
 import classNames from "classnames";
 import { CircularProgressbar } from "react-circular-progressbar";
 import BorderColorRoundedIcon from "@mui/icons-material/BorderColorRounded";
 import { useRouter } from "next/navigation";
 import DotsMenu from "../dots-menu/dots-menu.component";
-import { supabase } from "@/app/utils/supabaseClient/server"
+import { supabase } from "@/app/utils/supabaseClient/server";
 import styles from "./content-item.module.scss";
 
 export default function ContentItem({
@@ -24,7 +24,7 @@ export default function ContentItem({
 }) {
   const router = useRouter();
 
-  function onEditClick() { 
+  function onEditClick() {
     localStorage.setItem("content_id", content.id);
     router.push(`/content/create/${content.status}`);
   }
@@ -66,40 +66,48 @@ export default function ContentItem({
     let year = date.getFullYear();
 
     const currentDate = `${year}-${month}-${day}`;
-    const { data } = await supabase
-      .from("contentItems")
-      .select()
-      .eq("id", content.id);
-    if (data) {
-      const inserting = await supabase
+    try {
+      const { data } = await supabase
         .from("contentItems")
-        .insert([
-          {
-            content_score: data[0].content_score,
-            status: data[0].status,
-            edited_on: currentDate,
-            collection: data[0].collection,
-            language: data[0].language,
-            tone_of_voice: data[0].tone_of_voice,
-            content_title: data[0].content_title,
-            keywords: data[0].sub_keywords,
-            target_audience: data[0].target_audience,
-            outlines: data[0].outlines,
-            domain: data[0].domain
-          },
-        ])
-        .select();
-      if (!inserting.error && (smallWrapper ? shownContents.length < 3 : true)) {
-        setShownContents(sortContents([...shownContents, inserting.data[0]]));
+        .select()
+        .eq("id", content.id);
+      if (data) {
+        const inserting = await supabase
+          .from("contentItems")
+          .insert([
+            {
+              content_score: data[0].content_score,
+              status: data[0].status,
+              edited_on: currentDate,
+              collection: data[0].collection,
+              language: data[0].language,
+              tone_of_voice: data[0].tone_of_voice,
+              content_title: data[0].content_title,
+              sub_keywords: data[0].sub_keywords,
+              keyword: data[0].keyword,
+              target_audience: data[0].target_audience,
+              outlines: data[0].outlines,
+              domain: data[0].domain,
+            },
+          ])
+          .select();
+        if (
+          !inserting.error &&
+          (smallWrapper ? shownContents.length < 3 : true)
+        ) {
+          setShownContents(sortContents([...shownContents, inserting.data[0]]));
+        }
       }
+    } catch (error) {
+      alert("Something went wrong. Please try again later.")
     }
   }
 
-  function translateStatus(status: string){
+  function translateStatus(status: string) {
     if (status == "writing") {
       return "Writing content";
     } else if (status == "outlines") {
-      return "Creating outlines"
+      return "Creating outlines";
     }
     return status;
   }
@@ -109,7 +117,10 @@ export default function ContentItem({
       <div className={styles.titleWrapper}>
         <h4>{content.content_title}</h4>
         <p
-          className={classNames(getCollectionById(content.collection) != null && styles.collectionLink)}
+          className={classNames(
+            getCollectionById(content.collection) != null &&
+              styles.collectionLink
+          )}
           onClick={(e) => {
             e.stopPropagation();
             if (getCollectionById(content.collection) != null) {

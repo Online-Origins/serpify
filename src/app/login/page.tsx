@@ -25,10 +25,10 @@ export default function LogIn() {
     <InnerWrapper>
       <PageTitle title={"Log in"} />
       <Button type={"solid"} onClick={() => handleAuthorize()}>
-        <p>Log in</p>
+        <p>Log in with Google</p>
       </Button>
       <Button type={"outline"} onClick={() => {sessionStorage.setItem("role", "guest"); router.push("/")}}>
-        <p>Guest</p>
+        <p>Go further as guest</p>
       </Button>
     </InnerWrapper>
   );

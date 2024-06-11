@@ -5,7 +5,6 @@ import InputWrapper from "../ui/input-wrapper/input-wrapper.component";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import Information from "../information/information.component";
 
-import ArrowDownwardRoundedIcon from "@mui/icons-material/ArrowDownwardRounded";
 import classNames from "classnames";
 import styles from "./content-items-wrapper.module.scss";
 import { useSharedContext } from "@/context/SharedContext";
@@ -29,11 +28,7 @@ export default function ContentItemsWrapper({ small }: { small?: boolean }) {
   async function getContents() {
     const { data } = await supabase.from("contentItems").select();
     if (data) {
-      data.sort(
-        (a, b) =>
-          new Date(b.edited_on).getTime() - new Date(a.edited_on).getTime()
-      );
-      setContents(data);
+      setContents(sortContents(data));
     }
   }
 
@@ -81,18 +76,15 @@ export default function ContentItemsWrapper({ small }: { small?: boolean }) {
   }
 
   function sortContents(array: any) {
-    const sorted = array.sort((a: any, b: any) => {
-      const dateA = new Date(a.date_edited);
-      const dateB = new Date(b.date_edited);
-      return dateB.getTime() - dateA.getTime(); // Sort descending, for ascending: dateA - dateB
-    });
+    const sorted = array.sort(
+      (a: any, b: any) =>
+        new Date(b.edited_on).getTime() - new Date(a.edited_on).getTime()
+    );
     return sorted;
   }
 
   return (
-    <div
-      className={classNames(styles.pageWrapper, "scrollbar", !small && styles.bottomExtend)}
-    >
+    <div className={styles.pageWrapper}>
       <div className={styles.topRowWrapper}>
         <div className={styles.wrappingInput}>
           {!small && (
@@ -117,7 +109,13 @@ export default function ContentItemsWrapper({ small }: { small?: boolean }) {
           <h5>Date edited:</h5>
         </div>
       </div>
-      <div className={styles.contentItemsWrapper}>
+      <div
+        className={classNames(
+          styles.contentItemsWrapper,
+          "scrollbar",
+          !small && styles.bottomExtend
+        )}
+      >
         {shownContents.length > 0 ? (
           shownContents.map((content: any) => (
             <ContentItem
