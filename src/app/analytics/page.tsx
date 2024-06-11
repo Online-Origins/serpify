@@ -341,7 +341,7 @@ export default function AnalyticsPage() {
       {role == "unauthorized" && (
         <h5>
           You need to enable this domain in your Google Search console. Check{" "}
-          <a href="https://www.youtube.com/watch?v=OT7gotTCR7s">here</a> how to
+          <a href="https://www.youtube.com/watch?v=OT7gotTCR7s" target="_blank">here</a> how to
           do this.
         </h5>
       )}

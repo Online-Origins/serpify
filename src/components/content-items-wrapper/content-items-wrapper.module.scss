@@ -5,11 +5,7 @@
     flex-flow: column;
     gap: 1rem;
     transition: none;
-    overflow-x: hidden;
-
-    &.bottomExtend{
-        margin-bottom: 2.5rem;
-    }
+    overflow: hidden;
 
     .topRowWrapper {
         display: flex;
@@ -53,5 +49,6 @@
     .contentItemsWrapper {
         display: flex;
         flex-flow: column;
+        overflow-x: hidden;
     }
 }

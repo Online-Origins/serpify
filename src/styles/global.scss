@@ -33,7 +33,7 @@ h5 {
     font-family: $lexend_deca;
     font-weight: 700;
 
-    a{
+    a {
         font-family: $lexend_deca;
         font-weight: 700;
         color: $purple_primary;
@@ -84,13 +84,14 @@ a {
 }
 
 .MuiInputBase-root {
+
     &::before,
     &::after {
         display: none;
     }
 }
 
-.MuiInput-input{
+.MuiInput-input {
     display: flex;
     align-items: center;
     gap: .5rem;
@@ -107,12 +108,13 @@ a {
     display: flex;
     align-items: center;
     gap: .5rem;
+
     &:hover {
         background-color: $purple_50 !important;
     }
 }
 
-.Mui-disabled{
+.Mui-disabled {
     cursor: not-allowed !important;
 }
 
@@ -133,7 +135,7 @@ a {
     }
 }
 
-.noMargin{
+.noMargin {
     &::-webkit-scrollbar-track {
         margin: 0;
         border-radius: 1rem;
@@ -215,11 +217,44 @@ div[id^="tippy-"] {
     }
 }
 
-.css-1s5lphu-MuiPopper-root-MuiAutocomplete-popper{
+.css-1s5lphu-MuiPopper-root-MuiAutocomplete-popper {
     z-index: 2000 !important;
 }
 
-.error{
+.css-3dzjca-MuiPaper-root-MuiPopover-paper-MuiMenu-paper {
+    box-shadow: $shadow;
+    background-color: $white;
+    border: solid 1px $purple_secundary;
+    border-radius: .5rem;
+
+    .css-6hp17o-MuiList-root-MuiMenu-list {
+        padding: 0;
+
+        .Mui-focusVisible {
+            background-color: rgba($color: #000000, $alpha: 0);
+        }
+
+        li {
+            padding: .5rem;
+            justify-content: space-between;
+            transition: .3s all ease-in-out;
+
+            &.css-kk1bwy-MuiButtonBase-root-MuiMenuItem-root{
+                justify-content: flex-start;
+            }
+
+            svg{
+                height: 1.25rem;
+            }
+        }
+    }
+}
+
+.css-3dzjca-MuiPaper-root-MuiPopover-paper-MuiMenu-paper{
+    margin-top: .5rem;
+}
+
+.error {
     color: $red;
     text-wrap: nowrap;
 }

@@ -5,13 +5,14 @@ import Button from "@/components/ui/button/button.component";
 import { ArrowForwardRounded } from "@mui/icons-material";
 import ContentItemsWrapper from "@/components/content-items-wrapper/content-items-wrapper.component";
 import { useEffect, useRef, useState } from "react";
-import { supabase } from "./utils/supabaseClient/server";
 import CollectionsWrapper from "@/components/collections-wrapper/collections-wrapper.component";
 import classNames from "classnames";
 import { useRouter } from "next/navigation";
 import styles from "./page.module.scss";
 import DomainStatistics from "@/components/domain-statistics/domain-statistics.component";
 import { useSharedContext } from "@/context/SharedContext";
+import PopUpWrapper from "@/components/ui/popup-wrapper/popup-wrapper.component";
+import CircularLoader from "@/components/circular-loader/circular-loader.component";
 
 export default function Home() {
   const loadingRef = useRef(true);
@@ -38,9 +39,11 @@ export default function Home() {
     ) {
       if (loadingRef.current) {
         handleExecute(authorizationCode, currentUrl);
+        loadingRef.current = false;
       }
     } else if (role) {
       setRole(role);
+      loadingRef.current = false;
     }
   }, [currentUrl, loadingRef.current, gottenData.current]);
 
@@ -177,7 +180,12 @@ export default function Home() {
     return new URL(url).searchParams.get("code");
   };
 
-  return (
+  return loadingRef.current ? (
+    <PopUpWrapper>
+      <CircularLoader />
+      <p>Loading...</p>
+    </PopUpWrapper>
+  ) : (
     <InnerWrapper
       className={classNames(styles.homeWrapper, "scrollbar noMargin")}
     >
@@ -201,8 +209,13 @@ export default function Home() {
         {role == "unauthorized" && (
           <h5>
             You need to enable this domain in your Google Search console. Check{" "}
-            <a href="https://www.youtube.com/watch?v=OT7gotTCR7s">here</a> how
-            to do this.
+            <a
+              href="https://www.youtube.com/watch?v=OT7gotTCR7s"
+              target="_blank"
+            >
+              here
+            </a>{" "}
+            how to do this.
           </h5>
         )}
       </div>
