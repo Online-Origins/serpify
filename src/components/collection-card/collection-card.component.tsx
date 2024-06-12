@@ -32,7 +32,6 @@ export default function CollectionCard({
   const [popUpOpen, setPopUpOpen] = useState(false);
   const [chosenKeyword, setChosenKeyword] = useState(collection.keywords[0]);
   const [popUpStep, setPopUpStep] = useState(1);
-  const [keywordOptions, setKeywordOptions] = useState([]);
   const [chosenKeywords, setChosenKeywords] = useState([]);
   const [chosenLanguage, setChosenLanguage] = useState(languageCodes[0].id);
   const [toneOfVoice, setToneOfVoice] = useState(toneOfVoices[0].id);
