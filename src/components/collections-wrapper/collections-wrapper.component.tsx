@@ -13,12 +13,16 @@ export default function CollectionsWrapper({ small }: { small?: boolean }) {
   const [shownCollections, setShownCollections] = useState<any[]>([]);
   const [domains, setDomains] = useState<any[]>([]);
   const loadingRef = useRef(true);
+  const gotData = useRef(false);
   const { currentUrl } = useSharedContext();
   const [domainId, setDomainId] = useState();
 
   useEffect(() => {
-    getCollections();
-    getDomains();
+    if (!gotData.current) {
+      getCollections();
+      getDomains();
+      gotData.current = true;
+    }
   }, []);
 
   async function getCollections() {
@@ -41,17 +45,21 @@ export default function CollectionsWrapper({ small }: { small?: boolean }) {
         (domain: any) => domain.domain === currentUrl
       );
 
-      if (currentDomainId && currentDomainId.id !== domainId && collections.length > 0) {
+      if (
+        currentDomainId &&
+        currentDomainId.id !== domainId &&
+        collections.length > 0
+      ) {
         setDomainId(currentDomainId.id);
         const domainCollections = collections.filter(
           (collection: any) => collection.domain === currentDomainId.id
         );
-        setShownCollections([])
+        setShownCollections([]);
         setShownCollectionsWithDelay(settingCollections(domainCollections));
         loadingRef.current = false;
       }
     }
-  }, [currentUrl, domains]);
+  }, [currentUrl, domains, collections]);
 
   function settingCollections(col: any) {
     let array = [];
@@ -66,9 +74,11 @@ export default function CollectionsWrapper({ small }: { small?: boolean }) {
   }
 
   function setShownCollectionsWithDelay(arr: any[]) {
+    let array: any[] = [];
     arr.forEach((item, index) => {
       setTimeout(() => {
-        setShownCollections(prevState => [...prevState, item]);
+        array.push(item);
+        setShownCollections([...array]); // Using spread operator to create a new array
       }, index * 500); // Delay added for each item
     });
   }

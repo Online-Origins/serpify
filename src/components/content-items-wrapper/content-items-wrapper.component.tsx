@@ -12,7 +12,7 @@ import { supabase } from "@/app/utils/supabaseClient/server";
 
 export default function ContentItemsWrapper({ small }: { small?: boolean }) {
   const [shownContents, setShownContents] = useState<any[]>([]);
-  const showingContentsRef = useRef(false);
+  const gotData = useRef(false);
   const [titleFilter, setTitleFilter] = useState("");
   const { currentUrl } = useSharedContext();
   const [contents, setContents] = useState<any[]>([]);
@@ -22,9 +22,12 @@ export default function ContentItemsWrapper({ small }: { small?: boolean }) {
   const [domainContents, setDomainContents] = useState<any[]>([]);
 
   useEffect(() => {
+    if (!gotData.current) {
     getContents();
     getCollections();
     getDomains();
+      gotData.current = true;
+    }
   }, []);
 
   async function getContents() {
@@ -99,7 +102,7 @@ export default function ContentItemsWrapper({ small }: { small?: boolean }) {
         setShownContents(settingContents(filtered))
       }
     }
-  }, [currentUrl, domains, titleFilter]);
+  }, [currentUrl, domains, titleFilter, contents]);
 
   function settingContents(con: any) {
     let array = [];
