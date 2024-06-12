@@ -217,17 +217,18 @@ div[id^="tippy-"] {
     }
 }
 
-.css-1s5lphu-MuiPopper-root-MuiAutocomplete-popper {
+.MuiAutocomplete-popper {
     z-index: 2000 !important;
 }
 
-.css-3dzjca-MuiPaper-root-MuiPopover-paper-MuiMenu-paper {
+.MuiMenu-paper {
     box-shadow: $shadow;
     background-color: $white;
     border: solid 1px $purple_secundary;
     border-radius: .5rem;
+    margin-top: .5rem;
 
-    .css-6hp17o-MuiList-root-MuiMenu-list {
+    .MuiMenu-list {
         padding: 0;
 
         .Mui-focusVisible {
@@ -239,7 +240,7 @@ div[id^="tippy-"] {
             justify-content: space-between;
             transition: .3s all ease-in-out;
 
-            &.css-kk1bwy-MuiButtonBase-root-MuiMenuItem-root{
+            &.MuiMenuItem-root{
                 justify-content: flex-start;
             }
 
@@ -248,10 +249,6 @@ div[id^="tippy-"] {
             }
         }
     }
-}
-
-.css-3dzjca-MuiPaper-root-MuiPopover-paper-MuiMenu-paper{
-    margin-top: .5rem;
 }
 
 .error {

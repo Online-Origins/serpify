@@ -7,6 +7,7 @@ import styles from "./subtitle.module.scss";
 import { AutoAwesome } from "@mui/icons-material";
 import CircularLoader from "../circular-loader/circular-loader.component";
 import PopUpWrapper from "../ui/popup-wrapper/popup-wrapper.component";
+import languageCodes from "@/json/language-codes.json";
 
 export default function Subtitle({
   title,
@@ -33,6 +34,7 @@ export default function Subtitle({
   }, []);
 
   async function rephraseTitle() {
+    const languageValue = languageCodes.find((lang) => lang.id.toString() == language);
     setLoading(true);
     try {
       const response = await fetch("/api/generateContent", {
@@ -41,7 +43,7 @@ export default function Subtitle({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          prompt: `Rephrase this subtitle: ${title.title}. Keep it in the language with the code ${language} and only give back the subtitle.`,
+          prompt: `Rephrase this subtitle: ${title.title}. Keep the language in ${languageValue?.value} and only give back the subtitle.`,
         }),
       });
 
