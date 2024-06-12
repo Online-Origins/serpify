@@ -69,14 +69,14 @@ export default function SmallTable({
         });
   
         const data = await response.json();
-        attempt = retries;  // or simply `break;` to exit the loop
+        attempt = retries;
         return data;
       } catch (error) {
         attempt++;
         if (attempt === retries) {
           alert("Something went wrong. Please try again later.");
         } else {
-          await timeout(250);  // wait for 250ms before retrying
+          await timeout(500);
         }
       }
     }

@@ -18,6 +18,8 @@ export default function ContentItemsWrapper({ small }: { small?: boolean }) {
   const [contents, setContents] = useState<any[]>([]);
   const [collections, setCollections] = useState<any[]>([]);
   const [domains, setDomains] = useState<any[]>([]);
+  const [domainId, setDomainId] = useState();
+  const [domainContents, setDomainContents] = useState<any[]>([]);
 
   useEffect(() => {
     getContents();
@@ -47,19 +49,55 @@ export default function ContentItemsWrapper({ small }: { small?: boolean }) {
   }
 
   useEffect(() => {
-    if (currentUrl && domains.length > 0) {
+    if (currentUrl && domains.length > 0 && contents.length > 0) {
       const currentDomainId = domains.find(
         (domain: any) => domain.domain == currentUrl
       );
       const domainContents = contents.filter(
         (content: any) => content.domain == currentDomainId.id
       );
-      const filtered = domainContents.filter((content: any) =>
-        content.content_title
-          .toLocaleLowerCase()
-          .includes(titleFilter.toLocaleLowerCase())
-      );
+      let filtered = [];
+      if (titleFilter != "") {
+        filtered = domainContents.filter((content: any) =>
+          content.content_title
+            .toLocaleLowerCase()
+            .includes(titleFilter.toLocaleLowerCase())
+        );
+      } else {
+        filtered = domainContents;
+      }
       setShownContents(settingContents(filtered));
+    }
+  }, [currentUrl, domains, titleFilter, contents]);
+
+  useEffect(() => {
+    if (currentUrl && domains.length > 0) {
+      const currentDomainId = domains.find(
+        (domain: any) => domain.domain === currentUrl
+      );
+
+      if (
+        currentDomainId &&
+        currentDomainId.id !== domainId &&
+        collections.length > 0
+      ) {
+        setDomainId(currentDomainId.id);
+        const correctContents = contents.filter(
+          (collection: any) => collection.domain === currentDomainId.id
+        );
+        setDomainContents(settingContents(correctContents));
+        setShownContents(settingContents(correctContents));
+      }
+
+      if (titleFilter != "" && domainContents.length > 0) {
+        let filtered = [];
+        filtered = domainContents.filter((content: any) =>
+          content.content_title
+            .toLocaleLowerCase()
+            .includes(titleFilter.toLocaleLowerCase())
+        );
+        setShownContents(settingContents(filtered))
+      }
     }
   }, [currentUrl, domains, titleFilter]);
 
@@ -76,10 +114,11 @@ export default function ContentItemsWrapper({ small }: { small?: boolean }) {
   }
 
   function sortContents(array: any) {
-    const sorted = array.sort(
-      (a: any, b: any) =>
-        new Date(b.edited_on).getTime() - new Date(a.edited_on).getTime()
-    );
+    const sorted = array.sort((a: any, b: any) => {
+      const dateA = new Date(a.edited_on);
+      const dateB = new Date(b.edited_on);
+      return dateB.getTime() - dateA.getTime(); // Sort descending, for ascending: dateA - dateB
+    });
     return sorted;
   }
 

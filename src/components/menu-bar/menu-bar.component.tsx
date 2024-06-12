@@ -69,8 +69,8 @@ export default function MenuBar({
 
   useEffect(() => {
     if (currentUrl && currentUrl != currentDomain) {
-      const role = sessionStorage.getItem("role");
       setCurrentUrl(currentDomain);
+      const role = sessionStorage.getItem("role");
       if (role && role != "guest") {
         gettingData(currentDomain, undefined, undefined);
       }
