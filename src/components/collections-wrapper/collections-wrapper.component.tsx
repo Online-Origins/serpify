@@ -25,6 +25,7 @@ export default function CollectionsWrapper({ small }: { small?: boolean }) {
     const { data } = await supabase.from("collections").select();
     if (data) {
       setCollections(data);
+      console.log("collections: " + data)
     }
   }
 
@@ -32,6 +33,7 @@ export default function CollectionsWrapper({ small }: { small?: boolean }) {
     const { data } = await supabase.from("domains").select();
     if (data) {
       setDomains(data);
+      console.log("domains: "+data)
     }
   }
 
