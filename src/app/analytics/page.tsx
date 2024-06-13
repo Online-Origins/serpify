@@ -199,6 +199,7 @@ export default function AnalyticsPage() {
                           <Link href={page.keys[0]} target="_blank">
                             {page.keys[0]
                               .replace(`https://`, "")
+                              .replace(`http://`, "")
                               .replace(`www.`, "")
                               .replace(currentUrl, "")}
                           </Link>

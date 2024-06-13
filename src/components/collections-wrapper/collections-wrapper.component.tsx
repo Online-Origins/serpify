@@ -16,6 +16,7 @@ export default function CollectionsWrapper({ small }: { small?: boolean }) {
   const gotData = useRef(false);
   const { currentUrl } = useSharedContext();
   const [domainId, setDomainId] = useState();
+  const [currentDomain, setCurrentDomain] = useState();
 
   useEffect(() => {
     if (!gotData.current) {
@@ -51,6 +52,7 @@ export default function CollectionsWrapper({ small }: { small?: boolean }) {
         collections.length > 0
       ) {
         setDomainId(currentDomainId.id);
+        setCurrentDomain(currentDomainId.id);
         const domainCollections = collections.filter(
           (collection: any) => collection.domain === currentDomainId.id
         );
@@ -99,6 +101,7 @@ export default function CollectionsWrapper({ small }: { small?: boolean }) {
             shownCollections={shownCollections}
             setShownCollections={setShownCollections}
             smallWrapper={small}
+            currentDomain={currentDomain}
           />
         ))
       ) : (

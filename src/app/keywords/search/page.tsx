@@ -67,6 +67,7 @@ export default function KeywordSearching() {
   const [showAlert, setShowAlert] = useState(false);
   const { currentUrl } = useSharedContext();
   const [currentDomain, setCurrentDomain] = useState();
+  const getCollectionsRef = useRef(false);
 
   useEffect(() => {
     if (showAlert) {
@@ -102,12 +103,12 @@ export default function KeywordSearching() {
         return 0;
     }
   }
-
   useEffect(() => {
-    if (currentUrl) {
+    if (!getCollectionsRef.current) {
       getCollections();
+      getCollectionsRef.current = true;
     }
-  }, [currentUrl]);
+  }, [getCollectionsRef]);
 
   async function getCollections() {
     const { data } = await supabase.from("collections").select();
@@ -141,7 +142,7 @@ export default function KeywordSearching() {
       generateKeywords();
       isKeywordsGenerated.current = true;
     }
-  }, [filters.subjects]);
+  }, [filters]);
 
   // Generate keywords
   async function generateKeywords() {
@@ -286,23 +287,29 @@ export default function KeywordSearching() {
 
   // Sort the keywords on the sorting type
   function sortKeywords(array: any) {
-    setKeywordAmount([0, 15]);
     if (sorting == "potential") {
-      return array.sort(
-        (a: any, b: any) =>
-          b.keywordMetrics.potential - a.keywordMetrics.potential
-      );
+      return array.sort((a: any, b: any) =>b.keywordMetrics.potential - a.keywordMetrics.potential);
+    } else if (sorting == "potentialRev") {
+      return array.sort((a: any, b: any) =>a.keywordMetrics.potential - b.keywordMetrics.potential);
     } else if (sorting == "competition") {
-      return array.sort(
-        (a: any, b: any) =>
-          a.keywordMetrics.competitionIndex - b.keywordMetrics.competitionIndex
-      );
-    } else if (sorting == "searchVolume") {
-      return array.sort(
-        (a: any, b: any) =>
-          b.keywordMetrics.avgMonthlySearches -
-          a.keywordMetrics.avgMonthlySearches
-      );
+      return array.sort((a: any, b: any) =>a.keywordMetrics.competitionIndex - b.keywordMetrics.competitionIndex);
+    } else if (sorting == "competitionRev") {
+      return array.sort((a: any, b: any) =>b.keywordMetrics.competitionIndex - a.keywordMetrics.competitionIndex
+      );} else if (sorting == "searchVolume") {
+      return array.sort((a: any, b: any) =>b.keywordMetrics.avgMonthlySearches -a.keywordMetrics.avgMonthlySearches);
+    } else if (sorting == "searchVolumeRef") {
+      return array.sort((a: any, b: any) =>a.keywordMetrics.avgMonthlySearches -b.keywordMetrics.avgMonthlySearches);
+    } else if (sorting == "keywordRev") {
+      return array.sort((a: any, b: any) => {
+        // Compare the text values
+        if (a.text > b.text) {
+          return -1;
+        } else if (a.text < b.text) {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
     } else {
       return array.sort((a: any, b: any) => {
         // Compare the text values
@@ -460,7 +467,6 @@ export default function KeywordSearching() {
         min: filters.competition.min,
         max: filters.competition.max,
       },
-
       potential: { min: filters.potential.min, max: filters.potential.max },
     }));
     isKeywordsGenerated.current = false;

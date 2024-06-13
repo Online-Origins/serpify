@@ -32,11 +32,17 @@ export default function Table({
   const [scroll, setScroll] = useState(false);
 
   function selecting(clickedKeyword: any) {
-    if (!selectedKeywords.find((keyword:any) => keyword.text == clickedKeyword.text)) {
+    if (
+      !selectedKeywords.find(
+        (keyword: any) => keyword.text == clickedKeyword.text
+      )
+    ) {
       setSelectedKeywords([...selectedKeywords, clickedKeyword]);
     } else {
       setSelectedKeywords(
-        selectedKeywords.filter((index: any) => index.text != clickedKeyword.text)
+        selectedKeywords.filter(
+          (index: any) => index.text != clickedKeyword.text
+        )
       );
     }
   }
@@ -98,22 +104,30 @@ export default function Table({
           <p>Select</p>
         </div>
         <div
-          onClick={() => setSorting("keyword")}
+          onClick={() =>
+            setSorting(sorting == "keyword" ? "keywordRev" : "keyword")
+          }
           className={classNames(
             styles.item,
             styles.keyword,
-            sorting == "keyword" && styles.activeSort
+            sorting == "keyword" && styles.activeSort,
+            sorting == "keywordRev" && styles.activeSortRev
           )}
         >
           <p>Keyword</p>
           <ArrowDownwardRoundedIcon />
         </div>
         <div
-          onClick={() => setSorting("searchVolume")}
+          onClick={() =>
+            setSorting(
+              sorting == "searchVolume" ? "searchVolumeRev" : "searchVolume"
+            )
+          }
           className={classNames(
             styles.item,
             styles.searchVolume,
-            sorting == "searchVolume" && styles.activeSort
+            sorting == "searchVolume" && styles.activeSort,
+            sorting == "searchVolumeRev" && styles.activeSortRev
           )}
         >
           <ArrowDownwardRoundedIcon />
@@ -121,11 +135,16 @@ export default function Table({
           <Information information="The number of times, on average, that users enter a particular search query into a search engine each month." />
         </div>
         <div
-          onClick={() => setSorting("competition")}
+          onClick={() =>
+            setSorting(
+              sorting == "competition" ? "competitionRev" : "competition"
+            )
+          }
           className={classNames(
             styles.item,
             styles.competition,
-            sorting == "competition" && styles.activeSort
+            sorting == "competition" && styles.activeSort,
+            sorting == "competitionRev" && styles.activeSortRev
           )}
         >
           <ArrowUpwardRoundedIcon />
@@ -133,11 +152,14 @@ export default function Table({
           <Information information="A difficulty metric representing how easy or difficult it will be to rank on Google's organic search results for a specific keyword." />
         </div>
         <div
-          onClick={() => setSorting("potential")}
+          onClick={() =>
+            setSorting(sorting == "potential" ? "potentialRev" : "potential")
+          }
           className={classNames(
             styles.item,
             styles.potential,
-            sorting == "potential" && styles.activeSort
+            sorting == "potential" && styles.activeSort,
+            sorting == "potentialRev" && styles.activeSortRev
           )}
         >
           <ArrowDownwardRoundedIcon />
@@ -166,7 +188,9 @@ export default function Table({
                 </div>
                 <div className={classNames(styles.item, styles.keyword)}>
                   <p>{keyword.text}</p>
-                  {(searchSubjects && searchSubjects.includes(keyword.text)) ? <p className={styles.subject}>Subject</p> : null}
+                  {searchSubjects && searchSubjects.includes(keyword.text) ? (
+                    <p className={styles.subject}>Subject</p>
+                  ) : null}
                 </div>
                 <div className={classNames(styles.item, styles.searchVolume)}>
                   <p>

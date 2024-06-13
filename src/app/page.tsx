@@ -108,7 +108,7 @@ export default function Home() {
       );
       fetchData(
         currentToken,
-        correctUrl,
+        correctUrl[0],
         startDate,
         endDate,
         "date",
@@ -117,7 +117,7 @@ export default function Home() {
       );
       fetchData(
         currentToken,
-        correctUrl,
+        correctUrl[0],
         startDate,
         endDate,
         "page",
@@ -126,7 +126,7 @@ export default function Home() {
       );
       fetchData(
         currentToken,
-        correctUrl,
+        correctUrl[0],
         startDate,
         endDate,
         "query",
