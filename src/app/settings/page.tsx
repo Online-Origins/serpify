@@ -97,13 +97,13 @@ export default function ProjectSettings() {
           .filter((domain: any) => domain.id != currentDomain.id)
           .map((domain: any) => domain.domain)
       );
-      router.back();
+      router.push("/");
     }
   }
 
   async function createProject() {
     const cleanedDomain = newProjectDomain.replace(
-      /(https|http|www\.|:\/\/)/g,
+      /(https|http|www\.|:\/\/|\/)/g,
       ""
     );
     if (availableDomains.includes(cleanedDomain)) {
@@ -130,7 +130,7 @@ export default function ProjectSettings() {
           .sort((a: any, b: any) => a.id - b.id)
           .map((domain: any) => domain.domain)
       );
-      router.back();
+      router.push("/");
     }
   }
 
@@ -227,7 +227,6 @@ export default function ProjectSettings() {
                 disabled={
                   !newProjectName ||
                   !newProjectDomain ||
-                  !newProjectAudience ||
                   !newProjectLanguage
                 }
               >

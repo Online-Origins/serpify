@@ -41,7 +41,6 @@ export default function Collection({ params }: { params: { slug: string } }) {
   const [popUpOpen, setPopUpOpen] = useState(false);
   const [chosenFocusKeyword, setChosenFocusKeyword] = useState("");
   const [popUpStep, setPopUpStep] = useState(1);
-
   const [chosenKeywords, setChosenFocusKeywords] = useState([]);
   const [chosenLanguage, setChosenLanguage] = useState(languageCodes[0].id);
   const [toneOfVoice, setToneOfVoice] = useState(toneOfVoices[0].id);
@@ -232,21 +231,28 @@ export default function Collection({ params }: { params: { slug: string } }) {
   // Sort the keywords on the sorting type
   function sortKeywords(array: any) {
     if (sorting == "potential") {
-      return array.sort(
-        (a: any, b: any) =>
-          b.keywordMetrics.potential - a.keywordMetrics.potential
-      );
+      return array.sort((a: any, b: any) =>b.keywordMetrics.potential - a.keywordMetrics.potential);
+    } else if (sorting == "potentialRev") {
+      return array.sort((a: any, b: any) =>a.keywordMetrics.potential - b.keywordMetrics.potential);
     } else if (sorting == "competition") {
-      return array.sort(
-        (a: any, b: any) =>
-          a.keywordMetrics.competitionIndex - b.keywordMetrics.competitionIndex
-      );
-    } else if (sorting == "searchVolume") {
-      return array.sort(
-        (a: any, b: any) =>
-          b.keywordMetrics.avgMonthlySearches -
-          a.keywordMetrics.avgMonthlySearches
-      );
+      return array.sort((a: any, b: any) =>a.keywordMetrics.competitionIndex - b.keywordMetrics.competitionIndex);
+    } else if (sorting == "competitionRev") {
+      return array.sort((a: any, b: any) =>b.keywordMetrics.competitionIndex - a.keywordMetrics.competitionIndex
+      );} else if (sorting == "searchVolume") {
+      return array.sort((a: any, b: any) =>b.keywordMetrics.avgMonthlySearches -a.keywordMetrics.avgMonthlySearches);
+    } else if (sorting == "searchVolumeRef") {
+      return array.sort((a: any, b: any) =>a.keywordMetrics.avgMonthlySearches -b.keywordMetrics.avgMonthlySearches);
+    } else if (sorting == "keywordRev") {
+      return array.sort((a: any, b: any) => {
+        // Compare the text values
+        if (a.text > b.text) {
+          return -1;
+        } else if (a.text < b.text) {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
     } else {
       return array.sort((a: any, b: any) => {
         // Compare the text values
@@ -658,15 +664,15 @@ export default function Collection({ params }: { params: { slug: string } }) {
               </Button>
             }
           >
+            
             <InputWrapper
               type="text"
               title="Subjects:"
               required={true}
               onChange={(value: any) => setSubjectsInput(value)}
-              information="For what subjects do you want to search keywords?"
-              placeholder="Enter your subjects and devide them by a comma"
+              placeholder="For what subjects do you want to search keywords?"
             />
-            {moreFilters && (
+            <p style={{marginTop: -8, fontSize: 12}}>*Enter your subjects and devide them by a comma</p>
               <div className={styles.filters}>
                 <div className={styles.multiDropdown}>
                   <InputWrapper
@@ -799,15 +805,6 @@ export default function Collection({ params }: { params: { slug: string } }) {
                   ]}
                 />
               </div>
-            )}
-            <Button
-              type={"textOnly"}
-              onClick={() => setMoreFilters(!moreFilters)}
-            >
-              <p className={styles.underline}>
-                {moreFilters ? "Close filters" : "More filters"}
-              </p>
-            </Button>
           </PopUp>
         </PopUpWrapper>
       )}

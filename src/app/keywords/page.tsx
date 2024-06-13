@@ -104,7 +104,7 @@ export default function CollectionsPage() {
         information="
         Keywords are crucial terms for SEO that define content focus. Keyword Research identifies popular, relevant search terms to enhance content visibility and align with user search behavior."
       />
-        <CollectionsWrapper />
+      <CollectionsWrapper />
       {popUpOpen && (
         <PopUpWrapper>
           <PopUp
@@ -131,151 +131,141 @@ export default function CollectionsPage() {
               title="Subjects:"
               required={true}
               onChange={(value: any) => setSubjectsInput(value)}
-              information="For what subjects do you want to search keywords?"
-              placeholder="Enter your subjects and devide them by a comma"
+              placeholder="For what subjects do you want to search keywords?"
             />
-            {moreFilters && (
-              <div className={styles.filters}>
-                <div className={styles.multiDropdown}>
-                  <InputWrapper
-                    type="autocomplete"
-                    title="Country:"
-                    required={false}
-                    value={keywordsCountry}
-                    options={countryCodes}
-                    onChange={(value: any) =>
-                      setKeywordsCountry(
-                        value != null ? value : countryCodes[0].id
-                      )
-                    }
-                    placeholder="Which country do you want to target?"
-                  />
-                  <InputWrapper
-                    type="autocomplete"
-                    title="Language:"
-                    required={false}
-                    value={keywordsLanguage}
-                    options={languageCodes}
-                    onChange={(value: any) =>
-                      setKeywordsLanguage(
-                        value != null ? value : languageCodes[0].id
-                      )
-                    }
-                    placeholder="In what language should the keywords be?"
-                  />
-                </div>
+            <p style={{marginTop: -8, fontSize: 12}}>*Enter your subjects and devide them by a comma</p>
+            <div className={styles.filters}>
+              <div className={styles.multiDropdown}>
                 <InputWrapper
-                  type="multiSelect"
-                  title="Length of the keywords:"
+                  type="autocomplete"
+                  title="Country:"
                   required={false}
+                  value={keywordsCountry}
+                  options={countryCodes}
                   onChange={(value: any) =>
-                    value.length == 0
-                      ? alert("You need to select at least one")
-                      : setKeywordLength(value)
+                    setKeywordsCountry(
+                      value != null ? value : countryCodes[0].id
+                    )
                   }
-                  defValue={keywordLength}
-                  information="Short-tail keywords are broad, general, and popular terms with high search volume and competition. Longtail keywords are more specific, niche, and targeted multi-word terms with lower search volume and lower competition."
+                  placeholder="Which country do you want to target?"
                 />
                 <InputWrapper
-                  type="slider"
-                  title="Search volume:"
-                  information="Search volume is the number of times, on average, that users enter a particular search query into a search engine each month."
-                  defValue={searchVolume}
-                  onChange={(value: any) => setSearchVolume(value)}
-                  step={25}
-                  marks={[
-                    {
-                      value: 0,
-                      label: "10",
-                    },
-                    {
-                      value: 25,
-                      label: "100",
-                    },
-                    {
-                      value: 50,
-                      label: "1K",
-                    },
-                    {
-                      value: 75,
-                      label: "10K",
-                    },
-                    {
-                      value: 100,
-                      label: "100K",
-                    },
-                  ]}
-                />
-                <InputWrapper
-                  type="slider"
-                  title="Competition:"
-                  information="The degree of competition of the position for a keyword."
-                  defValue={competition}
-                  onChange={(value: any) => setCompetition(value)}
-                  step={25}
-                  marks={[
-                    {
-                      value: 0,
-                      label: "0",
-                    },
-                    {
-                      value: 25,
-                      label: "25",
-                    },
-                    {
-                      value: 50,
-                      label: "50",
-                    },
-                    {
-                      value: 75,
-                      label: "75",
-                    },
-                    {
-                      value: 100,
-                      label: "100",
-                    },
-                  ]}
-                />
-                <InputWrapper
-                  type="slider"
-                  title="Potential:"
-                  information="The ability of a particular keyword or key phrase to drive traffic, engagement, or conversions."
-                  defValue={potential}
-                  onChange={(value: any) => setPotential(value)}
-                  step={25}
-                  marks={[
-                    {
-                      value: 0,
-                      label: "0",
-                    },
-                    {
-                      value: 25,
-                      label: "25",
-                    },
-                    {
-                      value: 50,
-                      label: "50",
-                    },
-                    {
-                      value: 75,
-                      label: "75",
-                    },
-                    {
-                      value: 100,
-                      label: "100",
-                    },
-                  ]}
+                  type="autocomplete"
+                  title="Language:"
+                  required={false}
+                  value={keywordsLanguage}
+                  options={languageCodes}
+                  onChange={(value: any) =>
+                    setKeywordsLanguage(
+                      value != null ? value : languageCodes[0].id
+                    )
+                  }
+                  placeholder="In what language should the keywords be?"
                 />
               </div>
-            )}
-            <Button
-              type={"textOnly"}
-              onClick={() => setMoreFilters(!moreFilters)}
-            >
-              <p className={styles.underline}>
-                {moreFilters ? "Close filters" : "More filters"}
-              </p>
-            </Button>
+              <InputWrapper
+                type="multiSelect"
+                title="Length of the keywords:"
+                required={false}
+                onChange={(value: any) =>
+                  value.length == 0
+                    ? alert("You need to select at least one")
+                    : setKeywordLength(value)
+                }
+                defValue={keywordLength}
+                information="Short-tail keywords are broad, general, and popular terms with high search volume and competition. Longtail keywords are more specific, niche, and targeted multi-word terms with lower search volume and lower competition."
+              />
+              <InputWrapper
+                type="slider"
+                title="Search volume:"
+                information="Search volume is the number of times, on average, that users enter a particular search query into a search engine each month."
+                defValue={searchVolume}
+                onChange={(value: any) => setSearchVolume(value)}
+                step={25}
+                marks={[
+                  {
+                    value: 0,
+                    label: "10",
+                  },
+                  {
+                    value: 25,
+                    label: "100",
+                  },
+                  {
+                    value: 50,
+                    label: "1K",
+                  },
+                  {
+                    value: 75,
+                    label: "10K",
+                  },
+                  {
+                    value: 100,
+                    label: "100K",
+                  },
+                ]}
+              />
+              <InputWrapper
+                type="slider"
+                title="Competition:"
+                information="The degree of competition of the position for a keyword."
+                defValue={competition}
+                onChange={(value: any) => setCompetition(value)}
+                step={25}
+                marks={[
+                  {
+                    value: 0,
+                    label: "0",
+                  },
+                  {
+                    value: 25,
+                    label: "25",
+                  },
+                  {
+                    value: 50,
+                    label: "50",
+                  },
+                  {
+                    value: 75,
+                    label: "75",
+                  },
+                  {
+                    value: 100,
+                    label: "100",
+                  },
+                ]}
+              />
+              <InputWrapper
+                type="slider"
+                title="Potential:"
+                information="The ability of a particular keyword or key phrase to drive traffic, engagement, or conversions."
+                defValue={potential}
+                onChange={(value: any) => setPotential(value)}
+                step={25}
+                marks={[
+                  {
+                    value: 0,
+                    label: "0",
+                  },
+                  {
+                    value: 25,
+                    label: "25",
+                  },
+                  {
+                    value: 50,
+                    label: "50",
+                  },
+                  {
+                    value: 75,
+                    label: "75",
+                  },
+                  {
+                    value: 100,
+                    label: "100",
+                  },
+                ]}
+              />
+            </div>
           </PopUp>
         </PopUpWrapper>
       )}

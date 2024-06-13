@@ -106,5 +106,12 @@
                 opacity: 1;
             }
         }
+        
+        &.activeSortRev {
+            svg {
+                opacity: 1;
+                rotate: 180deg;
+            }
+        }
     }
 }

@@ -16,17 +16,20 @@ import toneOfVoices from "@/json/tone-of-voice.json";
 import InputWrapper from "../ui/input-wrapper/input-wrapper.component";
 import CircularLoader from "../circular-loader/circular-loader.component";
 import styles from "./collection-card.module.scss";
+import { AutoAwesome } from "@mui/icons-material";
 
 export default function CollectionCard({
   collection,
   shownCollections,
   setShownCollections,
   smallWrapper,
+  currentDomain,
 }: {
   collection: any;
   shownCollections: any;
   setShownCollections: any;
   smallWrapper?: boolean;
+  currentDomain: any;
 }) {
   const router = useRouter();
   const [popUpOpen, setPopUpOpen] = useState(false);
@@ -38,6 +41,7 @@ export default function CollectionCard({
   const [targetAudience, setTargetAudience] = useState("");
   const [contentTitle, setcontentTitle] = useState("");
   const [generating, setGenerating] = useState(false);
+  const [possibleTitles, setPossibleTitles] = useState<string[]>([]);
 
   async function deleteCollection() {
     const { error } = await supabase
@@ -65,11 +69,14 @@ export default function CollectionCard({
             keywords: data[0].keywords,
             language: data[0].language,
             country: data[0].country,
-            domain: data[0].domain
+            domain: data[0].domain,
           },
         ])
         .select();
-      if (!inserting.error && (smallWrapper ? shownCollections.length < 3 : true)) {
+      if (
+        !inserting.error &&
+        (smallWrapper ? shownCollections.length < 3 : true)
+      ) {
         setShownCollections([
           ...shownCollections,
           { ...data[0], id: inserting.data[0].id },
@@ -101,7 +108,8 @@ export default function CollectionCard({
           content_title: contentTitle,
           edited_on: currentDate(),
           status: "outlines",
-          keyword: chosenKeyword
+          keyword: chosenKeyword,
+          domain: currentDomain,
         },
       ])
       .select();
@@ -140,6 +148,25 @@ export default function CollectionCard({
       });
 
       const data = await response.json();
+
+      let possibleTitles = [];
+
+      while (possibleTitles.length < 3) {
+        const possibleRespone = await fetch("/api/generateTitle", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            keyword: chosenKeyword,
+            toneofvoice: toneOfVoicebyId?.value,
+            language: language?.value,
+          }),
+        });
+        const possibleData = await possibleRespone.json();
+        possibleTitles.push(possibleData.generatedTitle.split('"').join(""));
+      }
+      setPossibleTitles(possibleTitles);
       setGenerating(false);
       setcontentTitle(data.generatedTitle.split('"').join("")); //Remove the "" around the generated title
     } catch (error: any) {
@@ -212,10 +239,10 @@ export default function CollectionCard({
           >
             {popUpStep == 1 && (
               <div className={styles.selectingKeywords}>
-              <div className={styles.collectionWrapper}>
-                <h4>Collection:</h4>
-                <h5>{collection.collection_name}</h5>
-              </div>
+                <div className={styles.collectionWrapper}>
+                  <h4>Collection:</h4>
+                  <h5>{collection.collection_name}</h5>
+                </div>
                 <InputWrapper
                   type="dropdown"
                   title="Focus keyword:"
@@ -230,7 +257,9 @@ export default function CollectionCard({
                   type="vertMultiSelect"
                   title="Subkeywords to use:"
                   required={false}
-                  options={collection.keywords.filter((option:string) => option != chosenKeyword)}
+                  options={collection.keywords.filter(
+                    (option: string) => option != chosenKeyword
+                  )}
                   defValue={chosenKeywords}
                   information="Keywords that help by enhancing the relevance, reach, and effectiveness of your main keyword strategy."
                   onChange={(value: any) => setChosenKeywords(value)}
@@ -280,6 +309,28 @@ export default function CollectionCard({
                   placeholder="Insert title for the content (or generate with AI)"
                   generateTitle={() => generateTitle()}
                 />
+                {possibleTitles.length > 0 && (
+                  <div className={styles.possibleTitles}>
+                    <h5>Possible titles:</h5>
+                    {possibleTitles.map((title: string) => (
+                      <div
+                        key={title}
+                        className={styles.possibleTitle}
+                        onClick={() => {
+                          setcontentTitle(title);
+                          setPossibleTitles(
+                            possibleTitles.filter(
+                              (item: string) => item != title
+                            )
+                          );
+                        }}
+                      >
+                        <AutoAwesome />
+                        <p>{title}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
             {generating && (
