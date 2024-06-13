@@ -180,7 +180,7 @@ export default function CollectionsPage() {
                   type="slider"
                   title="Search volume:"
                   information="Search volume is the number of times, on average, that users enter a particular search query into a search engine each month."
-                  defValue={[0, 100]}
+                  defValue={searchVolume}
                   onChange={(value: any) => setSearchVolume(value)}
                   step={25}
                   marks={[
@@ -210,7 +210,7 @@ export default function CollectionsPage() {
                   type="slider"
                   title="Competition:"
                   information="The degree of competition of the position for a keyword."
-                  defValue={[0, 100]}
+                  defValue={competition}
                   onChange={(value: any) => setCompetition(value)}
                   step={25}
                   marks={[
@@ -240,7 +240,7 @@ export default function CollectionsPage() {
                   type="slider"
                   title="Potential:"
                   information="The ability of a particular keyword or key phrase to drive traffic, engagement, or conversions."
-                  defValue={[0, 100]}
+                  defValue={potential}
                   onChange={(value: any) => setPotential(value)}
                   step={25}
                   marks={[
