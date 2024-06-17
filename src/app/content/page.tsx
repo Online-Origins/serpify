@@ -249,7 +249,7 @@ export default function ContentOverview() {
                   value={chosenKeyword}
                   options={keywordOptions}
                   information="This will be the keyword your content is focused on."
-                  onChange={(value: any) => setChosenKeyword(value)}
+                  onChange={(value: any) => {setChosenKeyword(value); setChosenKeywords([])}}
                   placeholder="Which collection do you want to use?"
                 />
                 <InputWrapper

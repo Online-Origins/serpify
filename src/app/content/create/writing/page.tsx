@@ -628,7 +628,7 @@ export default function Writing() {
                 "Content-Type": "application/json",
               },
               body: JSON.stringify({
-                prompt: `Generate the paragraph for a blog. The text is for a blog with the title "${
+                prompt: `Generate a paragraph for a blog. The text is for a blog with the title "${
                   contentInfo.title
                 }" and will be about the following subtitle: "${
                   previousHeader.innerText
@@ -644,7 +644,7 @@ export default function Writing() {
                   currentContent[0].keyword
                 }" and these subkeywords: ${currentContent[0].sub_keywords.join(
                   ","
-                )}. Only give back an string of the generated text and don't include the subtitle.`,
+                )}. Don't include an introduction into the subject of the title and blog, just only text for the subtitle. Only give back an string of the generated text and don't include the subtitle.`,
               }),
             });
             const { generatedContent } = await response.json();
@@ -890,7 +890,9 @@ export default function Writing() {
             onClick={() => {
               if (editor) {
                 const clipboardItem = new ClipboardItem({
-                  "text/html": new Blob([editor?.getHTML()], { type: "text/html" }),
+                  "text/html": new Blob([editor?.getHTML()], {
+                    type: "text/html",
+                  }),
                 });
                 navigator.clipboard.write([clipboardItem]);
                 setCopyMessage(true);

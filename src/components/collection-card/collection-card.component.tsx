@@ -250,7 +250,7 @@ export default function CollectionCard({
                   value={chosenKeyword}
                   options={collection.keywords}
                   information="This will be the keyword your content is focused on."
-                  onChange={(value: any) => setChosenKeyword(value)}
+                  onChange={(value: any) => {setChosenKeyword(value); setChosenKeywords([])}}
                   placeholder="Which collection do you want to use?"
                 />
                 <InputWrapper

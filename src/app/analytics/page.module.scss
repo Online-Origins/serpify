@@ -17,7 +17,7 @@
     }
 }
 
-.innerAnalytics{
+.innerAnalytics {
     padding-right: 1rem;
     overflow-y: scroll !important;
 }
@@ -43,8 +43,8 @@
         display: flex;
         width: 100%;
         justify-content: space-between;
-        
-        h3{
+
+        h3 {
             width: 100%;
         }
     }
@@ -93,7 +93,7 @@
                     text-overflow: ellipsis;
                     transition: .3s all ease-in-out;
 
-                    &:hover{
+                    &:hover {
                         color: $purple_primary;
                     }
                 }
@@ -125,9 +125,16 @@
                 transition: .3s all ease-in-out;
             }
 
-            &.sorting{
-                svg{
+            &.sorting {
+                svg {
                     opacity: 1;
+                }
+            }
+
+            &.sortingRev {
+                svg {
+                    opacity: 1;
+                    rotate: 180deg;
                 }
             }
         }

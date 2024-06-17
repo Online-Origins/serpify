@@ -184,6 +184,7 @@ export default function MenuBar({
   useEffect(() => {
     if (currentUrl && !availableDomains.includes(currentUrl)) {
       setCurrentDomain(availableDomains[0]);
+      setDomains(availableDomains)
     } else if (availableDomains.length > domains.length) {
       setCurrentDomain(availableDomains[availableDomains.length - 1]);
       setDomains(availableDomains);

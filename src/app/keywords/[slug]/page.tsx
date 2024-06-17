@@ -230,18 +230,19 @@ export default function Collection({ params }: { params: { slug: string } }) {
 
   // Sort the keywords on the sorting type
   function sortKeywords(array: any) {
+    console.log(sorting)
     if (sorting == "potential") {
-      return array.sort((a: any, b: any) =>b.keywordMetrics.potential - a.keywordMetrics.potential);
+      return array.sort((a: any, b: any) => b.keywordMetrics.potential - a.keywordMetrics.potential);
     } else if (sorting == "potentialRev") {
-      return array.sort((a: any, b: any) =>a.keywordMetrics.potential - b.keywordMetrics.potential);
+      return array.sort((a: any, b: any) => a.keywordMetrics.potential - b.keywordMetrics.potential);
     } else if (sorting == "competition") {
-      return array.sort((a: any, b: any) =>a.keywordMetrics.competitionIndex - b.keywordMetrics.competitionIndex);
+      return array.sort((a: any, b: any) => a.keywordMetrics.competitionIndex - b.keywordMetrics.competitionIndex);
     } else if (sorting == "competitionRev") {
-      return array.sort((a: any, b: any) =>b.keywordMetrics.competitionIndex - a.keywordMetrics.competitionIndex
-      );} else if (sorting == "searchVolume") {
-      return array.sort((a: any, b: any) =>b.keywordMetrics.avgMonthlySearches -a.keywordMetrics.avgMonthlySearches);
-    } else if (sorting == "searchVolumeRef") {
-      return array.sort((a: any, b: any) =>a.keywordMetrics.avgMonthlySearches -b.keywordMetrics.avgMonthlySearches);
+      return array.sort((a: any, b: any) => b.keywordMetrics.competitionIndex - a.keywordMetrics.competitionIndex);
+    } else if (sorting == "searchVolume") {
+      return array.sort((a: any, b: any) => b.keywordMetrics.avgMonthlySearches - a.keywordMetrics.avgMonthlySearches);
+    } else if (sorting == "searchVolumeRev") {
+      return array.sort((a: any, b: any) => a.keywordMetrics.avgMonthlySearches - b.keywordMetrics.avgMonthlySearches);
     } else if (sorting == "keywordRev") {
       return array.sort((a: any, b: any) => {
         // Compare the text values

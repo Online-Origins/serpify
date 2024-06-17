@@ -297,7 +297,7 @@ export default function KeywordSearching() {
       return array.sort((a: any, b: any) =>b.keywordMetrics.competitionIndex - a.keywordMetrics.competitionIndex
       );} else if (sorting == "searchVolume") {
       return array.sort((a: any, b: any) =>b.keywordMetrics.avgMonthlySearches -a.keywordMetrics.avgMonthlySearches);
-    } else if (sorting == "searchVolumeRef") {
+    } else if (sorting == "searchVolumeRev") {
       return array.sort((a: any, b: any) =>a.keywordMetrics.avgMonthlySearches -b.keywordMetrics.avgMonthlySearches);
     } else if (sorting == "keywordRev") {
       return array.sort((a: any, b: any) => {
