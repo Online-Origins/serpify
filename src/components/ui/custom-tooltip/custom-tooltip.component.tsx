@@ -4,6 +4,7 @@ import { styled } from "@mui/material/styles";
 import { useState } from "react";
 import styles from "./custom-tooltip.module.scss";
 
+// Customized MUI tooltip
 const CustomToolTip = styled(({ className, ...props }: TooltipProps) => (
   <Tooltip {...props} classes={{ popper: className }} />
 ))(({ theme }) => ({

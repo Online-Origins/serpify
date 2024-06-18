@@ -21,6 +21,7 @@ export default function ContentItemsWrapper({ small }: { small?: boolean }) {
   const [domainId, setDomainId] = useState();
   const [domainContents, setDomainContents] = useState<any[]>([]);
 
+  // Get the content items, collections and domains
   useEffect(() => {
     if (!gotData.current) {
     getContents();
@@ -51,6 +52,7 @@ export default function ContentItemsWrapper({ small }: { small?: boolean }) {
     }
   }
 
+  // Get the content items that are linked to the current url
   useEffect(() => {
     if (currentUrl && domains.length > 0 && contents.length > 0) {
       const currentDomainId = domains.find(
@@ -73,37 +75,7 @@ export default function ContentItemsWrapper({ small }: { small?: boolean }) {
     }
   }, [currentUrl, domains, titleFilter, contents]);
 
-  useEffect(() => {
-    if (currentUrl && domains.length > 0) {
-      const currentDomainId = domains.find(
-        (domain: any) => domain.domain === currentUrl
-      );
-
-      if (
-        currentDomainId &&
-        currentDomainId.id !== domainId &&
-        collections.length > 0
-      ) {
-        setDomainId(currentDomainId.id);
-        const correctContents = contents.filter(
-          (collection: any) => collection.domain === currentDomainId.id
-        );
-        setDomainContents(settingContents(correctContents));
-        setShownContents(settingContents(correctContents));
-      }
-
-      if (titleFilter != "" && domainContents.length > 0) {
-        let filtered = [];
-        filtered = domainContents.filter((content: any) =>
-          content.content_title
-            .toLocaleLowerCase()
-            .includes(titleFilter.toLocaleLowerCase())
-        );
-        setShownContents(settingContents(filtered))
-      }
-    }
-  }, [currentUrl, domains, titleFilter, contents]);
-
+  // Set the contents to show
   function settingContents(con: any) {
     let array = [];
     if (small) {
@@ -116,6 +88,7 @@ export default function ContentItemsWrapper({ small }: { small?: boolean }) {
     return sortContents(array);
   }
 
+  // Sort the contents by date
   function sortContents(array: any) {
     const sorted = array.sort((a: any, b: any) => {
       const dateA = new Date(a.edited_on);

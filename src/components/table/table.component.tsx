@@ -31,6 +31,7 @@ export default function Table({
   const parentScrollRef = useRef<HTMLDivElement>(null);
   const [scroll, setScroll] = useState(false);
 
+  // Update the selection when a user clicks the select button
   function selecting(clickedKeyword: any) {
     if (
       !selectedKeywords.find(
@@ -47,6 +48,7 @@ export default function Table({
     }
   }
 
+  // Convert the value to an indexation
   function Indexation(indexNum: number) {
     switch (true) {
       case indexNum >= 0 && indexNum < 25:
@@ -61,10 +63,11 @@ export default function Table({
         return "low";
     }
   }
-
+  
+  // Convert the value to an indexation specific for the search volume
   function searchVolumeIndication(googleVolume: number) {
     switch (true) {
-      case googleVolume >= 10 && googleVolume < 100:
+      case googleVolume < 100:
         return "low";
       case googleVolume >= 100 && googleVolume < 1000:
         return "medium";
@@ -77,12 +80,14 @@ export default function Table({
     }
   }
 
+  // Reset the scrollposition when the keywords to show are changed
   useEffect(() => {
     if (shownKeywords.length > 0 && parentScrollRef.current) {
       parentScrollRef.current.scrollTop = 0;
     }
   }, [shownKeywords]);
 
+  // Check if scroll is neccessary
   useEffect(() => {
     if (shownKeywords.length > 0 && scrollRef.current && tableRef.current) {
       const scrollRefHeight = scrollRef.current.offsetHeight;

@@ -13,22 +13,25 @@ export default function DotsMenu({
 }) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
+  // Function to handle click on menu
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
     setAnchorEl(event.currentTarget);
   };
 
+  // Function to handle closing
   const handleClose = (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
     setAnchorEl(null);
   };
 
+  // Function to copy parent element
   const handleDuplicate = (event: React.MouseEvent<HTMLElement>) => {
     copyFunction();
-    console.log(true)
     handleClose(event);
   };
 
+  // Function to delete parent element
   const handleDelete = (event: React.MouseEvent<HTMLElement>) => {
     deleteFunction();
     handleClose(event);

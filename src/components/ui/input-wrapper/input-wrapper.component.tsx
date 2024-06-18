@@ -52,6 +52,7 @@ export default function InputWrapper({
   domainDropdown?: boolean;
   disabled?: boolean;
 }) {
+  // Handle the change of the input value
   const handleChange = (value: string) => {
     if (defValue.includes(value)) {
       onChange(defValue.filter((item: string) => item !== value));
@@ -62,6 +63,7 @@ export default function InputWrapper({
 
   const [tooltipOpen, setTooltipOpen] = useState(true);
 
+  // Return the input depending the type
   const handleType = (type: string) => {
     switch (true) {
       case type == "text":

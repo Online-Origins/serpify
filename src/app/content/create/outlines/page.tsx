@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import { useEffect, useRef, useState } from "react";
 import InnerWrapper from "@/components/inner-wrapper/inner-wrapper.component";
 import PageTitle from "@/components/page-title/page-title.component";
@@ -48,23 +48,24 @@ export default function CreateOutlines() {
   const [selectedTitleType, setSelectedTitleType] = useState("h2");
   const [customTitle, setCustomTitle] = useState("");
   const [updateTitle, setUpdateTitle] = useState("");
-  const [generatingTitle, setGeneratingTitle] = useState(false);
 
+  // Get the content
   useEffect(() => {
     if (contentId != "" && !getContentRef.current) {
       getContent();
       getContentRef.current = true;
     } else {
-      if (typeof localStorage !== 'undefined') {
-        const id = localStorage.getItem("content_id"); 
+      if (typeof localStorage !== "undefined") {
+        const id = localStorage.getItem("content_id");
         setContentId(id);
       } else {
         // If neither localStorage nor sessionStorage is supported
-        console.log('Web Storage is not supported in this environment.');
+        console.log("Web Storage is not supported in this environment.");
       }
     }
   }, [getContentRef, contentId]);
 
+  // Generate the outlines for the content or use the ones from the database if there are outlines in the database
   useEffect(() => {
     if (
       currentContent.length > 0 &&
@@ -83,6 +84,7 @@ export default function CreateOutlines() {
     }
   }, [currentContent, generateTitlesRef]);
 
+  // Sort the outlines. H4's are being placed in H3's, and H3's are being placed inside H2's
   function sortingOutlines(titles: any[]) {
     let array: any[] = [];
     titles.map((title: any, index: number) => {
@@ -109,6 +111,7 @@ export default function CreateOutlines() {
     setContentGeneratedOutlines(array);
   }
 
+  // Get the current content
   async function getContent() {
     const { data } = await supabase
       .from("contentItems")
@@ -119,6 +122,7 @@ export default function CreateOutlines() {
     }
   }
 
+  // Generate the outlines
   async function generateOutlines(retryCount = 3) {
     setGenerating(true);
     try {
@@ -145,7 +149,7 @@ export default function CreateOutlines() {
       });
 
       const { generatedOutlines } = await response.json();
-      sortingOutlines(generatedOutlines.subtitles)
+      sortingOutlines(generatedOutlines.subtitles);
       setGenerating(false);
     } catch (error) {
       console.log(error);
@@ -173,12 +177,14 @@ export default function CreateOutlines() {
     });
   };
 
+  // If an title is changed it should correctly be updated
   const handleTitleChangeRecursive = (id: number, newValue: string) => {
     setContentGeneratedOutlines((prevOutlines: any) => {
       return handleTitleChange(id, newValue, prevOutlines);
     });
   };
 
+  // Organize the subtitles when a users stops dragging a subtitle
   const onDragEnd = (result: any) => {
     if (!result.destination) {
       return;
@@ -282,6 +288,7 @@ export default function CreateOutlines() {
     }
   };
 
+  // Add a new subtitle from the user input
   function addNewTitle() {
     if (customTitle != "") {
       const generateUniqueId = (outlines: OutlineItem[]): number => {
@@ -324,6 +331,7 @@ export default function CreateOutlines() {
     }
   }
 
+  // Get the current date
   function currentDate() {
     const date = new Date();
 
@@ -334,6 +342,7 @@ export default function CreateOutlines() {
     return `${year}-${month}-${day}`;
   }
 
+  // Save the outlines in the database
   async function saveOutline() {
     const { error } = await supabase
       .from("contentItems")
@@ -350,8 +359,8 @@ export default function CreateOutlines() {
     }
   }
 
+  // Generate a new subtitle
   async function generateNewTitle() {
-    setGeneratingTitle(true);
     try {
       const language = languageCodes.find(
         (lang) => lang.id.toString() === currentContent[0].language
@@ -385,6 +394,7 @@ export default function CreateOutlines() {
     }
   }
 
+  // Go to the next step of creating content, and save the outlines
   async function nextContentStep() {
     const { error } = await supabase
       .from("contentItems")
@@ -417,7 +427,7 @@ export default function CreateOutlines() {
           </Button>,
           <Button key={1} type={"solid"} onClick={() => saveOutline()}>
             <p>Save & close</p> <SaveOutlinedIcon />
-          </Button>
+          </Button>,
         ]}
       />
       {currentContent.length > 0 ? (

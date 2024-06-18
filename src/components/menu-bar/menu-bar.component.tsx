@@ -40,6 +40,7 @@ export default function MenuBar({
   } = useSharedContext();
   const [domains, setDomains] = useState<string[]>([]);
 
+  // Get the default data from the session when reloaded
   useEffect(() => {
     const sessionWebData = sessionStorage.getItem("webData");
     const sessionPagesData = sessionStorage.getItem("pagesData");
@@ -61,12 +62,15 @@ export default function MenuBar({
     }
   }, [webData]);
 
+  // Check the pathname and change the menu to a smaller version
   useEffect(() => {
     if (pathname != "/") {
       setSmallNav(true);
     }
   }, [pathname, setSmallNav]);
 
+  // Update the current url if the current domain changes
+  // Also get the data from the domain
   useEffect(() => {
     if (currentUrl && currentUrl != currentDomain) {
       setCurrentUrl(currentDomain);
@@ -77,6 +81,7 @@ export default function MenuBar({
     }
   }, [currentDomain]);
 
+  // Get the data from search console
   function gettingData(
     websiteUrl: string,
     accessToken?: string,
@@ -142,6 +147,7 @@ export default function MenuBar({
     }
   }
 
+  // Fetch the data for each dimension and save it correctly
   async function fetchData(
     accessToken: string,
     correctUrl: string,
@@ -174,6 +180,7 @@ export default function MenuBar({
     }
   }
 
+  // Get the domains from the database
   useEffect(() => {
     if (!loadedDomains.current) {
       getDomains();
@@ -181,15 +188,20 @@ export default function MenuBar({
     }
   }, [loadedDomains.current]);
 
+  // Check it when the available domains change
   useEffect(() => {
     if (currentUrl && !availableDomains.includes(currentUrl)) {
+      // The current url is deleted from the available domains
       setCurrentDomain(availableDomains[0]);
+      setDomains(availableDomains)
     } else if (availableDomains.length > domains.length) {
+      // A domain is added to the platform
       setCurrentDomain(availableDomains[availableDomains.length - 1]);
       setDomains(availableDomains);
     }
   }, [availableDomains]);
 
+  // Get domains and sort them by id
   async function getDomains() {
     const { data } = await supabase.from("domains").select();
     if (data) {

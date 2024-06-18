@@ -43,6 +43,7 @@ export default function CollectionCard({
   const [generating, setGenerating] = useState(false);
   const [possibleTitles, setPossibleTitles] = useState<string[]>([]);
 
+  // Delete a collection
   async function deleteCollection() {
     const { error } = await supabase
       .from("collections")
@@ -55,6 +56,7 @@ export default function CollectionCard({
     }
   }
 
+  // Copy a collection
   async function copyCollection() {
     const { data } = await supabase
       .from("collections")
@@ -85,6 +87,7 @@ export default function CollectionCard({
     }
   }
 
+  // Get the current date
   function currentDate() {
     const date = new Date();
 
@@ -95,6 +98,7 @@ export default function CollectionCard({
     return `${year}-${month}-${day}`;
   }
 
+  // Create content
   async function createContent() {
     const inserting = await supabase
       .from("contentItems")
@@ -127,6 +131,7 @@ export default function CollectionCard({
     }
   }
 
+  // Generate a title
   async function generateTitle() {
     setGenerating(true);
     try {
@@ -149,6 +154,7 @@ export default function CollectionCard({
 
       const data = await response.json();
 
+      // Generate 3 more titles to let the user chose
       let possibleTitles = [];
 
       while (possibleTitles.length < 3) {
@@ -250,7 +256,7 @@ export default function CollectionCard({
                   value={chosenKeyword}
                   options={collection.keywords}
                   information="This will be the keyword your content is focused on."
-                  onChange={(value: any) => setChosenKeyword(value)}
+                  onChange={(value: any) => {setChosenKeyword(value); setChosenKeywords([])}}
                   placeholder="Which collection do you want to use?"
                 />
                 <InputWrapper

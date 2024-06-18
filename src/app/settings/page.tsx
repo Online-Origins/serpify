@@ -22,7 +22,7 @@ export default function ProjectSettings() {
   const router = useRouter();
   const [domains, setDomains] = useState<any[]>([]);
   const [currentDomain, setCurrentDomain] = useState<any>();
-  const { currentUrl, setCurrentUrl, setAvailableDomains, availableDomains } =
+  const { currentUrl, setAvailableDomains, availableDomains } =
     useSharedContext();
   const [projectName, setProjectName] = useState("");
   const [projectDomain, setProjectDomain] = useState("");
@@ -36,6 +36,7 @@ export default function ProjectSettings() {
     languageCodes[0].id
   );
 
+  // Get all domains
   useEffect(() => {
     getDomains();
   }, []);
@@ -47,27 +48,23 @@ export default function ProjectSettings() {
     }
   }
 
+  // Update the current domain if the user changes from project
   useEffect(() => {
     if (currentUrl && domains.length > 0) {
       const currentDomainId = domains.find(
         (domain: any) => domain.domain == currentUrl
       );
-      setCurrentDomain(currentDomainId);
-      setProjectName(
-        currentDomainId.projectName ? currentDomainId.projectName : ""
-      );
-      setProjectDomain(currentDomainId.domain ? currentDomainId.domain : "");
-      setProjectAudience(
-        currentDomainId.targetAudience ? currentDomainId.targetAudience : ""
-      );
-      setProjectLanguage(
-        currentDomainId.language
-          ? currentDomainId.language
-          : languageCodes[0].id
-      );
+      if (currentDomainId) {
+        setCurrentDomain(currentDomainId);
+        setProjectName(currentDomainId.projectName);
+        setProjectDomain(currentDomainId.domain);
+        setProjectAudience(currentDomainId.targetAudience);
+        setProjectLanguage(currentDomainId.language);
+      }
     }
   }, [currentUrl, domains]);
 
+  // Save domain edits
   async function saveDomain() {
     const { error } = await supabase
       .from("domains")
@@ -79,12 +76,13 @@ export default function ProjectSettings() {
       })
       .eq("id", currentDomain.id);
     if (error) {
-        alert("Something went wrong. Please try again")
-      return
+      alert("Something went wrong. Please try again");
+      return;
     }
     getDomains();
   }
 
+  // Delete projects
   async function deleteProject() {
     const { error } = await supabase
       .from("domains")
@@ -101,7 +99,18 @@ export default function ProjectSettings() {
     }
   }
 
+  // Check if a url is valid
+  function isValidUrl(string:string) {
+    const regex = /\.[a-z]{2,}$/i;
+    return regex.test(string);
+  }
+
+  // Create a project
   async function createProject() {
+    if (!isValidUrl(newProjectDomain)){
+      alert("Not a valid URL. Please try again.")
+      return;
+    }
     const cleanedDomain = newProjectDomain.replace(
       /(https|http|www\.|:\/\/|\/)/g,
       ""
@@ -111,14 +120,17 @@ export default function ProjectSettings() {
       setPopUpOpen(false);
       return;
     }
-    const inserting = await supabase.from("domains").insert([
-      {
-        domain: cleanedDomain,
-        projectName: newProjectName,
-        targetAudience: newProjectAudience,
-        language: newProjectLanguage,
-      },
-    ]).select();
+    const inserting = await supabase
+      .from("domains")
+      .insert([
+        {
+          domain: cleanedDomain,
+          projectName: newProjectName,
+          targetAudience: newProjectAudience,
+          language: newProjectLanguage,
+        },
+      ])
+      .select();
     if (inserting.error) {
       alert("Something went wrong. Please try again.");
       console.log(inserting.error);
@@ -225,9 +237,7 @@ export default function ProjectSettings() {
                 type={"solid"}
                 onClick={() => createProject()}
                 disabled={
-                  !newProjectName ||
-                  !newProjectDomain ||
-                  !newProjectLanguage
+                  !newProjectName || !newProjectDomain || !newProjectLanguage
                 }
               >
                 <p>Save</p>

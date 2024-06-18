@@ -1,5 +1,5 @@
 function GradientSVG() {
-  const idCSS = "hello";
+  const idCSS = "gradientId";
   const gradientTransform = `rotate(90)`;
   return (
     <svg style={{ height: 0, position: "absolute" }}>

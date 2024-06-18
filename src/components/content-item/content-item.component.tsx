@@ -24,11 +24,13 @@ export default function ContentItem({
 }) {
   const router = useRouter();
 
+  // Set the current content id and route to the status of the content when a user clicks a content item
   function onEditClick() {
     localStorage.setItem("content_id", content.id);
     router.push(`/content/create/${content.status}`);
   }
 
+  // Get a collection by the id linked in the content
   const getCollectionById = (id: string) => {
     const collection = collections.filter(
       (collection: any) => collection.id === id
@@ -39,6 +41,7 @@ export default function ContentItem({
       return null;
     }
   };
+  // Format the date
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
@@ -48,6 +51,7 @@ export default function ContentItem({
     });
   };
 
+  // Delete a content item
   async function deleteContent() {
     const { error } = await supabase
       .from("contentItems")
@@ -58,6 +62,7 @@ export default function ContentItem({
     }
   }
 
+  // Copy a content item with the current date
   async function copyContent() {
     const date = new Date();
 
@@ -103,6 +108,7 @@ export default function ContentItem({
     }
   }
 
+  // Translate the status from the database to understandable text
   function translateStatus(status: string) {
     if (status == "writing") {
       return "Writing content";

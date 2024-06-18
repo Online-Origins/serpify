@@ -25,6 +25,7 @@ ChartJS.register(
 const LineChart = ({ data, type }: { data: any; type: string }) => {
   const [aspectRatio, setAspectRatio] = useState(1.5);
 
+  // Check the width of the window and change the aspect ratio of the chart
   useEffect(() => {
     const handleResize = () => {
       setAspectRatio(window.innerWidth < 1800 ? 1.1 : 1.5);

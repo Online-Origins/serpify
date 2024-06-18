@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 
 export default function LogIn() {
   const router = useRouter();
+
+  // Open the google Oauth 2.0 authenticator
   async function handleAuthorize() {
     try {
       const response = await fetch("/api/authorizeSearchConsole", {

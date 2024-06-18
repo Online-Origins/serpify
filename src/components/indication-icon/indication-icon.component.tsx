@@ -6,6 +6,7 @@ import classNames from "classnames";
 import styles from "./indication-icon.module.scss";
 
 export default function IndicationIcon({ indication, competition }: { indication: any; competition?: boolean }) {
+  // Switch to return the icon according to the indication
   switch (true) {
     case indication == "extreme":
       return <KeyboardDoubleArrowUpRoundedIcon className={classNames(styles.extreme, competition && styles.comp)} />;

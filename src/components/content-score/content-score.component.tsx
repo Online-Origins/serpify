@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import PageTitle from "../page-title/page-title.component";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 
@@ -19,7 +19,7 @@ export default function ContentScore({ contentScore }: { contentScore: any }) {
   const [minorOpen, setMinorOpen] = useState(true);
   const [warningOpen, setWarningOpen] = useState(true);
   const [keywordsOpen, setKeywordsOpen] = useState(true);
-  const idCSS = "hello";
+  const idCSS = "gradientId";
 
   return (
     <div className={styles.contentScore}>

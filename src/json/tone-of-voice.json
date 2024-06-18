@@ -1,39 +1,150 @@
 [
-    {"id": 1, "value": "Authoritative"},
-    {"id": 2, "value": "Caring"},
-    {"id": 3, "value": "Cheerful"},
-    {"id": 4, "value": "Coarse"},
-    {"id": 5, "value": "Conservative"},
-    {"id": 6, "value": "Conversational"},
-    {"id": 7, "value": "Casual"},
-    {"id": 8, "value": "Dry"},
-    {"id": 9, "value": "Edgy"},
-    {"id": 10, "value": "Enthusiastic"},
-    {"id": 11, "value": "Formal"},
-    {"id": 12, "value": "Frank"},
-    {"id": 13, "value": "Friendly"},
-    {"id": 14, "value": "Fun"},
-    {"id": 15, "value": "Funny"},
-    {"id": 16, "value": "Humorous"},
-    {"id": 17, "value": "Informative"},
-    {"id": 18, "value": "Irreverent"},
-    {"id": 19, "value": "Matter-of-fact"},
-    {"id": 20, "value": "Nostalgic"},
-    {"id": 21, "value": "Passionate"},
-    {"id": 22, "value": "Playful"},
-    {"id": 23, "value": "Professional"},
-    {"id": 24, "value": "Provocative"},
-    {"id": 25, "value": "Quirky"},
-    {"id": 26, "value": "Respectful"},
-    {"id": 27, "value": "Romantic"},
-    {"id": 28, "value": "Sarcastic"},
-    {"id": 29, "value": "Serious"},
-    {"id": 30, "value": "Smart"},
-    {"id": 31, "value": "Snarky"},
-    {"id": 32, "value": "Sympathetic"},
-    {"id": 33, "value": "Trendy"},
-    {"id": 34, "value": "Trustworthy"},
-    {"id": 35, "value": "Unapologetic"},
-    {"id": 36, "value": "Upbeat"},
-    {"id": 37, "value": "Witty"}
+    {
+        "id": 1,
+        "value": "Authoritative"
+    },
+    {
+        "id": 2,
+        "value": "Caring"
+    },
+    {
+        "id": 3,
+        "value": "Cheerful"
+    },
+    {
+        "id": 4,
+        "value": "Coarse"
+    },
+    {
+        "id": 5,
+        "value": "Conservative"
+    },
+    {
+        "id": 6,
+        "value": "Conversational"
+    },
+    {
+        "id": 7,
+        "value": "Casual"
+    },
+    {
+        "id": 8,
+        "value": "Dry"
+    },
+    {
+        "id": 9,
+        "value": "Edgy"
+    },
+    {
+        "id": 10,
+        "value": "Enthusiastic"
+    },
+    {
+        "id": 11,
+        "value": "Formal"
+    },
+    {
+        "id": 12,
+        "value": "Frank"
+    },
+    {
+        "id": 13,
+        "value": "Friendly"
+    },
+    {
+        "id": 14,
+        "value": "Fun"
+    },
+    {
+        "id": 15,
+        "value": "Funny"
+    },
+    {
+        "id": 16,
+        "value": "Humorous"
+    },
+    {
+        "id": 17,
+        "value": "Informative"
+    },
+    {
+        "id": 18,
+        "value": "Irreverent"
+    },
+    {
+        "id": 19,
+        "value": "Matter-of-fact"
+    },
+    {
+        "id": 20,
+        "value": "Nostalgic"
+    },
+    {
+        "id": 21,
+        "value": "Passionate"
+    },
+    {
+        "id": 22,
+        "value": "Playful"
+    },
+    {
+        "id": 23,
+        "value": "Professional"
+    },
+    {
+        "id": 24,
+        "value": "Provocative"
+    },
+    {
+        "id": 25,
+        "value": "Quirky"
+    },
+    {
+        "id": 26,
+        "value": "Respectful"
+    },
+    {
+        "id": 27,
+        "value": "Romantic"
+    },
+    {
+        "id": 28,
+        "value": "Sarcastic"
+    },
+    {
+        "id": 29,
+        "value": "Serious"
+    },
+    {
+        "id": 30,
+        "value": "Smart"
+    },
+    {
+        "id": 31,
+        "value": "Snarky"
+    },
+    {
+        "id": 32,
+        "value": "Sympathetic"
+    },
+    {
+        "id": 33,
+        "value": "Trendy"
+    },
+    {
+        "id": 34,
+        "value": "Trustworthy"
+    },
+    {
+        "id": 35,
+        "value": "Unapologetic"
+    },
+    {
+        "id": 36,
+        "value": "Upbeat"
+    },
+    {
+        "id": 37,
+        "value": "Witty"
+    }
 ]

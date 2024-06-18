@@ -15,12 +15,10 @@ import CollectionsWrapper from "@/components/collections-wrapper/collections-wra
 
 import languageCodes from "@/json/language-codes.json";
 import countryCodes from "@/json/country-codes.json";
-import { supabase } from "@/app/utils/supabaseClient/server";
 import styles from "./page.module.scss";
 
 export default function CollectionsPage() {
   const [popUpOpen, setPopUpOpen] = useState(false);
-  const [moreFilters, setMoreFilters] = useState(false);
   const [subjectsInput, setSubjectsInput] = useState("");
   const [keywordsLanguage, setKeywordsLanguage] = useState(languageCodes[0].id);
   const [keywordsCountry, setKeywordsCountry] = useState(countryCodes[0].id);
@@ -28,24 +26,9 @@ export default function CollectionsPage() {
   const [searchVolume, setSearchVolume] = useState<number[]>([0, 100]);
   const [competition, setCompetition] = useState<number[]>([0, 100]);
   const [potential, setPotential] = useState<number[]>([0, 100]);
-  const getCollectionsRef = useRef(false);
-  const [collections, setCollections] = useState<any[]>([]);
   const router = useRouter();
 
-  useEffect(() => {
-    if (!getCollectionsRef.current) {
-      getCollections();
-      getCollectionsRef.current = true;
-    }
-  }, [getCollectionsRef]);
-
-  async function getCollections() {
-    const { data } = await supabase.from("collections").select();
-    if (data) {
-      setCollections(data);
-    }
-  }
-
+  // Set the filters to start searching
   const startSearching = () => {
     const subjectArray = subjectsInput.split(", ");
     const cleanArray = subjectArray.map((subject) =>
@@ -75,6 +58,7 @@ export default function CollectionsPage() {
     }
   };
 
+  // Translate the searchVolume
   function searchVolumeTranslate(filterValue: number) {
     switch (true) {
       case filterValue == 0:

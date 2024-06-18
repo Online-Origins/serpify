@@ -17,6 +17,7 @@ export default function DomainStatistics() {
   );
   const {webData} = useSharedContext();
 
+  // Set the analytics if the webdata is updated
   useEffect(() => {
     if (webData && webData.length > 0) {
       setTotalAnalytics({
@@ -30,6 +31,7 @@ export default function DomainStatistics() {
     }
   }, [webData]);
 
+  // Get the total
   function collectTotal(key: string, data: any[]) {
     let totalAmount = 0;
     data.forEach((item: any) => {
@@ -38,6 +40,7 @@ export default function DomainStatistics() {
     return totalAmount;
   }
 
+  // Get the average
   function collectAverage(key: string, data: any[]) {
     let totalAmount = 0;
     data.forEach((item: any) => {
@@ -46,6 +49,7 @@ export default function DomainStatistics() {
     return totalAmount / data.length;
   }
 
+  // If statement to check if there are analytics
   return totalAnalytics ? (
     <div className={styles.statsOverview}>
       <Statistic
