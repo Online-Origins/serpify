@@ -117,7 +117,7 @@ export default function AnalyticsPage() {
       <PageTitle
         title={"Website analytics"}
         information={
-          "Website Analytics involves tracking and analyzing web traffic data to understand user behavior, improve site performance, and optimize content for better engagement and conversion rates. The entirety of our data and analytics infrastructure relies exclusively on Google's platform."
+          "Website analytics involves tracking and analyzing web traffic data to understand user behavior, improve site performance, and optimize content for better engagement and conversion rates. The entirety of our data and analytics infrastructure relies exclusively on Google's platform."
         }
         smallTitle="(Last month)"
       />
