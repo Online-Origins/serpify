@@ -61,3 +61,30 @@
         gap: 1rem;
     }
 }
+
+.possibleTitles {
+    display: flex;
+    flex-flow: column;
+    gap: .5rem;
+
+    .possibleTitle {
+        display: flex;
+        align-items: center;
+        background-color: rgba($color: $purple_primary, $alpha: .2);
+        width: max-content;
+        border-radius: .25rem;
+        padding: .5rem;
+        gap: .25rem;
+        cursor: pointer;
+        transition: .3s all ease-in-out;
+
+        &:hover{
+            background-color: $purple_secundary;
+            color: $white;
+        }
+
+        svg {
+            height: 1rem;
+        }
+    }
+}

@@ -36,6 +36,7 @@ export default function ProjectSettings() {
     languageCodes[0].id
   );
 
+  // Get all domains
   useEffect(() => {
     getDomains();
   }, []);
@@ -47,6 +48,7 @@ export default function ProjectSettings() {
     }
   }
 
+  // Update the current domain if the user changes from project
   useEffect(() => {
     if (currentUrl && domains.length > 0) {
       const currentDomainId = domains.find(
@@ -62,6 +64,7 @@ export default function ProjectSettings() {
     }
   }, [currentUrl, domains]);
 
+  // Save domain edits
   async function saveDomain() {
     const { error } = await supabase
       .from("domains")
@@ -79,6 +82,7 @@ export default function ProjectSettings() {
     getDomains();
   }
 
+  // Delete projects
   async function deleteProject() {
     const { error } = await supabase
       .from("domains")
@@ -95,11 +99,13 @@ export default function ProjectSettings() {
     }
   }
 
+  // Check if a url is valid
   function isValidUrl(string:string) {
     const regex = /\.[a-z]{2,}$/i;
     return regex.test(string);
   }
 
+  // Create a project
   async function createProject() {
     if (!isValidUrl(newProjectDomain)){
       alert("Not a valid URL. Please try again.")

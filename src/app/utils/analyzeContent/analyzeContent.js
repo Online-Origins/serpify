@@ -47,24 +47,30 @@ export function analyzeContent(contentJson) {
         var count = (htmlText.match(regex) || []).length;
         if (type == "h1") {
             if (count == 1) {
+                // If there is 1 H1 it is good
                 goodPoints.push(`Your text contains an ${type.toUpperCase()} title`);
                 return points
             } else if (count > 1) {
+                // If there is more than 1 H1 than it is not good
                 warnings.push(`Your text can't contain multiple ${type.toUpperCase()} titles`)
-                return 0
             } else {
+                // If there is no H1 it is not good
                 warnings.push(`Your text doesn't contain an ${type.toUpperCase()} title. You need to add one`)
             }
         } else if (type == "h4") {
+            // It is not neccessary to have an H4
             if (count >= 1) {
+                // If there is an H4 it is good
                 goodPoints.push(`Your text contains an ${type.toUpperCase()} sub title`);
                 return points
             }
         } else {
+            // If there is more than zero H2 or H3 it is good
             if (count >= 1) {
                 goodPoints.push(`Your text contains an ${type.toUpperCase()} sub title`);
                 return points
             } else {
+                //  If there is no H2 or H3 it is not good
                 warnings.push(`Your text doesn't contain an ${type.toUpperCase()} sub title. Try to add one`)
             }
         }
@@ -82,7 +88,8 @@ export function analyzeContent(contentJson) {
                 const count = matches ? matches.length : 0;
                 const percentage = (count / getWordAmount()) * 100;
 
-                if (percentage >= 1 && percentage <= 2) {
+                // If the density of a keyword is between 1 and 2 percent it is good
+                if (percentage.toFixed(2) >= 1 && percentage.toFixed(2) <= 2) {
                     seoScore += (10 / subKeywords.length);
                 }
 
@@ -91,7 +98,6 @@ export function analyzeContent(contentJson) {
         } else {
             seoScore += 10;
         }
-
         return subKeywordsArray;
     }
 
@@ -101,7 +107,8 @@ export function analyzeContent(contentJson) {
         const count = matches ? matches.length : 0;
         const percentage = (count / getWordAmount()) * 100;
 
-        if (percentage >= 1 && percentage <= 2) {
+        // If the density of the keyword is between 1 and 2 percent it is good
+        if (percentage.toFixed(2) >= 1 && percentage.toFixed(2) <= 2) {
             seoScore += 10;
         }
 
@@ -110,9 +117,11 @@ export function analyzeContent(contentJson) {
 
     function getKeywordInTitle() {
         if (title.replace(/[-_@#!'"]/g, " ").toLowerCase().includes(keyword)) {
+            // If the title contains the focus keyword it is good
             goodPoints.push("Good! Your title contains your focus keyword")
             return 10;
         } else {
+            // If the title doesn't contain the focus keyword is not good
             warnings.push("Your title doesn't contain your focus keyword")
             return 0;
         }
@@ -120,12 +129,15 @@ export function analyzeContent(contentJson) {
 
     function getKeywordLength() {
         if (title.length >= 40 && title.length <= 60) {
+            // If the length of the title is between 40 and 60 characters it is good
             goodPoints.push("Your title has a good length. Nice work!")
             return 5
         } else {
             if (title.length < 40) {
+                // If the length is smaller than 40 characters it is to small
                 warnings.push(`The length of your title is ${title.length} and needs to be at least 40 characters`)
             } else if (title.length > 60) {
+                // If the length is longer than 60 characters it is to long
                 warnings.push(`The length of your title is ${title.length} and needs to be maximal 60 characters`)
             }
             return 0;
@@ -147,18 +159,23 @@ export function analyzeContent(contentJson) {
     }
 
     function getLinkCount() {
+        // Count all links in text
         var count = (htmlText.match(/<a\b/g) || []).length;
+        // get the optimal link amount according to the length of the text
         const optimalAmount = getWordAmount() < 300 ? 1 : (getWordAmount() / 300).toFixed(0)
         if (count >= optimalAmount) {
+            // If the amount is the same or more as the optimal amount it is good
             seoScore += 5;
             goodPoints.push("Your text contains a good amount of links");
         } else if (count > 0 && count < optimalAmount) {
+            // If the amount is more than 0 but less than optimal it is not good but not bad
             const linkScore = 5 / optimalAmount
             for (let x = 0; x < count; x++) {
                 seoScore += linkScore;
             }
             minorWarnings.push(`Your text contains a decent amount of links: ${count}. Try to add more`)
         } else {
+            // If the amount is 0 it is not good
             warnings.push("Your text doesn't contain any links. Try to add some")
         }
         return count;
@@ -170,6 +187,7 @@ export function analyzeContent(contentJson) {
         const doc = parser.parseFromString(htmlText, 'text/html');
         const headings = Array.from(doc.querySelectorAll('h2, h3')).map(heading => `<${heading.tagName.toLowerCase()}>${heading.textContent}</${heading.tagName.toLowerCase()}>`);
 
+        // Check for each subkeyword if it is in one of the h2 or h3 elements
         subKeywords.map((subKeyword) => {
             let subKeywordAmount = 0;
             headings.map((heading) => {
@@ -178,9 +196,11 @@ export function analyzeContent(contentJson) {
                 }
             })
             if (subKeywordAmount == 0) {
+                // If one of the subkeywords is not in one of the subtitles it is not good
                 score -= (10 / subKeywords.length);
                 warnings.push(`Your subkeyword "${subKeyword}" is in none of your subheadings. Try to add it somewhere`);
             } else {
+                // If one of the subkeywords is in one of the subtitles it is good
                 goodPoints.push(`Your subkeyword "${subKeyword}" is in one of your subheadings. Awesome!`);
             }
         })
@@ -208,6 +228,7 @@ export function analyzeContent(contentJson) {
         return seoScore;
     }
 
+    // Return the score
     const analyzedContent = {
         wordCount: getWordCount(),
         points: {

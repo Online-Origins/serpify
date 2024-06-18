@@ -1,6 +1,7 @@
 import { Draggable } from "@hello-pangea/dnd";
 import Subtitle from "../subtitle/subtitle.component";
 
+// Child element from draggable child, which is a child of draggable subtitle
 export default function DraggableBaby({
   title,
   index,

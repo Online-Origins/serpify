@@ -28,6 +28,7 @@ export default function Home() {
     const role = sessionStorage.getItem("role");
 
     if (!authorizationCode && !gottenData.current && !role) {
+      // Redirect to the login page if a user isn't authorized yet
       if (loadingRef.current) {
         router.push("/login");
       }
@@ -37,6 +38,7 @@ export default function Home() {
       currentUrl &&
       currentUrl != ""
     ) {
+      // Get search console data if a user is authenticated
       if (loadingRef.current) {
         handleExecute(authorizationCode, currentUrl);
         loadingRef.current = false;
@@ -47,6 +49,7 @@ export default function Home() {
     }
   }, [currentUrl, loadingRef.current, gottenData.current]);
 
+  // Handle getting search console data
   async function handleExecute(authorizationCode: any, websiteUrl: string) {
     try {
       const tokenResponse = await fetch("/api/exchangeCode", {
@@ -72,6 +75,7 @@ export default function Home() {
     }
   }
 
+  // Get data
   function gettingData(
     websiteUrl: string,
     accessToken?: string,
@@ -135,7 +139,8 @@ export default function Home() {
       );
     }
   }
-
+  
+  // Fetch specific dimension type data
   async function fetchData(
     accessToken: string,
     correctUrl: string,

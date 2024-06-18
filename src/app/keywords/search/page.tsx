@@ -69,6 +69,7 @@ export default function KeywordSearching() {
   const [currentDomain, setCurrentDomain] = useState();
   const getCollectionsRef = useRef(false);
 
+  // Remove a alert when the new collection name is not empty
   useEffect(() => {
     if (showAlert) {
       if (newCollection != "") {
@@ -77,6 +78,7 @@ export default function KeywordSearching() {
     }
   }, [showAlert, newCollection]);
 
+  // Get filters
   useEffect(() => {
     if (!getFiltersRef.current) {
       const filters = localStorage?.getItem("filters");
@@ -87,6 +89,7 @@ export default function KeywordSearching() {
     }
   }, [getFiltersRef]);
 
+  // Set the search volume filtering
   function searchVolumeFiltering(volume: number) {
     switch (true) {
       case volume == 10:
@@ -103,6 +106,8 @@ export default function KeywordSearching() {
         return 0;
     }
   }
+
+  // Get collections
   useEffect(() => {
     if (!getCollectionsRef.current) {
       getCollections();
@@ -128,6 +133,7 @@ export default function KeywordSearching() {
     }
   }
 
+  // get domains
   async function getDomains() {
     const { data } = await supabase.from("domains").select();
     if (data) {
@@ -473,6 +479,7 @@ export default function KeywordSearching() {
     setFilterPopUpOpen(false);
   }
 
+  // Translate the search volume
   function searchVolumeTranslate(filterValue: number) {
     switch (true) {
       case filterValue == 0:

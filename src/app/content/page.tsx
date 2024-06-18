@@ -43,18 +43,21 @@ export default function ContentOverview() {
   const [currentDomain, setCurrentDomain] = useState();
   const [possibleTitles, setPossibleTitles] = useState<string[]>([]);
 
+  // Get the collections when the currentUrl changes
   useEffect(() => {
     if (currentUrl) {
       getCollections();
     }
   }, [currentUrl]);
 
+  // Set the chosen collection to make content with to the first one when there are collections
   useEffect(() => {
     if (collections.length > 0) {
       setChosenCollection(collections[0].id);
     }
   }, [collections]);
 
+  // Set the keywordOptions and chosenKeyword to the first one of the keywords if the chosenCollection is set
   useEffect(() => {
     const filtered = collections.filter(
       (collection) => collection.id === chosenCollection
@@ -65,6 +68,7 @@ export default function ContentOverview() {
     }
   }, [chosenCollection]);
 
+  // Get collections from database
   async function getCollections() {
     const { data } = await supabase.from("collections").select();
     if (data) {
@@ -86,6 +90,7 @@ export default function ContentOverview() {
     }
   }
 
+  // Get domains from database
   async function getDomains() {
     const { data } = await supabase.from("domains").select();
     if (data) {
@@ -94,6 +99,7 @@ export default function ContentOverview() {
     return { domains: [] };
   }
 
+  // Generate a title for a blog
   async function generateTitle() {
     setGenerating(true);
     try {
@@ -116,6 +122,7 @@ export default function ContentOverview() {
 
       const data = await response.json();
 
+      // Generate 3 extra titles to give the user more options
       let possibleTitles = [];
 
       while (possibleTitles.length < 3) {
@@ -142,6 +149,7 @@ export default function ContentOverview() {
     }
   }
 
+  // Get current date
   function currentDate() {
     const date = new Date();
 
@@ -152,6 +160,7 @@ export default function ContentOverview() {
     return `${year}-${month}-${day}`;
   }
 
+  // Add content to the database and open the outlines step
   async function createContent() {
     const inserting = await supabase
       .from("contentItems")

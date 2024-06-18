@@ -16,6 +16,7 @@ export default function SmallTable({
   const [keywordsData, setKeywordsData] = useState<any>([]);
   const isGettingData = useRef(false);
 
+  // Show a maximum amount of 5 keywords in the small table
   function getSmallTableKeywords() {
     let array = [];
     for (let x = 0; x < keywords.length && x < 5; x++) {
@@ -24,6 +25,7 @@ export default function SmallTable({
     return array;
   }
 
+  // Get the data for the keywords 
   useEffect(() => {
     if (!isGettingData.current) {
       getKeywordsData().then((data) => {
@@ -49,11 +51,13 @@ export default function SmallTable({
     }
   }, [isGettingData]);
 
+  // Fetch the data from Google Ads
   async function getKeywordsData() {
     let attempt = 0;
     const retries = 3;
     const timeout = (ms:any) => new Promise(resolve => setTimeout(resolve, ms));
   
+    // Retry the fetch if it fails 
     while (attempt < retries) {
       try {
         const response = await fetch("/api/keywordMetrics", {
@@ -82,10 +86,10 @@ export default function SmallTable({
     }
   }
   
-
+  // Convert the search volume
   function searchVolume(googleVolume: number) {
     switch (true) {
-      case googleVolume >= 10 && googleVolume < 100:
+      case googleVolume < 100:
         return "10 - 100";
       case googleVolume >= 100 && googleVolume < 1000:
         return "100 - 1K";
@@ -98,6 +102,7 @@ export default function SmallTable({
     }
   }
 
+  // Calculate the potential index
   function potentialIndex(googleVolume: number, competition: number) {
     const search = searchVolume(googleVolume);
 
@@ -115,7 +120,8 @@ export default function SmallTable({
     }
   }
 
-  function Indexation(indexNum: number) {
+  // Get a indication for the value
+  function Indication(indexNum: number) {
     switch (true) {
       case indexNum >= 0 && indexNum < 25:
         return "extreme";
@@ -130,9 +136,10 @@ export default function SmallTable({
     }
   }
 
+  // Get a indication for the value of the search volume
   function searchVolumeIndication(googleVolume: number) {
     switch (true) {
-      case googleVolume >= 10 && googleVolume < 100:
+      case googleVolume < 100:
         return "low";
       case googleVolume >= 100 && googleVolume < 1000:
         return "medium";
@@ -178,7 +185,7 @@ export default function SmallTable({
               <div className={classNames(styles.item, styles.competition)}>
                 <p>{keyword.keywordMetrics.competitionIndex}</p>
                 <IndicationIcon
-                  indication={Indexation(
+                  indication={Indication(
                     100 - keyword.keywordMetrics.competitionIndex
                   )}
                   competition
@@ -188,7 +195,7 @@ export default function SmallTable({
                 <p>{keyword.keywordMetrics.potentialIndex.toString()}</p>
 
                 <IndicationIcon
-                  indication={Indexation(
+                  indication={Indication(
                     100 - keyword.keywordMetrics.potentialIndex
                   )}
                 />

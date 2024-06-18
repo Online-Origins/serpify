@@ -74,6 +74,7 @@ export default function Writing() {
   const { setSharedData } = useSharedContext();
   const [copyMessage, setCopyMessage] = useState(false);
 
+  // Hide the copy message after 2.5s
   useEffect(() => {
     if (copyMessage) {
       const timer = setTimeout(() => {
@@ -91,6 +92,7 @@ export default function Writing() {
     }
   }, [contentInfo]);
 
+  // Get the content score
   function getContentScore() {
     const contentJson = {
       title: contentInfo.title.replace(/[-_@#!'"]/g, " ").toLowerCase(), // Filter out punctuation marks
@@ -107,6 +109,7 @@ export default function Writing() {
     setSharedData(analyzedContent);
   }
 
+  // Colse popup if the user clicks outside popup
   useEffect(() => {
     // Close menu when clicked outside
     const handleClickOutside = (event: MouseEvent) => {
@@ -144,6 +147,7 @@ export default function Writing() {
     };
   });
 
+  // Set the tiptap editor
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -175,6 +179,7 @@ export default function Writing() {
     },
   });
 
+  // Check what type of text is active in the editor and save it to the useState variable
   useEffect(() => {
     if (editor?.isActive("paragraph")) {
       setSelectedTextType("Paragraph");
@@ -189,6 +194,7 @@ export default function Writing() {
     }
   });
 
+  // Get content
   useEffect(() => {
     if (contentId != "" && !getContentRef.current) {
       getContent();
@@ -199,6 +205,7 @@ export default function Writing() {
     }
   }, [contentId, getContentRef]);
 
+  // Convert the outlines to html for the editor
   useEffect(() => {
     if (
       currentContent.length > 0 &&
@@ -235,6 +242,7 @@ export default function Writing() {
     }
   }, [currentContent, getOutlines, editor]);
 
+  //  get content items
   async function getContent() {
     const { data } = await supabase
       .from("contentItems")
@@ -257,6 +265,7 @@ export default function Writing() {
     }
   }
 
+  // Change the text type
   function changeTextType(value: string) {
     if (value == "Paragraph") {
       editor?.chain().focus().setParagraph().run();
@@ -272,6 +281,7 @@ export default function Writing() {
     setSelectedTextType(value);
   }
 
+  // Get the current date
   function currentDate() {
     const date = new Date();
 
@@ -282,6 +292,7 @@ export default function Writing() {
     return `${year}-${month}-${day}`;
   }
 
+  // Save the content in the database
   async function saveContent() {
     const { error } = await supabase
       .from("contentItems")
@@ -297,6 +308,7 @@ export default function Writing() {
     }
   }
 
+  // Set a link to the text
   const setLink = useCallback(() => {
     if (!editor?.isActive("link")) {
       const previousUrl = editor?.getAttributes("link").href;
@@ -331,11 +343,13 @@ export default function Writing() {
     }
   }, [editor]);
 
+  // Add image
   const onAddedFile = async (value: any) => {
     const base64 = await toBase64(value as File);
     setImageLink(base64 as string);
   };
 
+  // convert added image to base64
   const toBase64 = (file: File) => {
     return new Promise((resolve, reject) => {
       const fileReader = new FileReader();
@@ -352,6 +366,7 @@ export default function Writing() {
     });
   };
 
+  // Generate content if user used a prompt and it is not empty
   function AiContentChange() {
     if (AiInput == "") {
       return;
@@ -359,6 +374,7 @@ export default function Writing() {
     generateTitleContent(AiInput);
   }
 
+  // Get the previous heading type that is connected to the paragraph
   const getPreviousHeading = () => {
     if (!editor || !editor.state) return null;
 
@@ -384,6 +400,7 @@ export default function Writing() {
     }
   };
 
+  // Get active element in editor
   const getActiveNode = () => {
     if (!editor) {
       return;
@@ -400,6 +417,7 @@ export default function Writing() {
     return element;
   };
 
+  // Build the prompt for generating content, depending different variables
   async function generateTitleContent(AiInputPrompt?: string, option?: string) {
     try {
       setGenerating(true);
@@ -583,23 +601,7 @@ export default function Writing() {
     }
   }
 
-  const replaceText = (newContent: string) => {
-    if (!editor) return;
-
-    const { state, dispatch } = editor.view;
-    const { selection } = state;
-    const { $from, $to } = selection;
-
-    // Get the start and end positions of the current paragraph
-    const startPos = $from.start($from.depth);
-    const endPos = $to.end($to.depth);
-
-    // Replace the entire content of the paragraph with new text
-    dispatch(
-      state.tr.replaceWith(startPos, endPos, state.schema.text(newContent))
-    );
-  };
-
+  // Get the subtitle for the paragraph
   const findPreviousHeader = (node: HTMLElement): HTMLElement | null => {
     let previousSibling = node.previousElementSibling;
     while (previousSibling) {
@@ -611,6 +613,7 @@ export default function Writing() {
     return null;
   };
 
+  // Generate the text for each paragraph
   async function generateAllContent() {
     setGenerating(true);
     const toneOfVoice = toneOfVoices.find(

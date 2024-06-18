@@ -3,6 +3,7 @@ import Subtitle from "../subtitle/subtitle.component";
 import DraggableBaby from "./draggable-baby.component";
 import classNames from "classnames";
 
+// Child element from draggable subtitle
 export default function DraggableChild({
   title,
   index,

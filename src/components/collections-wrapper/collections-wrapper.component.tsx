@@ -18,6 +18,7 @@ export default function CollectionsWrapper({ small }: { small?: boolean }) {
   const [domainId, setDomainId] = useState();
   const [currentDomain, setCurrentDomain] = useState();
 
+  // Get collections and domains
   useEffect(() => {
     if (!gotData.current) {
       getCollections();
@@ -40,6 +41,7 @@ export default function CollectionsWrapper({ small }: { small?: boolean }) {
     }
   }
 
+  // Get the domains that are linked to the currentUrl
   useEffect(() => {
     if (currentUrl && domains.length > 0) {
       const currentDomainId = domains.find(
@@ -63,6 +65,7 @@ export default function CollectionsWrapper({ small }: { small?: boolean }) {
     }
   }, [currentUrl, domains, collections]);
 
+  // Set the collections to show
   function settingCollections(col: any) {
     let array = [];
     if (small) {
@@ -75,6 +78,7 @@ export default function CollectionsWrapper({ small }: { small?: boolean }) {
     return array;
   }
 
+  // Show the collections with a delay to prevent errors from google ads api
   function setShownCollectionsWithDelay(arr: any[]) {
     let array: any[] = [];
     arr.forEach((item, index) => {

@@ -25,6 +25,7 @@ export default function Subtitle({
   const [openTooltip, setOpenTooltip] = useState(true);
   const [loading, setLoading] = useState(false);
 
+  // Close the tooltip after 5 seconds
   useEffect(() => {
     const timer = setTimeout(() => {
       setOpenTooltip(false);
@@ -33,6 +34,7 @@ export default function Subtitle({
     return () => clearTimeout(timer);
   }, []);
 
+  // Rephrase the title with OpenAI GPT
   async function rephraseTitle() {
     const languageValue = languageCodes.find((lang) => lang.id.toString() == language);
     setLoading(true);

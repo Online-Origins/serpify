@@ -1,16 +1,13 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-
 import { supabase } from "@/app/utils/supabaseClient/server";
-import { useParams, useRouter } from "next/navigation";
-
+import { useRouter } from "next/navigation";
 import PageTitle from "@/components/page-title/page-title.component";
 import Table from "@/components/table/table.component";
 import InnerWrapper from "@/components/inner-wrapper/inner-wrapper.component";
 import Button from "@/components/ui/button/button.component";
 import PopUpWrapper from "@/components/ui/popup-wrapper/popup-wrapper.component";
 import PopUp from "@/components/ui/popup/popup.component";
-
 import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded";
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
@@ -22,7 +19,7 @@ import countryCodes from "@/json/country-codes.json";
 import InputWrapper from "@/components/ui/input-wrapper/input-wrapper.component";
 import CircularLoader from "@/components/circular-loader/circular-loader.component";
 import styles from "./page.module.scss";
-import { AddOutlined, SearchRounded } from "@mui/icons-material";
+import { AddOutlined, AutoAwesome, SearchRounded } from "@mui/icons-material";
 
 export default function Collection({ params }: { params: { slug: string } }) {
   const activeCollection = params.slug;
@@ -47,7 +44,6 @@ export default function Collection({ params }: { params: { slug: string } }) {
   const [targetAudience, setTargetAudience] = useState("");
   const [contentTitle, setcontentTitle] = useState("");
   const [generating, setGenerating] = useState(false);
-  const [moreFilters, setMoreFilters] = useState(false);
   const [subjectsInput, setSubjectsInput] = useState("");
   const [keywordsLanguage, setKeywordsLanguage] = useState<number>();
   const [keywordsCountry, setKeywordsCountry] = useState<number>();
@@ -56,7 +52,9 @@ export default function Collection({ params }: { params: { slug: string } }) {
   const [competition, setCompetition] = useState<number[]>([0, 100]);
   const [potential, setPotential] = useState<number[]>([0, 100]);
   const [addPopUpOpen, setAddPopUpOpen] = useState(false);
+  const [possibleTitles, setPossibleTitles] = useState<string[]>([]);
 
+  // Get the selected collection
   useEffect(() => {
     if (!getSelectedCollectionRef.current && activeCollection != undefined) {
       getSelectedCollection();
@@ -77,6 +75,7 @@ export default function Collection({ params }: { params: { slug: string } }) {
     }
   }
 
+  // Get the data for thekeywords when there is a selectedCollection
   useEffect(() => {
     if (selectedCollection.length > 0 && !isGettingData.current) {
       getKeywordsData();
@@ -110,6 +109,7 @@ export default function Collection({ params }: { params: { slug: string } }) {
     setShownKeywords(array);
   }
 
+  // Get the keywords data
   async function getKeywordsData() {
     setLoading(true);
     let attempt = 0;
@@ -162,6 +162,7 @@ export default function Collection({ params }: { params: { slug: string } }) {
     }
   }
 
+  // Convert the search volume to user friendly strings
   function searchVolumeString(googleVolume: number) {
     switch (true) {
       case googleVolume >= 10 && googleVolume < 100:
@@ -177,6 +178,7 @@ export default function Collection({ params }: { params: { slug: string } }) {
     }
   }
 
+  // Calculate the potential index
   function potentialIndex(googleVolume: number, competition: number) {
     const search = searchVolumeString(googleVolume);
 
@@ -208,6 +210,7 @@ export default function Collection({ params }: { params: { slug: string } }) {
     return state;
   }
 
+  // Update the collection
   async function updateCollection() {
     const { error } = await supabase
       .from("collections")
@@ -268,6 +271,7 @@ export default function Collection({ params }: { params: { slug: string } }) {
     }
   }
 
+  // Delete a collection
   async function deleteCollection(collectionId: number) {
     const { error } = await supabase
       .from("collections")
@@ -278,6 +282,7 @@ export default function Collection({ params }: { params: { slug: string } }) {
     }
   }
 
+  // Edit the collection title
   async function editTitle() {
     const { error } = await supabase
       .from("collections")
@@ -289,6 +294,7 @@ export default function Collection({ params }: { params: { slug: string } }) {
     }
   }
 
+  // Get the current date
   function currentDate() {
     const date = new Date();
 
@@ -299,6 +305,7 @@ export default function Collection({ params }: { params: { slug: string } }) {
     return `${year}-${month}-${day}`;
   }
 
+  // Create a content item
   async function createContent() {
     const inserting = await supabase
       .from("contentItems")
@@ -330,6 +337,7 @@ export default function Collection({ params }: { params: { slug: string } }) {
     }
   }
 
+  // Generate the tile for the content
   async function generateTitle() {
     setGenerating(true);
     try {
@@ -351,6 +359,26 @@ export default function Collection({ params }: { params: { slug: string } }) {
       });
 
       const data = await response.json();
+      
+      // Generate 3 possible titles for the user
+      let possibleTitles = [];
+
+      while (possibleTitles.length < 3) {
+        const possibleRespone = await fetch("/api/generateTitle", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            keyword: chosenFocusKeyword,
+            toneofvoice: toneOfVoicebyId?.value,
+            language: language?.value,
+          }),
+        });
+        const possibleData = await possibleRespone.json();
+        possibleTitles.push(possibleData.generatedTitle.split('"').join(""));
+      }
+      setPossibleTitles(possibleTitles);
       setGenerating(false);
       setcontentTitle(data.generatedTitle.split('"').join("")); //Remove the "" around the generated title
     } catch (error: any) {
@@ -359,6 +387,7 @@ export default function Collection({ params }: { params: { slug: string } }) {
     }
   }
 
+  // Start a search for new keywords
   const startSearching = () => {
     const subjectArray = subjectsInput.split(", ");
     const cleanArray = subjectArray.map((subject) =>
@@ -388,6 +417,7 @@ export default function Collection({ params }: { params: { slug: string } }) {
     }
   };
 
+  // Translate the search volume
   function searchVolumeTranslate(filterValue: number) {
     switch (true) {
       case filterValue == 0:
@@ -634,6 +664,28 @@ export default function Collection({ params }: { params: { slug: string } }) {
                   placeholder="Insert title for the content (or generate with AI)"
                   generateTitle={() => generateTitle()}
                 />
+                {possibleTitles.length > 0 && (
+                  <div className={styles.possibleTitles}>
+                    <h5>Possible titles:</h5>
+                    {possibleTitles.map((title: string) => (
+                      <div
+                        key={title}
+                        className={styles.possibleTitle}
+                        onClick={() => {
+                          setcontentTitle(title);
+                          setPossibleTitles(
+                            possibleTitles.filter(
+                              (item: string) => item != title
+                            )
+                          );
+                        }}
+                      >
+                        <AutoAwesome />
+                        <p>{title}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
             {generating && (

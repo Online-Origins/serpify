@@ -38,18 +38,21 @@ export default function AnalyticsPage() {
     }
   }, [gotData.current]);
 
+  // Update pages to show when an other domain is chosen (when an other domain is chosen the pagesData will update), when the sorting is updated or when a user wants to see the next 10 pages
   useEffect(() => {
     if (pagesData && pagesData.length > 0) {
       showPages(sortPages(pagesData));
     }
   }, [pagesData, pagesAmount, pagesSorting]);
 
+  // Update keywords to show when an other domain is chosen (when an other domain is chosen the queryData will update), when the sorting is updated or when a user wants to see the next 10 keywords
   useEffect(() => {
     if (queryData && queryData.length > 0) {
       showKeywords(sortKeywords(queryData));
     }
   }, [queryData, keywordsAmount, keywordSorting]);
 
+  // Show a list of specific pages
   function showPages(pages: any) {
     let array: any[] = [];
     for (let x = pagesAmount[0]; x < pagesAmount[1] && x < pages.length; x++) {
@@ -58,6 +61,7 @@ export default function AnalyticsPage() {
     setShownPages(array);
   }
 
+  // Show a list of specific keywords
   function showKeywords(keywords: any) {
     let array: any[] = [];
     for (
@@ -70,6 +74,7 @@ export default function AnalyticsPage() {
     setShownKeywords(array);
   }
 
+  // Sort the keywords
   function sortKeywords(array: any) {
     if (keywordSorting == "position") {
       return array.sort((a: any, b: any) => a.position - b.position);
@@ -90,6 +95,7 @@ export default function AnalyticsPage() {
     }
   }
 
+  // Sort the pages
   function sortPages(array: any) {
     if (pagesSorting == "impressions") {
       return array.sort((a: any, b: any) => b.impressions - a.impressions);
