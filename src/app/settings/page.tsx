@@ -202,7 +202,6 @@ export default function ProjectSettings() {
             currentDomain &&
             (!projectName ||
               !projectDomain ||
-              !projectAudience ||
               !projectLanguage ||
               (projectName ===
                 (currentDomain.projectName ? currentDomain.projectName : "") &&
