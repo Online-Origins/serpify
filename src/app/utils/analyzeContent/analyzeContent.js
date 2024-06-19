@@ -3,6 +3,7 @@ export function analyzeContent(contentJson) {
     const keyword = contentJson.keyword;
     const subKeywords = contentJson.subKeywords;
     const htmlText = contentJson.htmlText;
+    const type = contentJson.type;
     let seoScore = 0;
     let goodPoints = [];
     let minorWarnings = [];
@@ -127,20 +128,24 @@ export function analyzeContent(contentJson) {
         }
     }
 
-    function getKeywordLength() {
-        if (title.length >= 40 && title.length <= 60) {
-            // If the length of the title is between 40 and 60 characters it is good
-            goodPoints.push("Your title has a good length. Nice work!")
-            return 5
-        } else {
-            if (title.length < 40) {
-                // If the length is smaller than 40 characters it is to small
-                warnings.push(`The length of your title is ${title.length} and needs to be at least 40 characters`)
-            } else if (title.length > 60) {
-                // If the length is longer than 60 characters it is to long
-                warnings.push(`The length of your title is ${title.length} and needs to be maximal 60 characters`)
+    function getTitleLength() {
+        if (type == "blog") {
+            if (title.length >= 40 && title.length <= 60) {
+                // If the length of the title is between 40 and 60 characters it is good
+                goodPoints.push("Your title has a good length. Nice work!")
+                return 5
+            } else {
+                if (title.length < 40) {
+                    // If the length is smaller than 40 characters it is to small
+                    warnings.push(`The length of your title is ${title.length} and needs to be at least 40 characters`)
+                } else if (title.length > 60) {
+                    // If the length is longer than 60 characters it is to long
+                    warnings.push(`The length of your title is ${title.length} and needs to be maximal 60 characters`)
+                }
+                return 0;
             }
-            return 0;
+        } else {
+            return 5
         }
     }
 
@@ -159,26 +164,31 @@ export function analyzeContent(contentJson) {
     }
 
     function getLinkCount() {
-        // Count all links in text
-        var count = (htmlText.match(/<a\b/g) || []).length;
-        // get the optimal link amount according to the length of the text
-        const optimalAmount = getWordAmount() < 300 ? 1 : (getWordAmount() / 300).toFixed(0)
-        if (count >= optimalAmount) {
-            // If the amount is the same or more as the optimal amount it is good
-            seoScore += 5;
-            goodPoints.push("Your text contains a good amount of links");
-        } else if (count > 0 && count < optimalAmount) {
-            // If the amount is more than 0 but less than optimal it is not good but not bad
-            const linkScore = 5 / optimalAmount
-            for (let x = 0; x < count; x++) {
-                seoScore += linkScore;
+        if (type == "blog") {
+            // Count all links in text
+            var count = (htmlText.match(/<a\b/g) || []).length;
+            // get the optimal link amount according to the length of the text
+            const optimalAmount = getWordAmount() < 300 ? 1 : (getWordAmount() / 300).toFixed(0)
+            if (count >= optimalAmount) {
+                // If the amount is the same or more as the optimal amount it is good
+                seoScore += 5;
+                goodPoints.push("Your text contains a good amount of links");
+            } else if (count > 0 && count < optimalAmount) {
+                // If the amount is more than 0 but less than optimal it is not good but not bad
+                const linkScore = 5 / optimalAmount
+                for (let x = 0; x < count; x++) {
+                    seoScore += linkScore;
+                }
+                minorWarnings.push(`Your text contains a decent amount of links: ${count}. Try to add more`)
+            } else {
+                // If the amount is 0 it is not good
+                warnings.push("Your text doesn't contain any links. Try to add some")
             }
-            minorWarnings.push(`Your text contains a decent amount of links: ${count}. Try to add more`)
+            return count;
         } else {
-            // If the amount is 0 it is not good
-            warnings.push("Your text doesn't contain any links. Try to add some")
+            seoScore += 5;
+            return 0;
         }
-        return count;
     }
 
     function getKeywordsinSubTitles() {
@@ -211,7 +221,7 @@ export function analyzeContent(contentJson) {
     function getSeoScore() {
         // Check the title for the focus keyword and length
         seoScore += getKeywordInTitle();
-        seoScore += getKeywordLength();
+        seoScore += getTitleLength();
 
         // Check if heading types exist
         seoScore += getHeading("h1", 10);

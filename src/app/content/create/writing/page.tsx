@@ -69,6 +69,7 @@ export default function Writing() {
     keyword: "",
     language: "",
     title: "",
+    type: ""
   });
   const [seoAnalysis, setSeoAnalysis] = useState<any>();
   const { setSharedData } = useSharedContext();
@@ -102,6 +103,7 @@ export default function Writing() {
       subKeywords: contentInfo.sub_keywords,
       keyword: contentInfo.keyword,
       languageCode: contentInfo.language,
+      type: contentInfo.type
     };
 
     const { analyzedContent } = analyzeContent(contentJson);
@@ -237,6 +239,7 @@ export default function Writing() {
         keyword: currentContent[0].keyword,
         language: language ? language.languageCode : "",
         html: content,
+        type: currentContent[0].type
       });
       getOutlines.current = true;
     }
@@ -260,6 +263,7 @@ export default function Writing() {
         keyword: data[0].keyword,
         language: language ? language.languageCode : "",
         html: data[0].content,
+        type: data[0].type
       });
       setCurrentContent(data);
     }
@@ -447,7 +451,7 @@ export default function Writing() {
           setOpenOptions(false);
         } else {
           // Otherwise just generate a pragraph
-          gptPrompt = `Generate the paragraph for a blog. `;
+          gptPrompt = `Generate the paragraph for a ${contentInfo.type} text. `;
         }
 
         if (!editor?.state.selection.empty) {
@@ -465,10 +469,10 @@ export default function Writing() {
             );
             if (notSelectedText != "" && option != "grammar") {
               // If the selected text is not the same as the whole text of the paragraph
-              gptPrompt += `The text will be an addition on the existing text: "${notSelectedText}", and wil replace this text: "${selectedText}". `;
+              gptPrompt += `it will be an addition on the existing: "${notSelectedText}", and wil replace this: "${selectedText}". `;
             } else if (notSelectedText == "") {
               // If the selected text is the same as the whole text of the paragraph
-              gptPrompt += `The newly generated will replace this text: "${currentNode.textContent}". `;
+              gptPrompt += `The newly generated will replace this: "${currentNode.textContent}". `;
             } else if (option == "grammar") {
               // If the user selected the option grammar
               gptPrompt += `"${selectedText}". `;
@@ -478,11 +482,11 @@ export default function Writing() {
           // When the user didn't make a selection from a paragraph
           if (currentNode.textContent != "" && option != "grammar") {
             // The generated text needs to replace the text in te current element if the current element is not empty and if the user didn't chose the grammar option
-            gptPrompt += `The text will be an addition on the existing text: "${currentNode.textContent}". `;
+            gptPrompt += `The newly generated will be an addition on the existing: "${currentNode.textContent}". `;
           } else if (currentNode.textContent == "") {
-            gptPrompt += `The text is for a blog with the title "${
+            gptPrompt += `It is for a ${contentInfo.type} text with the title "${
               contentInfo.title
-            }" and will be about the following subtitle: "${handleGetPreviousHeading()}". The text has a ${
+            }" and will be about the following subtitle: "${handleGetPreviousHeading()}". The content has a ${
               toneOfVoice?.value
             } tone of voice, is in the language with the code ${
               currentContent[0].language
@@ -631,11 +635,11 @@ export default function Writing() {
                 "Content-Type": "application/json",
               },
               body: JSON.stringify({
-                prompt: `Generate a paragraph for a blog. The text is for a blog with the title "${
+                prompt: `Generate a paragraph for a ${contentInfo.type} text. The content has the title "${
                   contentInfo.title
-                }" and will be about the following subtitle: "${
+                }" and the paragraph will be about the following subtitle: "${
                   previousHeader.innerText
-                }". The text has a ${
+                }". The content has a ${
                   toneOfVoice?.value
                 } tone of voice, is in the language with the code ${
                   currentContent[0].language
@@ -647,7 +651,7 @@ export default function Writing() {
                   currentContent[0].keyword
                 }" and these subkeywords: ${currentContent[0].sub_keywords.join(
                   ","
-                )}. Don't include an introduction into the subject of the title and blog, just only text for the subtitle. Only give back an string of the generated text and don't include the subtitle.`,
+                )}. Don't include an introduction into the subject of the title and ${contentInfo.type} text, just only text for the subtitle. Only give back an string of the generated text and don't include the subtitle.`,
               }),
             });
             const { generatedContent } = await response.json();

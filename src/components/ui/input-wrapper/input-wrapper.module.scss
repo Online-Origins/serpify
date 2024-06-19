@@ -1,4 +1,4 @@
-@import '@/styles/variables.scss';
+@import '@/styles/variables';
 
 .wrapper {
     width: 100%;
@@ -95,7 +95,7 @@
 
         &.vertMultiSelect {
             flex-flow: column;
-            width: calc(100% - 1rem);
+            width: 100%;
             gap: 0;
             max-height: 15rem;
             overflow-x: hidden;

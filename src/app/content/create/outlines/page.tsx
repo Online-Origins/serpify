@@ -145,6 +145,7 @@ export default function CreateOutlines() {
           language: language?.value,
           audience: currentContent[0].target_audience,
           toneOfVoice: toneOfVoice?.value,
+          type: currentContent[0].type
         }),
       });
 
@@ -401,7 +402,7 @@ export default function CreateOutlines() {
       .update({
         status: "writing",
         outlines: contentGeneratedOutlines,
-        date_edited: currentDate,
+        date_edited: currentDate(),
         content_title: updateTitle,
       })
       .match({ id: currentContent[0].id });

@@ -115,13 +115,16 @@ export default function ContentItemsWrapper({ small }: { small?: boolean }) {
         </div>
         <div className={styles.rowItem}>
           <h5>Content score:</h5>
-          <Information information="A numerical value that ranges from 0 to 100, which is a metric used to show you how well optimized your content is in the eyes of Google." />
+          {/* <Information information="A numerical value that ranges from 0 to 100, which is a metric used to show you how well optimized your content is in the eyes of Google." /> */}
         </div>
         <div className={styles.rowItem}>
           <h5>Status:</h5>
         </div>
         <div className={styles.rowItem}>
           <h5>Date edited:</h5>
+        </div>
+        <div className={styles.rowItem}>
+          <h5>Content type:</h5>
         </div>
       </div>
       <div

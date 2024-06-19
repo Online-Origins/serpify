@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import DotsMenu from "../dots-menu/dots-menu.component";
 import { supabase } from "@/app/utils/supabaseClient/server";
 import styles from "./content-item.module.scss";
+import Link from "next/link";
 
 export default function ContentItem({
   content,
@@ -93,6 +94,7 @@ export default function ContentItem({
               target_audience: data[0].target_audience,
               outlines: data[0].outlines,
               domain: data[0].domain,
+              type: data[0].type,
             },
           ])
           .select();
@@ -104,7 +106,7 @@ export default function ContentItem({
         }
       }
     } catch (error) {
-      alert("Something went wrong. Please try again later.")
+      alert("Something went wrong. Please try again later.");
     }
   }
 
@@ -122,22 +124,17 @@ export default function ContentItem({
     <div className={styles.content} onClick={() => onEditClick()}>
       <div className={styles.titleWrapper}>
         <h4>{content.content_title}</h4>
-        <p
-          className={classNames(
-            getCollectionById(content.collection) != null &&
-              styles.collectionLink
-          )}
-          onClick={(e) => {
-            e.stopPropagation();
-            if (getCollectionById(content.collection) != null) {
-              router.push(`/keywords/${content.collection}`);
-            }
-          }}
-        >
-          {getCollectionById(content.collection) != null
-            ? getCollectionById(content.collection).collection_name
-            : "Collection not found"}
-        </p>
+        {getCollectionById(content.collection) != null ? (
+          <Link
+            href={`/keywords/${content.collection}`}
+            className={styles.collectionLink}
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+          >
+            {getCollectionById(content.collection).collection_name}
+          </Link>
+        ) : <p>Collection not found</p>}
       </div>
       <div className={classNames(styles.contentInfo)}>
         <div className={styles.meterWrapper}>
@@ -162,6 +159,9 @@ export default function ContentItem({
       </div>
       <div className={classNames(styles.contentInfo)}>
         <p>{formatDate(content.edited_on)}</p>
+      </div>
+      <div className={classNames(styles.contentInfo)}>
+        <p>{content.type.charAt(0).toUpperCase() + content.type.slice(1)}</p>
       </div>
       <div className={styles.iconsWrapper}>
         <div className={styles.editIcon} onClick={() => onEditClick()}>

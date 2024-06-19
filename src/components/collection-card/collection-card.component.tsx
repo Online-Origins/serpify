@@ -42,6 +42,8 @@ export default function CollectionCard({
   const [contentTitle, setcontentTitle] = useState("");
   const [generating, setGenerating] = useState(false);
   const [possibleTitles, setPossibleTitles] = useState<string[]>([]);
+  const [contentType, setContentType] = useState("Blog");
+  const typesOfContent = ["Blog", "Product category", "Company service", "Custom"];
 
   // Delete a collection
   async function deleteCollection() {
@@ -215,7 +217,14 @@ export default function CollectionCard({
           <PopUp
             title={"New content"}
             titleButtons={
-              <Button type={"textOnly"} onClick={() => setPopUpOpen(false)}>
+              <Button
+                type={"textOnly"}
+                onClick={() => {
+                  setPopUpOpen(false);
+                  setcontentTitle("");
+                  setPopUpStep(1);
+                }}
+              >
                 <p>Close</p>
                 <CloseRoundedIcon />
               </Button>
@@ -245,6 +254,14 @@ export default function CollectionCard({
           >
             {popUpStep == 1 && (
               <div className={styles.selectingKeywords}>
+              <InputWrapper
+                type="dropdown"
+                title="Type of content:"
+                required={false}
+                value={contentType}
+                options={typesOfContent}
+                onChange={(value: any) => setContentType(value)}
+              />
                 <div className={styles.collectionWrapper}>
                   <h4>Collection:</h4>
                   <h5>{collection.collection_name}</h5>
@@ -256,7 +273,10 @@ export default function CollectionCard({
                   value={chosenKeyword}
                   options={collection.keywords}
                   information="This will be the keyword your content is focused on."
-                  onChange={(value: any) => {setChosenKeyword(value); setChosenKeywords([])}}
+                  onChange={(value: any) => {
+                    setChosenKeyword(value);
+                    setChosenKeywords([]);
+                  }}
                   placeholder="Which collection do you want to use?"
                 />
                 <InputWrapper

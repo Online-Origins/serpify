@@ -25,7 +25,6 @@ import { AutoAwesome } from "@mui/icons-material";
 
 export default function ContentOverview() {
   const [popUpOpen, setPopUpOpen] = useState(false);
-  const [contents, setContents] = useState<any[]>([]);
   const getContentsRef = useRef(false);
   const [collections, setCollections] = useState<any[]>([]);
   const [chosenCollection, setChosenCollection] = useState();
@@ -42,6 +41,8 @@ export default function ContentOverview() {
   const { currentUrl } = useSharedContext();
   const [currentDomain, setCurrentDomain] = useState();
   const [possibleTitles, setPossibleTitles] = useState<string[]>([]);
+  const [contentType, setContentType] = useState("Blog");
+  const typesOfContent = ["Blog", "Product category", "Company service", "Custom"];
 
   // Get the collections when the currentUrl changes
   useEffect(() => {
@@ -176,6 +177,7 @@ export default function ContentOverview() {
           status: "outlines",
           keyword: chosenKeyword,
           domain: currentDomain,
+          type: contentType.toLowerCase(),
         },
       ])
       .select();
@@ -203,8 +205,7 @@ export default function ContentOverview() {
             <p>Create new content</p> <AddRoundedIcon />
           </Button>
         }
-        information="
-        Creating SEO content involves integrating targeted keywords, producing high-quality, relevant material, and optimizing structure to enhance visibility and engagement, ultimately boosting search engine rankings and user experience."
+        information="Creating SEO content involves integrating targeted keywords, producing high-quality, relevant material, and optimizing structure to enhance visibility and engagement, ultimately boosting search engine rankings and user experience."
       />
       <ContentItemsWrapper />
       {popUpOpen && (
@@ -212,7 +213,7 @@ export default function ContentOverview() {
           <PopUp
             title={"New content"}
             titleButtons={
-              <Button type={"textOnly"} onClick={() => setPopUpOpen(false)}>
+              <Button type={"textOnly"} onClick={() => {setPopUpOpen(false); setcontentTitle(""); setPopUpStep(1)}}>
                 <p>Close</p>
                 <CloseRoundedIcon />
               </Button>
@@ -244,6 +245,14 @@ export default function ContentOverview() {
               <div className={styles.selectingKeywords}>
                 <InputWrapper
                   type="dropdown"
+                  title="Type of content:"
+                  required={false}
+                  value={contentType}
+                  options={typesOfContent}
+                  onChange={(value: any) => setContentType(value)}
+                />
+                <InputWrapper
+                  type="dropdown"
                   title="Keyword collection:"
                   required={false}
                   value={chosenCollection}
@@ -258,7 +267,10 @@ export default function ContentOverview() {
                   value={chosenKeyword}
                   options={keywordOptions}
                   information="This will be the keyword your content is focused on."
-                  onChange={(value: any) => {setChosenKeyword(value); setChosenKeywords([])}}
+                  onChange={(value: any) => {
+                    setChosenKeyword(value);
+                    setChosenKeywords([]);
+                  }}
                   placeholder="Which collection do you want to use?"
                 />
                 <InputWrapper
@@ -309,15 +321,17 @@ export default function ContentOverview() {
                   placeholder="Who do you want to target?"
                 />
                 <InputWrapper
-                  type="generate"
+                  type={contentType == "Blog" ? "generate" : "text"}
                   title="Title of your content:"
                   required={true}
                   value={contentTitle}
                   onChange={(value: any) => setcontentTitle(value)}
-                  placeholder="Insert title for the content (or generate with AI)"
+                  placeholder={`Insert the title of your ${contentType.toLowerCase()} ${
+                    contentType.toLowerCase() == "blog" ? "(or generate with AI)" : "content"
+                  }`}
                   generateTitle={() => generateTitle()}
                 />
-                {possibleTitles.length > 0 && (
+                {(possibleTitles.length > 0 && contentType.toLowerCase() == "blog") && (
                   <div className={styles.possibleTitles}>
                     <h5>Possible titles:</h5>
                     {possibleTitles.map((title: string) => (
