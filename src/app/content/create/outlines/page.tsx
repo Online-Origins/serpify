@@ -28,6 +28,7 @@ import DraggableSubtitle from "@/components/draggable-subtitle/draggable-subtitl
 import CustomizedTooltip from "@/components/ui/custom-tooltip/custom-tooltip.component";
 import { ArrowForwardRounded } from "@mui/icons-material";
 import styles from "./page.module.scss";
+import { getCurrentDateTime } from '@/app/utils/currentDateTime/dateUtils';
 
 export default function CreateOutlines() {
   const router = useRouter();
@@ -332,24 +333,13 @@ export default function CreateOutlines() {
     }
   }
 
-  // Get the current date
-  function currentDate() {
-    const date = new Date();
-
-    let day = date.getDate();
-    let month = date.getMonth() + 1;
-    let year = date.getFullYear();
-
-    return `${year}-${month}-${day}`;
-  }
-
   // Save the outlines in the database
   async function saveOutline() {
     const { error } = await supabase
       .from("contentItems")
       .update({
         outlines: contentGeneratedOutlines,
-        edited_on: currentDate(),
+        edited_on: getCurrentDateTime(),
         status: "outlines",
         content_title: updateTitle,
       })
@@ -402,7 +392,7 @@ export default function CreateOutlines() {
       .update({
         status: "writing",
         outlines: contentGeneratedOutlines,
-        date_edited: currentDate(),
+        edited_on: getCurrentDateTime(),
         content_title: updateTitle,
       })
       .match({ id: currentContent[0].id });

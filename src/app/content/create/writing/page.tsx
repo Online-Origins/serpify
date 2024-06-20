@@ -16,6 +16,7 @@ import PopUp from "@/components/ui/popup/popup.component";
 import CircularLoader from "@/components/circular-loader/circular-loader.component";
 import InputWrapper from "@/components/ui/input-wrapper/input-wrapper.component";
 import styles from "./page.module.scss";
+import { getCurrentDateTime } from "@/app/utils/currentDateTime/dateUtils";
 
 import {
   FormatBold,
@@ -69,7 +70,7 @@ export default function Writing() {
     keyword: "",
     language: "",
     title: "",
-    type: ""
+    type: "",
   });
   const [seoAnalysis, setSeoAnalysis] = useState<any>();
   const { setSharedData } = useSharedContext();
@@ -103,7 +104,7 @@ export default function Writing() {
       subKeywords: contentInfo.sub_keywords,
       keyword: contentInfo.keyword,
       languageCode: contentInfo.language,
-      type: contentInfo.type
+      type: contentInfo.type,
     };
 
     const { analyzedContent } = analyzeContent(contentJson);
@@ -111,7 +112,7 @@ export default function Writing() {
     setSharedData(analyzedContent);
   }
 
-  // Colse popup if the user clicks outside popup
+  // Close popup if the user clicks outside popup
   useEffect(() => {
     // Close menu when clicked outside
     const handleClickOutside = (event: MouseEvent) => {
@@ -209,25 +210,32 @@ export default function Writing() {
 
   // Convert the outlines to html for the editor
   useEffect(() => {
+    let content = "";
     if (
       currentContent.length > 0 &&
       !getOutlines.current &&
       !gotContent.current
     ) {
-      let content = `<h1>${currentContent[0].content_title}</h1>`;
-      currentContent[0].outlines.map((outline: any) => {
-        content += `<${outline.type}>${outline.title}</${outline.type}><p></p>`;
-        if (outline.subtitles) {
-          outline.subtitles.map((subtitle: any) => {
-            content += `<${subtitle.type}>${subtitle.title}</${subtitle.type}><p></p>`;
-            if (subtitle.subtitles) {
-              subtitle.subtitles.map((subsubtitle: any) => {
-                content += `<${subsubtitle.type}>${subsubtitle.title}</${subsubtitle.type}><p></p>`;
-              });
-            }
-          });
+      if (currentContent[0].type != "custom") {
+        content = `<h1>${currentContent[0].content_title}</h1>`;
+        currentContent[0].outlines.map((outline: any) => {
+          content += `<${outline.type}>${outline.title}</${outline.type}><p></p>`;
+          if (outline.subtitles) {
+            outline.subtitles.map((subtitle: any) => {
+              content += `<${subtitle.type}>${subtitle.title}</${subtitle.type}><p></p>`;
+              if (subtitle.subtitles) {
+                subtitle.subtitles.map((subsubtitle: any) => {
+                  content += `<${subsubtitle.type}>${subsubtitle.title}</${subsubtitle.type}><p></p>`;
+                });
+              }
+            });
+          }
+        });
+      } else {
+        if (currentContent[0].content_title) {
+          content = `<h1>${currentContent[0].content_title}</h1><p></p>`;
         }
-      });
+      }
       editor?.commands.setContent(content);
 
       const language = languages.find(
@@ -239,7 +247,7 @@ export default function Writing() {
         keyword: currentContent[0].keyword,
         language: language ? language.languageCode : "",
         html: content,
-        type: currentContent[0].type
+        type: currentContent[0].type,
       });
       getOutlines.current = true;
     }
@@ -262,8 +270,8 @@ export default function Writing() {
         sub_keywords: data[0].sub_keywords,
         keyword: data[0].keyword,
         language: language ? language.languageCode : "",
-        html: data[0].content,
-        type: data[0].type
+        html: data[0].content ? data[0].content : " ",
+        type: data[0].type,
       });
       setCurrentContent(data);
     }
@@ -285,23 +293,12 @@ export default function Writing() {
     setSelectedTextType(value);
   }
 
-  // Get the current date
-  function currentDate() {
-    const date = new Date();
-
-    let day = date.getDate();
-    let month = date.getMonth() + 1;
-    let year = date.getFullYear();
-
-    return `${year}-${month}-${day}`;
-  }
-
   // Save the content in the database
   async function saveContent() {
     const { error } = await supabase
       .from("contentItems")
       .update({
-        edited_on: currentDate(),
+        edited_on: getCurrentDateTime(),
         content: editor?.getHTML(),
         content_score: seoAnalysis.seoScore,
         content_title: contentInfo.title,
@@ -428,6 +425,9 @@ export default function Writing() {
       const toneOfVoice = toneOfVoices.find(
         (item) => item.id == currentContent[0].tone_of_voice
       );
+      const language = languages.find(
+        (item) => item.id == currentContent[0].language
+      );
 
       const currentNode = getActiveNode();
 
@@ -484,21 +484,38 @@ export default function Writing() {
             // The generated text needs to replace the text in te current element if the current element is not empty and if the user didn't chose the grammar option
             gptPrompt += `The newly generated will be an addition on the existing: "${currentNode.textContent}". `;
           } else if (currentNode.textContent == "") {
-            gptPrompt += `It is for a ${contentInfo.type} text with the title "${
-              contentInfo.title
-            }" and will be about the following subtitle: "${handleGetPreviousHeading()}". The content has a ${
-              toneOfVoice?.value
-            } tone of voice, is in the language with the code ${
-              currentContent[0].language
-            }${
-              currentContent[0].audience
-                ? `, has the target audience "${currentContent[0].audience}",`
-                : ","
-            } and contains this keyword: "${
-              currentContent[0].keyword
-            }" and these subkeywords: ${currentContent[0].sub_keywords.join(
-              ","
-            )}. `;
+            gptPrompt += `It is for a ${
+              contentInfo.type
+            } text with the title "${contentInfo.title}" ${
+              handleGetPreviousHeading() != "" &&
+              handleGetPreviousHeading() != contentInfo.title
+                ? `and will be about the following subtitle: "${handleGetPreviousHeading()}"`
+                : ""
+            }. `;
+            if (
+              currentContent[0].language ||
+              currentContent[0].audience ||
+              currentContent[0].keyword ||
+              toneOfVoice
+            ) {
+              gptPrompt += `The content ${
+                toneOfVoice ? `has a ${toneOfVoice.value} tone of voice,` : ""
+              }${language ? `is in ${language.value},` : ""}${
+                currentContent[0].audience
+                  ? ` has the target audience "${currentContent[0].audience}",`
+                  : ""
+              }${
+                currentContent[0].keyword
+                  ? ` contains this focus keyword: "${currentContent[0].keyword}",`
+                  : ""
+              }${
+                currentContent[0].sub_keywords.length > 0
+                  ? ` contains these subkeywords: ${currentContent[0].sub_keywords.join(
+                      ", "
+                    )}`
+                  : ""
+              }. `;
+            }
           } else if (option == "grammar") {
             // If the user did chose the grammar option give the current element text to the api
             gptPrompt += `"${currentNode.textContent}". `;
@@ -506,7 +523,7 @@ export default function Writing() {
         }
 
         // Specify to the AI that only a string of the generated text is needed
-        gptPrompt += `Only give back an string of the generated text and don't include the subtitle.`;
+        gptPrompt += `Only give back the updated text part and not the whole text and subtitle.`;
 
         // Prompt building for when the element is an header
       } else if (currentNode?.nodeName.toLowerCase().includes("h")) {
@@ -515,59 +532,21 @@ export default function Writing() {
           gptPrompt = `${AiInputPrompt}. The current subtitle is: "${currentNode?.textContent}". Only give back an string of the generated subtitle. `;
         } else if (option) {
           // If the user selected one of the options
-          if (!editor?.state.selection.empty) {
-            // If the user made a selection from a header
-            const selection = editor?.state.selection;
-            if (selection && !selection.empty && currentNode.textContent) {
-              const selectedText = editor.state.doc.textBetween(
-                selection.from,
-                selection.to,
-                "\n"
-              );
-              const notSelectedText = currentNode.textContent.replace(
-                selectedText,
-                ""
-              );
-
-              if (notSelectedText != "") {
-                // If the selected text is not the same as the whole text of the header
-                if (option == "grammar") {
-                  gptPrompt = `Correct the spelling and grammar of the text: "${selectedText}"`;
-                } else if (option == "expand") {
-                  gptPrompt = `Expand the text: "${selectedText}"`;
-                } else if (option == "shorten") {
-                  gptPrompt = `Shorten the text: "${selectedText}"`;
-                } else if (option == "improve") {
-                  gptPrompt = `Improve the text: "${selectedText}"`;
-                }
-                gptPrompt += `, which is part of the subtitle: "${currentNode?.textContent}". Only give back the updated text part and not the whole subitle.`;
-              } else {
-                // If the selected text is the same as the whole text of the header
-                if (option == "grammar") {
-                  gptPrompt = `Correct the spelling and grammar of the subtitle: `;
-                } else if (option == "expand") {
-                  gptPrompt = `expand the current subtitle: `;
-                } else if (option == "shorten") {
-                  gptPrompt = `Shorten the current subtitle: `;
-                } else if (option == "improve") {
-                  gptPrompt = `Improve the current subtitle: `;
-                }
-                gptPrompt += `"${currentNode?.textContent}". Only give back the new subtitle.`;
-              }
-            }
-          } else {
-            // When the user didn't make a selection from a paragraph
-            if (option == "grammar") {
-              gptPrompt = `Correct the spelling and grammar of the subtitle: `;
-            } else if (option == "expand") {
-              gptPrompt = `expand the current subtitle: `;
-            } else if (option == "shorten") {
-              gptPrompt = `Shorten the current subtitle: `;
-            } else if (option == "improve") {
-              gptPrompt = `Improve the current subtitle: `;
-            }
-            gptPrompt += `"${currentNode?.textContent}". Only give back the new sutbtitle.`;
+          // When the user didn't make a selection from a paragraph
+          if (option == "grammar") {
+            gptPrompt = `Correct the spelling and grammar of the subtitle: `;
+          } else if (option == "expand") {
+            gptPrompt = `expand the current subtitle: `;
+          } else if (option == "shorten") {
+            gptPrompt = `Shorten the current subtitle: `;
+          } else if (option == "improve") {
+            gptPrompt = `Improve the current subtitle: `;
           }
+          gptPrompt += `"${currentNode?.textContent}".`;
+          if (language) {
+            gptPrompt += ` The language of the content is ${language.value}.`;
+          }
+          gptPrompt += " Only give back the new subtitle and only the first letter of the string should be uppercase."
           setOpenOptions(false);
         } else {
           gptPrompt = `Regenerate The subtitle: "${currentNode?.textContent}". Only give back an string of the generated subtitle. `;
@@ -587,15 +566,21 @@ export default function Writing() {
 
       const { generatedContent } = await response.json();
       if (editor?.state.selection.empty) {
-        // Replace the user selected texteditor
-        editor?.chain().focus().insertContent(generatedContent).run();
+        if (currentNode?.nodeName.toLowerCase() == "p") {
+          // Add the generated text to the position of the cursor
+          editor?.chain().focus().insertContent(`${generatedContent}`).run();
+        } else if (currentNode?.nodeName.toLowerCase().includes("h")) {
+          if (currentNode instanceof HTMLElement) {
+            currentNode.innerText = generatedContent;
+          }
+        }
       } else {
         // Add the new generated text into the current selected element of the editor
         editor
           ?.chain()
           .focus()
           .deleteSelection()
-          .insertContent(generatedContent)
+          .insertContent(` ${generatedContent}`)
           .run();
       }
 
@@ -623,39 +608,54 @@ export default function Writing() {
     const toneOfVoice = toneOfVoices.find(
       (item) => item.id == currentContent[0].tone_of_voice
     );
+    const language = languages.find(
+      (item) => item.id == currentContent[0].language
+    );
     try {
       if (editorRef.current) {
         const paragraphs = Array.from(editorRef.current.querySelectorAll("p"));
         for (const p of paragraphs) {
           const previousHeader = findPreviousHeader(p as HTMLElement);
           if (previousHeader) {
+            let gptPrompt = `Generate a paragraph for a ${contentInfo.type} text. It is for a ${contentInfo.type} text with the title "${contentInfo.title}" and will be about the following subtitle: "${previousHeader.innerText}". `;
+            if (
+              currentContent[0].language ||
+              currentContent[0].audience ||
+              currentContent[0].keyword ||
+              toneOfVoice
+            ) {
+              gptPrompt += `The content ${
+                toneOfVoice ? `has a ${toneOfVoice.value} tone of voice,` : ""
+              } ${language ? `is in ${language.value},` : ""} ${
+                currentContent[0].audience
+                  ? `has the target audience "${currentContent[0].audience}",`
+                  : ""
+              } ${
+                currentContent[0].keyword
+                  ? `contains this focus keyword ${currentContent[0].keyword},`
+                  : ""
+              } ${
+                currentContent[0].sub_keywords.length > 0
+                  ? `contains these subkeywords: ${currentContent[0].sub_keywords.join(
+                      ", "
+                    )}`
+                  : ""
+              }. `;
+            }
+            gptPrompt += `Don't include an introduction into the subject of the title and ${contentInfo.type} text, just only text for the subtitle. Only give back an string of the generated text and don't include the subtitle.`;
             const response = await fetch("/api/generateContent", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
               },
               body: JSON.stringify({
-                prompt: `Generate a paragraph for a ${contentInfo.type} text. The content has the title "${
-                  contentInfo.title
-                }" and the paragraph will be about the following subtitle: "${
-                  previousHeader.innerText
-                }". The content has a ${
-                  toneOfVoice?.value
-                } tone of voice, is in the language with the code ${
-                  currentContent[0].language
-                }${
-                  currentContent[0].audience
-                    ? `, has the target audience "${currentContent[0].audience}",`
-                    : ","
-                } and contains this keyword: "${
-                  currentContent[0].keyword
-                }" and these subkeywords: ${currentContent[0].sub_keywords.join(
-                  ","
-                )}. Don't include an introduction into the subject of the title and ${contentInfo.type} text, just only text for the subtitle. Only give back an string of the generated text and don't include the subtitle.`,
+                prompt: gptPrompt,
               }),
             });
             const { generatedContent } = await response.json();
             p.innerText = generatedContent;
+          } else {
+            alert("No subheaders found to generate text");
           }
         }
         setGenerating(false);

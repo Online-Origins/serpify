@@ -103,68 +103,76 @@ export function analyzeContent(contentJson) {
     }
 
     function getKeywordDensity() {
-        const textWithoutTags = htmlText.replace(/<\/?[^>]+(>|$)/g, " ");
-        const matches = textWithoutTags.match(new RegExp(`\\b${keyword}\\w*\\b`, 'gi'));
-        const count = matches ? matches.length : 0;
-        const percentage = (count / getWordAmount()) * 100;
+        if (keyword) {
+            const textWithoutTags = htmlText.replace(/<\/?[^>]+(>|$)/g, " ");
+            const matches = textWithoutTags.match(new RegExp(`\\b${keyword}\\w*\\b`, 'gi'));
+            const count = matches ? matches.length : 0;
+            const percentage = (count / getWordAmount()) * 100;
 
-        // If the density of the keyword is between 1 and 2 percent it is good
-        if (percentage.toFixed(2) >= 1 && percentage.toFixed(2) <= 2) {
-            seoScore += 10;
+            // If the density of the keyword is between 1 and 2 percent it is good
+            if (percentage.toFixed(2) >= 1 && percentage.toFixed(2) <= 2) {
+                seoScore += 10;
+            }
+
+            return { keyword: keyword, density: percentage };
+        } else {
+            return;
         }
-
-        return { keyword: keyword, density: percentage };
     }
 
     function getKeywordInTitle() {
-        if (title.replace(/[-_@#!'"]/g, " ").toLowerCase().includes(keyword)) {
-            // If the title contains the focus keyword it is good
-            goodPoints.push("Good! Your title contains your focus keyword")
-            return 10;
+        if (keyword) {
+            if (title.replace(/[-_@#!'"]/g, " ").toLowerCase().includes(keyword)) {
+                // If the title contains the focus keyword it is good
+                goodPoints.push("Good! Your title contains your focus keyword")
+                return 10;
+            } else {
+                // If the title doesn't contain the focus keyword is not good
+                warnings.push("Your title doesn't contain your focus keyword")
+                return 0;
+            }
         } else {
-            // If the title doesn't contain the focus keyword is not good
-            warnings.push("Your title doesn't contain your focus keyword")
-            return 0;
+            return 10;
         }
     }
 
     function getTitleLength() {
-        if (type == "blog") {
-            if (title.length >= 40 && title.length <= 60) {
-                // If the length of the title is between 40 and 60 characters it is good
-                goodPoints.push("Your title has a good length. Nice work!")
-                return 5
-            } else {
-                if (title.length < 40) {
-                    // If the length is smaller than 40 characters it is to small
-                    warnings.push(`The length of your title is ${title.length} and needs to be at least 40 characters`)
-                } else if (title.length > 60) {
-                    // If the length is longer than 60 characters it is to long
-                    warnings.push(`The length of your title is ${title.length} and needs to be maximal 60 characters`)
-                }
-                return 0;
-            }
-        } else {
+        if (title.length >= 40 && title.length <= 60) {
+            // If the length of the title is between 40 and 60 characters it is good
+            goodPoints.push("Your title has a good length. Nice work!")
             return 5
-        }
-    }
-
-    function getKeywordInParagraph() {
-        // Regular expression to match the content inside the first <p> tag
-        var match = htmlText.match(/<p>(.*?)<\/p>/);
-
-        // Check if a match is found and if it contains the search string
-        if (match && match[1].includes(keyword)) {
-            goodPoints.push("Your first paragraph contains the focus keyword. Good job!")
-            return 5;
         } else {
-            warnings.push("Your first paragraph doesn't contain the focus keyword. Try to add it")
+            if (title.length < 40) {
+                // If the length is smaller than 40 characters it is to small
+                warnings.push(`The length of your title is ${title.length} and needs to be at least 40 characters`)
+            } else if (title.length > 60) {
+                // If the length is longer than 60 characters it is to long
+                warnings.push(`The length of your title is ${title.length} and needs to be maximal 60 characters`)
+            }
             return 0;
         }
     }
 
+    function getKeywordInParagraph() {
+        if (keyword) {
+            // Regular expression to match the content inside the first <p> tag
+            var match = htmlText.match(/<p>(.*?)<\/p>/);
+
+            // Check if a match is found and if it contains the search string
+            if (match && match[1].includes(keyword)) {
+                goodPoints.push("Your first paragraph contains the focus keyword. Good job!")
+                return 5;
+            } else {
+                warnings.push("Your first paragraph doesn't contain the focus keyword. Try to add it")
+                return 0;
+            }
+        } else {
+            return 5;
+        }
+    }
+
     function getLinkCount() {
-        if (type == "blog") {
+        if (type != "custom") {
             // Count all links in text
             var count = (htmlText.match(/<a\b/g) || []).length;
             // get the optimal link amount according to the length of the text

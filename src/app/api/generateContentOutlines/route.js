@@ -23,7 +23,7 @@ export async function POST(request) {
             },
             {
                 "role": "user",
-                "content": `Generate a list of ${type != "blog" ? "maximal 10" : ""} subtitles for a ${type} with the title: ${title}. It needs to be in ${language}, needs to have a ${toneOfVoice} tone of voice ${audience != '' ? ", and needs to target" + audience : ""}. The following keyword: "${keyword}", and subkeywords are going to be used in it: ${subKeywords.join(',')}. Only give back an JSON format array with the following structure: [{id: , type: (h2,h3 or h4), title: }], for coding purposes only.`
+                "content": `Generate a list of ${type != "blog" ? "maximal 10" : ""} subtitles for a ${type} with the title: ${title}. It needs to be in ${language}, needs to have a ${toneOfVoice} tone of voice ${audience != '' ? ", and needs to target" + audience : ""}. The following keyword: "${keyword}", and subkeywords are going to be used in it: ${subKeywords.join(',')}. Only give back an JSON format array with the following structure: [{id: , type: (h2,h3 or h4), title: }], for coding purposes only. Only the first letter in the string of title should be uppercase`
             }
         ],
         model: "gpt-4o",

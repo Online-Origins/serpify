@@ -7,6 +7,7 @@ import DotsMenu from "../dots-menu/dots-menu.component";
 import { supabase } from "@/app/utils/supabaseClient/server";
 import styles from "./content-item.module.scss";
 import Link from "next/link";
+import { getCurrentDateTime } from '@/app/utils/currentDateTime/dateUtils';
 
 export default function ContentItem({
   content,
@@ -65,13 +66,6 @@ export default function ContentItem({
 
   // Copy a content item with the current date
   async function copyContent() {
-    const date = new Date();
-
-    let day = date.getDate();
-    let month = date.getMonth() + 1;
-    let year = date.getFullYear();
-
-    const currentDate = `${year}-${month}-${day}`;
     try {
       const { data } = await supabase
         .from("contentItems")
@@ -84,7 +78,7 @@ export default function ContentItem({
             {
               content_score: data[0].content_score,
               status: data[0].status,
-              edited_on: currentDate,
+              edited_on: getCurrentDateTime(),
               collection: data[0].collection,
               language: data[0].language,
               tone_of_voice: data[0].tone_of_voice,
@@ -134,7 +128,7 @@ export default function ContentItem({
           >
             {getCollectionById(content.collection).collection_name}
           </Link>
-        ) : <p>Collection not found</p>}
+        ) : <p>No collection found</p>}
       </div>
       <div className={classNames(styles.contentInfo)}>
         <div className={styles.meterWrapper}>
