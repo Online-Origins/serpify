@@ -442,11 +442,11 @@ export default function Writing() {
           if (option == "grammar") {
             gptPrompt = `Correct the spelling and grammar of the text: `;
           } else if (option == "expand") {
-            gptPrompt = `expand the current text. `;
+            gptPrompt = `expand the current text: `;
           } else if (option == "shorten") {
-            gptPrompt = `Shorten the current text. `;
+            gptPrompt = `Shorten the current text: `;
           } else if (option == "improve") {
-            gptPrompt = `Improve the current text. `;
+            gptPrompt = `Improve the current text: `;
           }
           setOpenOptions(false);
         } else {
@@ -467,20 +467,20 @@ export default function Writing() {
               selectedText,
               ""
             );
-            if (notSelectedText != "" && option != "grammar") {
+            if (notSelectedText != "" && option != "grammar" && option != "expand") {
               // If the selected text is not the same as the whole text of the paragraph
               gptPrompt += `it will be an addition on the existing: "${notSelectedText}", and wil replace this: "${selectedText}". `;
-            } else if (notSelectedText == "") {
+            } else if (notSelectedText == "" && selectedText != currentNode.textContent) {
               // If the selected text is the same as the whole text of the paragraph
               gptPrompt += `The newly generated will replace this: "${currentNode.textContent}". `;
-            } else if (option == "grammar") {
+            } else {
               // If the user selected the option grammar
               gptPrompt += `"${selectedText}". `;
             }
           }
         } else {
           // When the user didn't make a selection from a paragraph
-          if (currentNode.textContent != "" && option != "grammar") {
+          if (currentNode.textContent != "" && !option) {
             // The generated text needs to replace the text in te current element if the current element is not empty and if the user didn't chose the grammar option
             gptPrompt += `The newly generated will be an addition on the existing: "${currentNode.textContent}". `;
           } else if (currentNode.textContent == "") {
@@ -516,14 +516,18 @@ export default function Writing() {
                   : ""
               }. `;
             }
-          } else if (option == "grammar") {
+          } else {
             // If the user did chose the grammar option give the current element text to the api
             gptPrompt += `"${currentNode.textContent}". `;
           }
         }
 
-        // Specify to the AI that only a string of the generated text is needed
-        gptPrompt += `Only give back the updated text part and not the whole text and subtitle.`;
+        if (option && option != "shorten"){
+          // Specify to the AI that only a string of the generated text is needed
+          gptPrompt += `Only give back the text including the old text and not the subtitle.`;
+        } else {
+          gptPrompt += `Only give back the new text and not the subtitle.`;
+        }
 
         // Prompt building for when the element is an header
       } else if (currentNode?.nodeName.toLowerCase().includes("h")) {
@@ -546,7 +550,8 @@ export default function Writing() {
           if (language) {
             gptPrompt += ` The language of the content is ${language.value}.`;
           }
-          gptPrompt += " Only give back the new subtitle and only the first letter of the string should be uppercase."
+          gptPrompt +=
+            " Only give back the new subtitle and only the first letter of the string should be uppercase.";
           setOpenOptions(false);
         } else {
           gptPrompt = `Regenerate The subtitle: "${currentNode?.textContent}". Only give back an string of the generated subtitle. `;
@@ -566,13 +571,8 @@ export default function Writing() {
 
       const { generatedContent } = await response.json();
       if (editor?.state.selection.empty) {
-        if (currentNode?.nodeName.toLowerCase() == "p") {
-          // Add the generated text to the position of the cursor
-          editor?.chain().focus().insertContent(`${generatedContent}`).run();
-        } else if (currentNode?.nodeName.toLowerCase().includes("h")) {
-          if (currentNode instanceof HTMLElement) {
-            currentNode.innerText = generatedContent;
-          }
+        if (currentNode instanceof HTMLElement) {
+          currentNode.innerText = generatedContent;
         }
       } else {
         // Add the new generated text into the current selected element of the editor
@@ -580,7 +580,7 @@ export default function Writing() {
           ?.chain()
           .focus()
           .deleteSelection()
-          .insertContent(` ${generatedContent}`)
+          .insertContent(generatedContent)
           .run();
       }
 
