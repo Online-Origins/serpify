@@ -1,4 +1,4 @@
-@import '@/styles/variables.scss';
+@import '@/styles/variables';
 
 .editorWrapper {
     gap: 0 !important;
@@ -105,6 +105,7 @@
     overflow-x: hidden;
     position: relative;
     padding-top: 2rem;
+    height: 100%;
 
     h2,
     h3,

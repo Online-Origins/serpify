@@ -124,19 +124,20 @@ export default function ContentScore({ contentScore }: { contentScore: any }) {
           <div
             className={classNames(
               styles.points,
-              keywordsOpen && styles.open,
+              styles.keywords,
+              // keywordsOpen && styles.open,
               contentScore.subKeywordDensity.length > 4 && styles.long
             )}
           >
             <div
               className={styles.pointsHeader}
-              onClick={() => setKeywordsOpen(!keywordsOpen)}
+              // onClick={() => setKeywordsOpen(!keywordsOpen)}
             >
               <h4>Keywords</h4>
-              <ArrowForwardIosRounded />
+              {/* <ArrowForwardIosRounded /> */}
             </div>
             <div className={styles.pointsList}>
-            {[
+            {contentScore.keywordDensity ? [
               ...[contentScore.keywordDensity],
               ...contentScore.subKeywordDensity,
             ].map((keyword: any, index: number) => (
@@ -168,7 +169,7 @@ export default function ContentScore({ contentScore }: { contentScore: any }) {
                   )}
                 </div>
               </CustomizedTooltip>
-            ))}
+            )) : <p>No keywords found</p>}
             </div>
           </div>
         </div>

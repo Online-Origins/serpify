@@ -42,6 +42,15 @@ export default function CollectionCard({
   const [contentTitle, setcontentTitle] = useState("");
   const [generating, setGenerating] = useState(false);
   const [possibleTitles, setPossibleTitles] = useState<string[]>([]);
+  const [contentType, setContentType] = useState("Blog");
+  const [customKeyword, setCustomKeyword] = useState<String>();
+  const [customSubKeywords, setCustomSubKeywords] = useState<String[]>();
+  const typesOfContent = [
+    "Blog",
+    "Product category",
+    "Company service",
+    "Custom",
+  ];
 
   // Delete a collection
   async function deleteCollection() {
@@ -104,16 +113,20 @@ export default function CollectionCard({
       .from("contentItems")
       .insert([
         {
-          collection: collection.id,
+          collection: contentType.toLowerCase() != "custom" ? collection.id : null,
           language: chosenLanguage,
+          keyword: contentType.toLowerCase() != "custom" ? chosenKeyword : null,
           sub_keywords: chosenKeywords,
           tone_of_voice: toneOfVoice,
           target_audience: targetAudience,
           content_title: contentTitle,
           edited_on: currentDate(),
-          status: "outlines",
-          keyword: chosenKeyword,
+          status:
+            contentType.toLowerCase() == "custom" ? "writing" : "outlines",
           domain: currentDomain,
+          type: contentType.toLowerCase(),
+          custom_keyword: customKeyword,
+          custom_sub_keywords: customSubKeywords,
         },
       ])
       .select();
@@ -127,7 +140,11 @@ export default function CollectionCard({
         // If neither localStorage nor sessionStorage is supported
         console.log("Web Storage is not supported in this environment.");
       }
-      router.push("/content/create/outlines");
+      if(contentType.toLowerCase() == "custom"){
+        router.push("/content/create/writing");
+      } else {
+        router.push("/content/create/outlines");
+      }
     }
   }
 
@@ -215,7 +232,14 @@ export default function CollectionCard({
           <PopUp
             title={"New content"}
             titleButtons={
-              <Button type={"textOnly"} onClick={() => setPopUpOpen(false)}>
+              <Button
+                type={"textOnly"}
+                onClick={() => {
+                  setPopUpOpen(false);
+                  setcontentTitle("");
+                  setPopUpStep(1);
+                }}
+              >
                 <p>Close</p>
                 <CloseRoundedIcon />
               </Button>
@@ -245,98 +269,163 @@ export default function CollectionCard({
           >
             {popUpStep == 1 && (
               <div className={styles.selectingKeywords}>
-                <div className={styles.collectionWrapper}>
-                  <h4>Collection:</h4>
-                  <h5>{collection.collection_name}</h5>
-                </div>
                 <InputWrapper
                   type="dropdown"
-                  title="Focus keyword:"
+                  title="Type of content:"
                   required={false}
-                  value={chosenKeyword}
-                  options={collection.keywords}
-                  information="This will be the keyword your content is focused on."
-                  onChange={(value: any) => {setChosenKeyword(value); setChosenKeywords([])}}
-                  placeholder="Which collection do you want to use?"
+                  value={contentType}
+                  options={typesOfContent}
+                  onChange={(value: any) => setContentType(value)}
                 />
-                <InputWrapper
-                  type="vertMultiSelect"
-                  title="Subkeywords to use:"
-                  required={false}
-                  options={collection.keywords.filter(
-                    (option: string) => option != chosenKeyword
-                  )}
-                  defValue={chosenKeywords}
-                  information="Keywords that help by enhancing the relevance, reach, and effectiveness of your main keyword strategy."
-                  onChange={(value: any) => setChosenKeywords(value)}
-                  placeholder="Which collection do you want to use?"
-                />
+                {contentType.toLowerCase() != "custom" ? (
+                  <>
+                    <div className={styles.collectionWrapper}>
+                      <h4>Collection:</h4>
+                      <h5>{collection.collection_name}</h5>
+                    </div>
+                    <InputWrapper
+                      type="dropdown"
+                      title="Focus keyword:"
+                      required={false}
+                      value={chosenKeyword}
+                      options={collection.keywords}
+                      information="This will be the keyword your content is focused on."
+                      onChange={(value: any) => {
+                        setChosenKeyword(value);
+                        setChosenKeywords([]);
+                      }}
+                      placeholder="Which collection do you want to use?"
+                    />
+                    <InputWrapper
+                      type="vertMultiSelect"
+                      title="Subkeywords to use:"
+                      required={false}
+                      options={collection.keywords.filter(
+                        (option: string) => option != chosenKeyword
+                      )}
+                      defValue={chosenKeywords}
+                      information="Keywords that help by enhancing the relevance, reach, and effectiveness of your main keyword strategy."
+                      onChange={(value: any) => setChosenKeywords(value)}
+                      placeholder="Which collection do you want to use?"
+                    />
+                  </>
+                ) : (
+                  <>
+                    <InputWrapper
+                      type="text"
+                      title="Keywords: **"
+                      required={false}
+                      onChange={(value: any) => setCustomKeyword(value)}
+                      placeholder="Enter your keyword"
+                    />
+                    <InputWrapper
+                      type="text"
+                      title="Sub keywords: **"
+                      required={false}
+                      onChange={(value: any) => setCustomSubKeywords(value)}
+                      placeholder="Enter your keywords and devide them by a comma"
+                    />
+                    <p style={{ fontSize: 12 }}>
+                      ** You can keep this empty if you really want to start
+                      blank. It can help creating better content when filling
+                      this in.
+                    </p>
+                  </>
+                )}
               </div>
             )}
             {popUpStep == 2 && (
               <div className={styles.contentSettings}>
                 <InputWrapper
                   type="autocomplete"
-                  title="Language:"
-                  required={false}
+                  title={`Language: ${
+                    contentType.toLowerCase() == "custom" ? "**" : ""
+                  }`}
+                  required={contentType.toLowerCase() != "custom"}
                   value={chosenLanguage}
                   options={languageCodes}
                   onChange={(value: any) =>
                     setChosenLanguage(
-                      value != null ? value : languageCodes[0].id
+                      contentType.toLowerCase() != "custom"
+                        ? value != null
+                          ? value
+                          : languageCodes[0].id
+                        : value
                     )
                   }
                   placeholder="In what language should the keywords be?"
                 />
                 <InputWrapper
                   type="autocomplete"
-                  title="Tone of voice:"
-                  required={false}
+                  title={`Tone of voice: ${
+                    contentType.toLowerCase() == "custom" ? "**" : ""
+                  }`}
+                  required={contentType.toLowerCase() != "custom"}
                   value={toneOfVoice}
                   options={toneOfVoices}
                   onChange={(value: any) =>
-                    setToneOfVoice(value != null ? value : toneOfVoices[0].id)
+                    setToneOfVoice(
+                      contentType.toLowerCase() != "custom"
+                        ? value != null
+                          ? value
+                          : toneOfVoices[0].id
+                        : value
+                    )
                   }
                   placeholder="How do you want to tell the information?"
                 />
                 <InputWrapper
                   type="text"
-                  title="Target adience:"
+                  title={`Target adience: ${
+                    contentType.toLowerCase() == "custom" ? "**" : ""
+                  }`}
                   required={false}
                   onChange={(value: any) => setTargetAudience(value)}
                   placeholder="Who do you want to target?"
                 />
                 <InputWrapper
-                  type="generate"
-                  title="Title of your content:"
+                  type={contentType == "Blog" ? "generate" : "text"}
+                  title={`Title of your content:`}
                   required={true}
                   value={contentTitle}
                   onChange={(value: any) => setcontentTitle(value)}
-                  placeholder="Insert title for the content (or generate with AI)"
+                  placeholder={`Insert the title of your ${contentType.toLowerCase()} ${
+                    contentType.toLowerCase() == "blog"
+                      ? "(or generate with AI)"
+                      : "content"
+                  }`}
                   generateTitle={() => generateTitle()}
                 />
-                {possibleTitles.length > 0 && (
-                  <div className={styles.possibleTitles}>
-                    <h5>Possible titles:</h5>
-                    {possibleTitles.map((title: string) => (
-                      <div
-                        key={title}
-                        className={styles.possibleTitle}
-                        onClick={() => {
-                          setcontentTitle(title);
-                          setPossibleTitles(
-                            possibleTitles.filter(
-                              (item: string) => item != title
-                            )
-                          );
-                        }}
-                      >
-                        <AutoAwesome />
-                        <p>{title}</p>
-                      </div>
-                    ))}
-                  </div>
+                {contentType.toLowerCase() == "custom" && (
+                  <p style={{ fontSize: 12 }}>
+                    ** You can keep this empty if you really want to start
+                    blank. It can help creating better content when filling this
+                    in.
+                  </p>
                 )}
+                {possibleTitles.length > 0 &&
+                  contentType.toLowerCase() == "blog" && (
+                    <div className={styles.possibleTitles}>
+                      <h5>Possible titles:</h5>
+                      {possibleTitles.map((title: string) => (
+                        <div
+                          key={title}
+                          className={styles.possibleTitle}
+                          onClick={() => {
+                            setcontentTitle(title);
+                            setPossibleTitles(
+                              possibleTitles.filter(
+                                (item: string) => item != title
+                              )
+                            );
+                          }}
+                        >
+                          <AutoAwesome />
+                          <p>{title}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
               </div>
             )}
             {generating && (

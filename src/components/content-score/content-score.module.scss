@@ -60,6 +60,17 @@
             z-index: 50;
             position: relative;
 
+            &.keywords{
+                .pointsList{
+                    gap: .25rem;
+                }
+
+                .pointWrapper{
+                    opacity: 1;
+                    max-height: 5rem;
+                }
+            }
+
             .pointsHeader {
                 display: flex;
                 width: 100%;

@@ -3,6 +3,7 @@ export function analyzeContent(contentJson) {
     const keyword = contentJson.keyword;
     const subKeywords = contentJson.subKeywords;
     const htmlText = contentJson.htmlText;
+    const type = contentJson.type;
     let seoScore = 0;
     let goodPoints = [];
     let minorWarnings = [];
@@ -102,32 +103,40 @@ export function analyzeContent(contentJson) {
     }
 
     function getKeywordDensity() {
-        const textWithoutTags = htmlText.replace(/<\/?[^>]+(>|$)/g, " ");
-        const matches = textWithoutTags.match(new RegExp(`\\b${keyword}\\w*\\b`, 'gi'));
-        const count = matches ? matches.length : 0;
-        const percentage = (count / getWordAmount()) * 100;
+        if (keyword) {
+            const textWithoutTags = htmlText.replace(/<\/?[^>]+(>|$)/g, " ");
+            const matches = textWithoutTags.match(new RegExp(`\\b${keyword}\\w*\\b`, 'gi'));
+            const count = matches ? matches.length : 0;
+            const percentage = (count / getWordAmount()) * 100;
 
-        // If the density of the keyword is between 1 and 2 percent it is good
-        if (percentage.toFixed(2) >= 1 && percentage.toFixed(2) <= 2) {
-            seoScore += 10;
+            // If the density of the keyword is between 1 and 2 percent it is good
+            if (percentage.toFixed(2) >= 1 && percentage.toFixed(2) <= 2) {
+                seoScore += 10;
+            }
+
+            return { keyword: keyword, density: percentage };
+        } else {
+            return;
         }
-
-        return { keyword: keyword, density: percentage };
     }
 
     function getKeywordInTitle() {
-        if (title.replace(/[-_@#!'"]/g, " ").toLowerCase().includes(keyword)) {
-            // If the title contains the focus keyword it is good
-            goodPoints.push("Good! Your title contains your focus keyword")
-            return 10;
+        if (keyword) {
+            if (title.replace(/[-_@#!'"]/g, " ").toLowerCase().includes(keyword)) {
+                // If the title contains the focus keyword it is good
+                goodPoints.push("Good! Your title contains your focus keyword")
+                return 10;
+            } else {
+                // If the title doesn't contain the focus keyword is not good
+                warnings.push("Your title doesn't contain your focus keyword")
+                return 0;
+            }
         } else {
-            // If the title doesn't contain the focus keyword is not good
-            warnings.push("Your title doesn't contain your focus keyword")
-            return 0;
+            return 10;
         }
     }
 
-    function getKeywordLength() {
+    function getTitleLength() {
         if (title.length >= 40 && title.length <= 60) {
             // If the length of the title is between 40 and 60 characters it is good
             goodPoints.push("Your title has a good length. Nice work!")
@@ -145,40 +154,49 @@ export function analyzeContent(contentJson) {
     }
 
     function getKeywordInParagraph() {
-        // Regular expression to match the content inside the first <p> tag
-        var match = htmlText.match(/<p>(.*?)<\/p>/);
+        if (keyword) {
+            // Regular expression to match the content inside the first <p> tag
+            var match = htmlText.match(/<p>(.*?)<\/p>/);
 
-        // Check if a match is found and if it contains the search string
-        if (match && match[1].includes(keyword)) {
-            goodPoints.push("Your first paragraph contains the focus keyword. Good job!")
-            return 5;
+            // Check if a match is found and if it contains the search string
+            if (match && match[1].includes(keyword)) {
+                goodPoints.push("Your first paragraph contains the focus keyword. Good job!")
+                return 5;
+            } else {
+                warnings.push("Your first paragraph doesn't contain the focus keyword. Try to add it")
+                return 0;
+            }
         } else {
-            warnings.push("Your first paragraph doesn't contain the focus keyword. Try to add it")
-            return 0;
+            return 5;
         }
     }
 
     function getLinkCount() {
-        // Count all links in text
-        var count = (htmlText.match(/<a\b/g) || []).length;
-        // get the optimal link amount according to the length of the text
-        const optimalAmount = getWordAmount() < 300 ? 1 : (getWordAmount() / 300).toFixed(0)
-        if (count >= optimalAmount) {
-            // If the amount is the same or more as the optimal amount it is good
-            seoScore += 5;
-            goodPoints.push("Your text contains a good amount of links");
-        } else if (count > 0 && count < optimalAmount) {
-            // If the amount is more than 0 but less than optimal it is not good but not bad
-            const linkScore = 5 / optimalAmount
-            for (let x = 0; x < count; x++) {
-                seoScore += linkScore;
+        if (type != "custom") {
+            // Count all links in text
+            var count = (htmlText.match(/<a\b/g) || []).length;
+            // get the optimal link amount according to the length of the text
+            const optimalAmount = getWordAmount() < 300 ? 1 : (getWordAmount() / 300).toFixed(0)
+            if (count >= optimalAmount) {
+                // If the amount is the same or more as the optimal amount it is good
+                seoScore += 5;
+                goodPoints.push("Your text contains a good amount of links");
+            } else if (count > 0 && count < optimalAmount) {
+                // If the amount is more than 0 but less than optimal it is not good but not bad
+                const linkScore = 5 / optimalAmount
+                for (let x = 0; x < count; x++) {
+                    seoScore += linkScore;
+                }
+                minorWarnings.push(`Your text contains a decent amount of links: ${count}. Try to add more`)
+            } else {
+                // If the amount is 0 it is not good
+                warnings.push("Your text doesn't contain any links. Try to add some")
             }
-            minorWarnings.push(`Your text contains a decent amount of links: ${count}. Try to add more`)
+            return count;
         } else {
-            // If the amount is 0 it is not good
-            warnings.push("Your text doesn't contain any links. Try to add some")
+            seoScore += 5;
+            return 0;
         }
-        return count;
     }
 
     function getKeywordsinSubTitles() {
@@ -211,7 +229,7 @@ export function analyzeContent(contentJson) {
     function getSeoScore() {
         // Check the title for the focus keyword and length
         seoScore += getKeywordInTitle();
-        seoScore += getKeywordLength();
+        seoScore += getTitleLength();
 
         // Check if heading types exist
         seoScore += getHeading("h1", 10);

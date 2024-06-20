@@ -53,6 +53,15 @@ export default function Collection({ params }: { params: { slug: string } }) {
   const [potential, setPotential] = useState<number[]>([0, 100]);
   const [addPopUpOpen, setAddPopUpOpen] = useState(false);
   const [possibleTitles, setPossibleTitles] = useState<string[]>([]);
+  const [contentType, setContentType] = useState("Blog");
+  const [customKeyword, setCustomKeyword] = useState<String>();
+  const [customSubKeywords, setCustomSubKeywords] = useState<String[]>();
+  const typesOfContent = [
+    "Blog",
+    "Product category",
+    "Company service",
+    "Custom",
+  ];
 
   // Get the selected collection
   useEffect(() => {
@@ -69,7 +78,7 @@ export default function Collection({ params }: { params: { slug: string } }) {
       .eq("id", activeCollection);
     if (data) {
       setKeywordsLanguage(parseInt(data[0].language));
-      setKeywordsCountry(parseInt(data[0].country))
+      setKeywordsCountry(parseInt(data[0].country));
       setSelectedCollection(data);
       setChosenFocusKeyword(data[0].keywords[0]);
     }
@@ -214,7 +223,11 @@ export default function Collection({ params }: { params: { slug: string } }) {
   async function updateCollection() {
     const { error } = await supabase
       .from("collections")
-      .update({ keywords: selectedKeywords.map((selectedKeyword) => selectedKeyword.text)})
+      .update({
+        keywords: selectedKeywords.map(
+          (selectedKeyword) => selectedKeyword.text
+        ),
+      })
       .eq("id", activeCollection);
     if (error) {
       console.log(error);
@@ -233,19 +246,38 @@ export default function Collection({ params }: { params: { slug: string } }) {
 
   // Sort the keywords on the sorting type
   function sortKeywords(array: any) {
-    console.log(sorting)
     if (sorting == "potential") {
-      return array.sort((a: any, b: any) => b.keywordMetrics.potential - a.keywordMetrics.potential);
+      return array.sort(
+        (a: any, b: any) =>
+          b.keywordMetrics.potential - a.keywordMetrics.potential
+      );
     } else if (sorting == "potentialRev") {
-      return array.sort((a: any, b: any) => a.keywordMetrics.potential - b.keywordMetrics.potential);
+      return array.sort(
+        (a: any, b: any) =>
+          a.keywordMetrics.potential - b.keywordMetrics.potential
+      );
     } else if (sorting == "competition") {
-      return array.sort((a: any, b: any) => a.keywordMetrics.competitionIndex - b.keywordMetrics.competitionIndex);
+      return array.sort(
+        (a: any, b: any) =>
+          a.keywordMetrics.competitionIndex - b.keywordMetrics.competitionIndex
+      );
     } else if (sorting == "competitionRev") {
-      return array.sort((a: any, b: any) => b.keywordMetrics.competitionIndex - a.keywordMetrics.competitionIndex);
+      return array.sort(
+        (a: any, b: any) =>
+          b.keywordMetrics.competitionIndex - a.keywordMetrics.competitionIndex
+      );
     } else if (sorting == "searchVolume") {
-      return array.sort((a: any, b: any) => b.keywordMetrics.avgMonthlySearches - a.keywordMetrics.avgMonthlySearches);
+      return array.sort(
+        (a: any, b: any) =>
+          b.keywordMetrics.avgMonthlySearches -
+          a.keywordMetrics.avgMonthlySearches
+      );
     } else if (sorting == "searchVolumeRev") {
-      return array.sort((a: any, b: any) => a.keywordMetrics.avgMonthlySearches - b.keywordMetrics.avgMonthlySearches);
+      return array.sort(
+        (a: any, b: any) =>
+          a.keywordMetrics.avgMonthlySearches -
+          b.keywordMetrics.avgMonthlySearches
+      );
     } else if (sorting == "keywordRev") {
       return array.sort((a: any, b: any) => {
         // Compare the text values
@@ -311,15 +343,21 @@ export default function Collection({ params }: { params: { slug: string } }) {
       .from("contentItems")
       .insert([
         {
-          collection: selectedCollection[0].id,
+          collection: contentType.toLowerCase() != "custom" ? selectedCollection[0].id : null,
           language: chosenLanguage,
+          keyword:
+            contentType.toLowerCase() != "custom" ? chosenFocusKeyword : null,
           sub_keywords: chosenKeywords,
           tone_of_voice: toneOfVoice,
           target_audience: targetAudience,
           content_title: contentTitle,
           edited_on: currentDate(),
-          status: "outlines",
-          keyword: chosenFocusKeyword,
+          status:
+            contentType.toLowerCase() == "custom" ? "writing" : "outlines",
+          domain: selectedCollection[0].domain,
+          type: contentType.toLowerCase(),
+          custom_keyword: customKeyword,
+          custom_sub_keywords: customSubKeywords,
         },
       ])
       .select();
@@ -333,7 +371,11 @@ export default function Collection({ params }: { params: { slug: string } }) {
         // If neither localStorage nor sessionStorage is supported
         console.log("Web Storage is not supported in this environment.");
       }
-      router.push("/content/create/outlines");
+      if (contentType.toLowerCase() == "custom") {
+        router.push("/content/create/writing");
+      } else {
+        router.push("/content/create/outlines");
+      }
     }
   }
 
@@ -359,7 +401,7 @@ export default function Collection({ params }: { params: { slug: string } }) {
       });
 
       const data = await response.json();
-      
+
       // Generate 3 possible titles for the user
       let possibleTitles = [];
 
@@ -584,7 +626,11 @@ export default function Collection({ params }: { params: { slug: string } }) {
                   <Button
                     type={"solid"}
                     onClick={() => createContent()}
-                    disabled={contentTitle == ""}
+                    disabled={
+                      contentType.toLowerCase() != "custom"
+                        ? toneOfVoice == null || contentTitle == ""
+                        : contentTitle == ""
+                    }
                   >
                     <p>Start creating</p>
                   </Button>
@@ -594,98 +640,160 @@ export default function Collection({ params }: { params: { slug: string } }) {
           >
             {popUpStep == 1 && (
               <div className={styles.selectingKeywords}>
-                <div className={styles.collectionWrapper}>
-                  <h4>Collection:</h4>
-                  <h5>{selectedCollection[0].collection_name}</h5>
-                </div>
                 <InputWrapper
                   type="dropdown"
-                  title="Focus keyword:"
+                  title="Type of content:"
                   required={false}
-                  value={chosenFocusKeyword}
-                  options={selectedCollection[0].keywords}
-                  information="This will be the keyword your content is focused on."
-                  onChange={(value: any) => setChosenFocusKeyword(value)}
-                  placeholder="Which collection do you want to use?"
+                  value={contentType}
+                  options={typesOfContent}
+                  onChange={(value: any) => setContentType(value)}
                 />
-                <InputWrapper
-                  type="vertMultiSelect"
-                  title="Subkeywords to use:"
-                  required={false}
-                  options={selectedCollection[0].keywords.filter(
-                    (option: string) => option != chosenFocusKeyword
-                  )}
-                  defValue={chosenKeywords}
-                  information="Keywords that help by enhancing the relevance, reach, and effectiveness of your main keyword strategy."
-                  onChange={(value: any) => setChosenFocusKeywords(value)}
-                  placeholder="Which collection do you want to use?"
-                />
+                {contentType.toLowerCase() != "custom" ? (
+                  <>
+                    <div className={styles.collectionWrapper}>
+                      <h4>Collection:</h4>
+                      <h5>{selectedCollection[0].collection_name}</h5>
+                    </div>
+                    <InputWrapper
+                      type="dropdown"
+                      title="Focus keyword:"
+                      required={false}
+                      value={chosenFocusKeyword}
+                      options={selectedCollection[0].keywords}
+                      information="This will be the keyword your content is focused on."
+                      onChange={(value: any) => setChosenFocusKeyword(value)}
+                      placeholder="Which collection do you want to use?"
+                    />
+                    <InputWrapper
+                      type="vertMultiSelect"
+                      title="Subkeywords to use:"
+                      required={false}
+                      options={selectedCollection[0].keywords.filter(
+                        (option: string) => option != chosenFocusKeyword
+                      )}
+                      defValue={chosenKeywords}
+                      information="Keywords that help by enhancing the relevance, reach, and effectiveness of your main keyword strategy."
+                      onChange={(value: any) => setChosenFocusKeywords(value)}
+                      placeholder="Which collection do you want to use?"
+                    />
+                  </>
+                ) : (
+                  <>
+                    <InputWrapper
+                      type="text"
+                      title="Keywords: **"
+                      required={false}
+                      onChange={(value: any) => setCustomKeyword(value)}
+                      placeholder="Enter your keyword"
+                    />
+                    <InputWrapper
+                      type="text"
+                      title="Sub keywords: **"
+                      required={false}
+                      onChange={(value: any) => setCustomSubKeywords(value)}
+                      placeholder="Enter your keywords and devide them by a comma"
+                    />
+                    <p style={{ fontSize: 12 }}>
+                      ** You can keep this empty if you really want to start
+                      blank. It can help creating better content when filling
+                      this in.
+                    </p>
+                  </>
+                )}
               </div>
             )}
             {popUpStep == 2 && (
               <div className={styles.contentSettings}>
                 <InputWrapper
                   type="autocomplete"
-                  title="Language:"
-                  required={false}
+                  title={`Language: ${
+                    contentType.toLowerCase() == "custom" ? "**" : ""
+                  }`}
+                  required={contentType.toLowerCase() != "custom"}
                   value={chosenLanguage}
                   options={languageCodes}
                   onChange={(value: any) =>
                     setChosenLanguage(
-                      value != null ? value : languageCodes[0].id
+                      contentType.toLowerCase() != "custom"
+                        ? value != null
+                          ? value
+                          : languageCodes[0].id
+                        : value
                     )
                   }
-                  placeholder="In what language should the content be?"
+                  placeholder="In what language should the keywords be?"
                 />
                 <InputWrapper
                   type="autocomplete"
-                  title="Tone of voice:"
-                  required={false}
+                  title={`Tone of voice: ${
+                    contentType.toLowerCase() == "custom" ? "**" : ""
+                  }`}
+                  required={contentType.toLowerCase() != "custom"}
                   value={toneOfVoice}
                   options={toneOfVoices}
                   onChange={(value: any) =>
-                    setToneOfVoice(value != null ? value : toneOfVoices[0].id)
+                    setToneOfVoice(
+                      contentType.toLowerCase() != "custom"
+                        ? value != null
+                          ? value
+                          : toneOfVoices[0].id
+                        : value
+                    )
                   }
                   placeholder="How do you want to tell the information?"
                 />
                 <InputWrapper
                   type="text"
-                  title="Target adience:"
+                  title={`Target adience: ${
+                    contentType.toLowerCase() == "custom" ? "**" : ""
+                  }`}
                   required={false}
                   onChange={(value: any) => setTargetAudience(value)}
                   placeholder="Who do you want to target?"
                 />
                 <InputWrapper
-                  type="generate"
-                  title="Title of your content:"
+                  type={contentType == "Blog" ? "generate" : "text"}
+                  title={`Title of your content:`}
                   required={true}
                   value={contentTitle}
                   onChange={(value: any) => setcontentTitle(value)}
-                  placeholder="Insert title for the content (or generate with AI)"
+                  placeholder={`Insert the title of your ${contentType.toLowerCase()} ${
+                    contentType.toLowerCase() == "blog"
+                      ? "(or generate with AI)"
+                      : "content"
+                  }`}
                   generateTitle={() => generateTitle()}
                 />
-                {possibleTitles.length > 0 && (
-                  <div className={styles.possibleTitles}>
-                    <h5>Possible titles:</h5>
-                    {possibleTitles.map((title: string) => (
-                      <div
-                        key={title}
-                        className={styles.possibleTitle}
-                        onClick={() => {
-                          setcontentTitle(title);
-                          setPossibleTitles(
-                            possibleTitles.filter(
-                              (item: string) => item != title
-                            )
-                          );
-                        }}
-                      >
-                        <AutoAwesome />
-                        <p>{title}</p>
-                      </div>
-                    ))}
-                  </div>
+                {contentType.toLowerCase() == "custom" && (
+                  <p style={{ fontSize: 12 }}>
+                    ** You can keep this empty if you really want to start
+                    blank. It can help creating better content when filling this
+                    in.
+                  </p>
                 )}
+                {possibleTitles.length > 0 &&
+                  contentType.toLowerCase() == "blog" && (
+                    <div className={styles.possibleTitles}>
+                      <h5>Possible titles:</h5>
+                      {possibleTitles.map((title: string) => (
+                        <div
+                          key={title}
+                          className={styles.possibleTitle}
+                          onClick={() => {
+                            setcontentTitle(title);
+                            setPossibleTitles(
+                              possibleTitles.filter(
+                                (item: string) => item != title
+                              )
+                            );
+                          }}
+                        >
+                          <AutoAwesome />
+                          <p>{title}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
               </div>
             )}
             {generating && (
@@ -717,7 +825,6 @@ export default function Collection({ params }: { params: { slug: string } }) {
               </Button>
             }
           >
-            
             <InputWrapper
               type="text"
               title="Subjects:"
@@ -725,139 +832,141 @@ export default function Collection({ params }: { params: { slug: string } }) {
               onChange={(value: any) => setSubjectsInput(value)}
               placeholder="For what subjects do you want to search keywords?"
             />
-            <p style={{marginTop: -8, fontSize: 12}}>*Enter your subjects and devide them by a comma</p>
-              <div className={styles.filters}>
-                <div className={styles.multiDropdown}>
-                  <InputWrapper
-                    type="autocomplete"
-                    title="Country:"
-                    required={false}
-                    value={keywordsCountry}
-                    options={countryCodes}
-                    onChange={(value: any) =>
-                      setKeywordsCountry(
-                        value != null ? value : countryCodes[0].id
-                      )
-                    }
-                    placeholder="Which country do you want to target?"
-                  />
-                  <InputWrapper
-                    type="autocomplete"
-                    title="Language:"
-                    required={false}
-                    value={keywordsLanguage}
-                    options={languageCodes}
-                    onChange={(value: any) =>
-                      setKeywordsLanguage(
-                        value != null ? value : languageCodes[0].id
-                      )
-                    }
-                    placeholder="In what language should the keywords be?"
-                  />
-                </div>
+            <p style={{ marginTop: -8, fontSize: 12 }}>
+              *Enter your subjects and devide them by a comma
+            </p>
+            <div className={styles.filters}>
+              <div className={styles.multiDropdown}>
                 <InputWrapper
-                  type="multiSelect"
-                  title="Length of the keywords:"
+                  type="autocomplete"
+                  title="Country:"
                   required={false}
+                  value={keywordsCountry}
+                  options={countryCodes}
                   onChange={(value: any) =>
-                    value.length == 0
-                      ? alert("You need to select at least one")
-                      : setKeywordLength(value)
+                    setKeywordsCountry(
+                      value != null ? value : countryCodes[0].id
+                    )
                   }
-                  defValue={keywordLength}
-                  information="Short-tail keywords are broad, general, and popular terms with high search volume and competition. Longtail keywords are more specific, niche, and targeted multi-word terms with lower search volume and lower competition."
+                  placeholder="Which country do you want to target?"
                 />
                 <InputWrapper
-                  type="slider"
-                  title="Search volume:"
-                  information="Search volume is the number of times, on average, that users enter a particular search query into a search engine each month."
-                  defValue={searchVolume}
-                  onChange={(value: any) => setSearchVolume(value)}
-                  step={25}
-                  marks={[
-                    {
-                      value: 0,
-                      label: "10",
-                    },
-                    {
-                      value: 25,
-                      label: "100",
-                    },
-                    {
-                      value: 50,
-                      label: "1K",
-                    },
-                    {
-                      value: 75,
-                      label: "10K",
-                    },
-                    {
-                      value: 100,
-                      label: "100K",
-                    },
-                  ]}
-                />
-                <InputWrapper
-                  type="slider"
-                  title="Competition:"
-                  information="The degree of competition of the position for a keyword."
-                  defValue={competition}
-                  onChange={(value: any) => setCompetition(value)}
-                  step={25}
-                  marks={[
-                    {
-                      value: 0,
-                      label: "0",
-                    },
-                    {
-                      value: 25,
-                      label: "25",
-                    },
-                    {
-                      value: 50,
-                      label: "50",
-                    },
-                    {
-                      value: 75,
-                      label: "75",
-                    },
-                    {
-                      value: 100,
-                      label: "100",
-                    },
-                  ]}
-                />
-                <InputWrapper
-                  type="slider"
-                  title="Potential:"
-                  information="The ability of a particular keyword or key phrase to drive traffic, engagement, or conversions."
-                  defValue={potential}
-                  onChange={(value: any) => setPotential(value)}
-                  step={25}
-                  marks={[
-                    {
-                      value: 0,
-                      label: "0",
-                    },
-                    {
-                      value: 25,
-                      label: "25",
-                    },
-                    {
-                      value: 50,
-                      label: "50",
-                    },
-                    {
-                      value: 75,
-                      label: "75",
-                    },
-                    {
-                      value: 100,
-                      label: "100",
-                    },
-                  ]}
+                  type="autocomplete"
+                  title="Language:"
+                  required={false}
+                  value={keywordsLanguage}
+                  options={languageCodes}
+                  onChange={(value: any) =>
+                    setKeywordsLanguage(
+                      value != null ? value : languageCodes[0].id
+                    )
+                  }
+                  placeholder="In what language should the keywords be?"
                 />
               </div>
+              <InputWrapper
+                type="multiSelect"
+                title="Length of the keywords:"
+                required={false}
+                onChange={(value: any) =>
+                  value.length == 0
+                    ? alert("You need to select at least one")
+                    : setKeywordLength(value)
+                }
+                defValue={keywordLength}
+                information="Short-tail keywords are broad, general, and popular terms with high search volume and competition. Longtail keywords are more specific, niche, and targeted multi-word terms with lower search volume and lower competition."
+              />
+              <InputWrapper
+                type="slider"
+                title="Search volume:"
+                information="Search volume is the number of times, on average, that users enter a particular search query into a search engine each month."
+                defValue={searchVolume}
+                onChange={(value: any) => setSearchVolume(value)}
+                step={25}
+                marks={[
+                  {
+                    value: 0,
+                    label: "10",
+                  },
+                  {
+                    value: 25,
+                    label: "100",
+                  },
+                  {
+                    value: 50,
+                    label: "1K",
+                  },
+                  {
+                    value: 75,
+                    label: "10K",
+                  },
+                  {
+                    value: 100,
+                    label: "100K",
+                  },
+                ]}
+              />
+              <InputWrapper
+                type="slider"
+                title="Competition:"
+                information="The degree of competition of the position for a keyword."
+                defValue={competition}
+                onChange={(value: any) => setCompetition(value)}
+                step={25}
+                marks={[
+                  {
+                    value: 0,
+                    label: "0",
+                  },
+                  {
+                    value: 25,
+                    label: "25",
+                  },
+                  {
+                    value: 50,
+                    label: "50",
+                  },
+                  {
+                    value: 75,
+                    label: "75",
+                  },
+                  {
+                    value: 100,
+                    label: "100",
+                  },
+                ]}
+              />
+              <InputWrapper
+                type="slider"
+                title="Potential:"
+                information="The ability of a particular keyword or key phrase to drive traffic, engagement, or conversions."
+                defValue={potential}
+                onChange={(value: any) => setPotential(value)}
+                step={25}
+                marks={[
+                  {
+                    value: 0,
+                    label: "0",
+                  },
+                  {
+                    value: 25,
+                    label: "25",
+                  },
+                  {
+                    value: 50,
+                    label: "50",
+                  },
+                  {
+                    value: 75,
+                    label: "75",
+                  },
+                  {
+                    value: 100,
+                    label: "100",
+                  },
+                ]}
+              />
+            </div>
           </PopUp>
         </PopUpWrapper>
       )}

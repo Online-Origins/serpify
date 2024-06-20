@@ -1,4 +1,4 @@
-@import '@/styles/variables.scss';
+@import '@/styles/variables';
 
 .content {
     display: flex;
@@ -9,10 +9,13 @@
     gap: 1rem;
     transition: .3s all ease-in-out;
     cursor: pointer;
-    justify-content: space-between;
 
-    &:hover{
+    &:hover {
         background-color: $purple_50;
+    }
+
+    @media (min-width:1800px) {
+        gap: 2.5rem;
     }
 
     .titleWrapper {
@@ -28,41 +31,38 @@
             text-overflow: ellipsis;
         }
 
-        .collectionLink{
+        .collectionLink {
             width: max-content;
             color: $purple_primary;
             text-decoration: underline;
             cursor: pointer;
         }
 
-        @media (min-width: 1450px){
-            width: 450px;
+        @media (min-width: 1450px) {
+            width: 400px;
         }
 
-        @media (min-width: 1800px){
+        @media (min-width: 1800px) {
             width: 550px;
         }
     }
 
-    .contentInfo{
-        width: 150px;
+    .contentInfo {
+        width: 125px;
+        text-wrap: nowrap;
 
-        @media (min-width: 1800px) {
-            width: 250px;
-        }
-
-        .meterWrapper{
+        .meterWrapper {
             height: 2rem;
             width: 4rem;
             position: relative;
             overflow: hidden;
 
-            .score{
+            .score {
                 position: absolute;
                 width: 100%;
             }
 
-            h5{
+            h5 {
                 color: $purple_primary;
                 position: absolute;
                 bottom: 0;
@@ -71,14 +71,22 @@
                 transform: translateX(-50%);
             }
         }
+
+        @media (min-width: 1800px) {
+            width: 150px;
+        }
     }
 
-    .iconsWrapper{
+    .iconsWrapper {
         display: flex;
         justify-content: space-between;
-        gap: 2rem;
+        gap: 1rem;
 
-        .editIcon{
+        @media (min-width:1800px) {
+            gap: 2rem;
+        }
+
+        .editIcon {
             color: $purple_primary;
             cursor: pointer;
         }
