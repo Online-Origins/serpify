@@ -440,13 +440,13 @@ export default function Writing() {
         } else if (option) {
           // If the user selected one of the options
           if (option == "grammar") {
-            gptPrompt = `Correct the spelling and grammar of the text: `;
+            gptPrompt = `Correct the spelling and grammar of the text. `;
           } else if (option == "expand") {
-            gptPrompt = `expand the current text: `;
+            gptPrompt = `expand the current text. `;
           } else if (option == "shorten") {
-            gptPrompt = `Shorten the current text: `;
+            gptPrompt = `Shorten the current text. `;
           } else if (option == "improve") {
-            gptPrompt = `Improve the current text: `;
+            gptPrompt = `Improve the current text. `;
           }
           setOpenOptions(false);
         } else {
@@ -475,7 +475,7 @@ export default function Writing() {
               gptPrompt += `The newly generated will replace this: "${currentNode.textContent}". `;
             } else {
               // If the user selected the option grammar
-              gptPrompt += `"${selectedText}". `;
+              gptPrompt += `The text is "${selectedText}". `;
             }
           }
         } else {
@@ -518,7 +518,7 @@ export default function Writing() {
             }
           } else {
             // If the user did chose the grammar option give the current element text to the api
-            gptPrompt += `"${currentNode.textContent}". `;
+            gptPrompt += `The text is: "${currentNode.textContent}". `;
           }
         }
 
@@ -570,19 +570,19 @@ export default function Writing() {
       setAiInput("");
 
       const { generatedContent } = await response.json();
-      if (editor?.state.selection.empty) {
+      // if (editor?.state.selection.empty) {
         if (currentNode instanceof HTMLElement) {
           currentNode.innerText = generatedContent;
         }
-      } else {
-        // Add the new generated text into the current selected element of the editor
-        editor
-          ?.chain()
-          .focus()
-          .deleteSelection()
-          .insertContent(generatedContent)
-          .run();
-      }
+      // } else {
+      //   // Add the new generated text into the current selected element of the editor
+      //   editor
+      //     ?.chain()
+      //     .focus()
+      //     .deleteSelection()
+      //     .insertContent(generatedContent)
+      //     .run();
+      // }
 
       setGenerating(false);
     } catch (error) {
