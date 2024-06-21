@@ -520,7 +520,7 @@ export default function Writing() {
           setOpenOptions(false);
         } else {
           // Otherwise just generate a pragraph
-          gptPrompt = `Generate a unique paragraph for a ${contentInfo.type} text. `;
+          gptPrompt = `Generate a unique and humanly paragraph for a ${contentInfo.type} text. `;
         }
         let selectedText = "";
         let notSelectedText = "";
@@ -711,7 +711,7 @@ export default function Writing() {
         for (const p of paragraphs) {
           const previousHeader = findPreviousHeader(p as HTMLElement);
           if (previousHeader) {
-            let gptPrompt = `Generate a unique paragraph for a ${contentInfo.type} text. It is for a ${contentInfo.type} text with the title "${contentInfo.title}" and will be about the following subtitle: "${previousHeader.innerText}". `;
+            let gptPrompt = `Generate a unique and humanly paragraph for a ${contentInfo.type} text. It is for a ${contentInfo.type} text with the title "${contentInfo.title}" and will be about the following subtitle: "${previousHeader.innerText}". `;
             if (
               currentContent[0].language ||
               currentContent[0].audience ||
