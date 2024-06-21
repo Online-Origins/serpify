@@ -144,10 +144,10 @@ export default function ContentScore({ contentScore }: { contentScore: any }) {
               <CustomizedTooltip
                 information={`${
                   index == 0 ? "Focus keyword" : "Subkeyword"
-                } density is: ${keyword.density.toFixed(2)}%. This is ${
-                  keyword.density.toFixed(2) < 1
+                } density is: ${keyword.density}%. This is ${
+                  keyword.density < 1
                     ? "to low. Try to mention the keyword more."
-                    : keyword.density.toFixed(2) > 2
+                    : keyword.density > 2
                     ? "to high. Try to mention it less."
                     : "good!"
                 }`}

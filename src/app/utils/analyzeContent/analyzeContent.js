@@ -94,7 +94,7 @@ export function analyzeContent(contentJson) {
                     seoScore += (10 / subKeywords.length);
                 }
 
-                subKeywordsArray.push({ keyword: keyword, density: percentage })
+                subKeywordsArray.push({ keyword: keyword, density: percentage.toFixed(2) })
             })
         } else {
             seoScore += 10;
@@ -114,7 +114,7 @@ export function analyzeContent(contentJson) {
                 seoScore += 10;
             }
 
-            return { keyword: keyword, density: percentage };
+            return { keyword: keyword, density: percentage.toFixed(2) };
         } else {
             return;
         }
@@ -172,31 +172,26 @@ export function analyzeContent(contentJson) {
     }
 
     function getLinkCount() {
-        if (type != "custom") {
-            // Count all links in text
-            var count = (htmlText.match(/<a\b/g) || []).length;
-            // get the optimal link amount according to the length of the text
-            const optimalAmount = getWordAmount() < 300 ? 1 : (getWordAmount() / 300).toFixed(0)
-            if (count >= optimalAmount) {
-                // If the amount is the same or more as the optimal amount it is good
-                seoScore += 5;
-                goodPoints.push("Your text contains a good amount of links");
-            } else if (count > 0 && count < optimalAmount) {
-                // If the amount is more than 0 but less than optimal it is not good but not bad
-                const linkScore = 5 / optimalAmount
-                for (let x = 0; x < count; x++) {
-                    seoScore += linkScore;
-                }
-                minorWarnings.push(`Your text contains a decent amount of links: ${count}. Try to add more`)
-            } else {
-                // If the amount is 0 it is not good
-                warnings.push("Your text doesn't contain any links. Try to add some")
-            }
-            return count;
-        } else {
+        // Count all links in text
+        var count = (htmlText.match(/<a\b/g) || []).length;
+        // get the optimal link amount according to the length of the text
+        const optimalAmount = getWordAmount() < 300 ? 1 : (getWordAmount() / 300).toFixed(0)
+        if (count >= optimalAmount) {
+            // If the amount is the same or more as the optimal amount it is good
             seoScore += 5;
-            return 0;
+            goodPoints.push("Your text contains a good amount of links");
+        } else if (count > 0 && count < optimalAmount) {
+            // If the amount is more than 0 but less than optimal it is not good but not bad
+            const linkScore = 5 / optimalAmount
+            for (let x = 0; x < count; x++) {
+                seoScore += linkScore;
+            }
+            minorWarnings.push(`Your text contains a decent amount of links: ${count}. Try to add more`)
+        } else {
+            // If the amount is 0 it is not good
+            warnings.push("Your text doesn't contain any links. Try to add some")
         }
+        return count;
     }
 
     function getKeywordsinSubTitles() {

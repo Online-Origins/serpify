@@ -17,7 +17,8 @@ export async function POST(request) {
             },
             {
                 "role": "user",
-                "content": `${prompt}`
+                "content": `${prompt}`,
+                "temperature": `2`
             }
         ],
         model: "gpt-4o",
