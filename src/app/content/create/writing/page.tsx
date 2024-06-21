@@ -418,27 +418,6 @@ export default function Writing() {
     return element;
   };
 
-  function getPreviousHeadingsOfType(
-    doc: any,
-    startPos: any,
-    targetLevel: any
-  ) {
-    const previousHeadings = [];
-
-    for (let i = startPos - 1; i >= 0; i--) {
-      const node = doc.nodeAt(i);
-      if (node && node.type.name === "heading") {
-        if (node.attrs.level === targetLevel) {
-          previousHeadings.push({ node, pos: i });
-        } else if (node.attrs.level < targetLevel) {
-          break; // Stop if a higher level heading is encountered
-        }
-      }
-    }
-
-    return previousHeadings;
-  }
-
   function getPreviousHeadingOfType(doc: any, startPos: any, targetLevel: any) {
     for (let i = startPos - 1; i >= 0; i--) {
       const node = doc.nodeAt(i);
@@ -464,42 +443,46 @@ export default function Writing() {
 
     const { state } = editor;
     const { doc } = state;
-    let previousH2Text = null;
+    let previousParentHeading: any = null;
     const previousHeadingsTexts: string[] = [];
-    let currentEmptyHeadings: any[] = [];
-    let headingsOfSameType: any[] = [];
+    let headingsOfCurrentType: any[] = [];
 
     const { selection } = editor.state;
     const currentPos = selection.anchor;
 
     doc.descendants((node, pos) => {
-      if (node.type.name === "heading" && node.attrs.level === targetHeadingLevel + 1 && node.textContent === "") {
+      if (node.type.name === "heading" && node.attrs.level === targetHeadingLevel + 1) {
         // Get the previous heading of targetHeadingLevel
         const previousHeading = getPreviousHeadingOfType(doc,pos,targetHeadingLevel);
-        currentEmptyHeadings.push({content: node.textContent,pos: pos,parent: previousHeading,});
-
-        // // Collect previous headings of the same level until an empty h3 is encountered
-        const previousHeadings = getPreviousHeadingsOfType(doc,pos,targetHeadingLevel + 1);
-        headingsOfSameType.push(previousHeadings);
-
+        headingsOfCurrentType.push({content: node.textContent,pos: pos,parent: previousHeading,});
       }
     });
 
-    currentEmptyHeadings.forEach((emptyHeading) => {
-      if (emptyHeading.pos == currentPos - 1){
-        previousH2Text = emptyHeading.parent.node.textContent;
-        headingsOfSameType.forEach((headingWrapper) => {
-          headingWrapper.forEach((heading:any) => {
-            if (heading.pos > emptyHeading.parent.pos && heading.pos < emptyHeading.pos) {
-              previousHeadingsTexts.push(heading.node.textContent)
-            }
-          })
-        })
+    let parentHeadings: any[] = [];
+
+    headingsOfCurrentType.forEach((typeHeading) => {
+      if(!parentHeadings.some(heading => heading.pos == typeHeading.parent.pos)){
+        parentHeadings.push(typeHeading.parent)
+      }
+      if (typeHeading.pos == currentPos - 1 || typeHeading.pos == (currentPos-1-typeHeading.content.length)){
+        previousParentHeading = typeHeading.parent;
       }
     });
+
+    if(previousParentHeading){
+      let currentContent = "";
+      headingsOfCurrentType.forEach((typeHeading) => {
+        if (typeHeading.pos == currentPos - 1 || typeHeading.pos == (currentPos-1-typeHeading.content.length)){
+          currentContent = typeHeading.content
+        }
+        if( previousParentHeading.pos == typeHeading.parent.pos && typeHeading.content != currentContent){
+          previousHeadingsTexts.push(typeHeading.content)
+        }
+      })
+    }
 
     return {
-      previousH2Text,
+      previousParentHeadingText: previousParentHeading?.node.textContent,
       previousHeadingsTexts,
     };
   }
@@ -537,19 +520,20 @@ export default function Writing() {
           setOpenOptions(false);
         } else {
           // Otherwise just generate a pragraph
-          gptPrompt = `Generate the paragraph for a ${contentInfo.type} text. `;
+          gptPrompt = `Generate a unique paragraph for a ${contentInfo.type} text. `;
         }
-
+        let selectedText = "";
+        let notSelectedText = "";
         if (!editor?.state.selection.empty) {
           // If the user made a selection from a paragraph
           const selection = editor?.state.selection;
           if (selection && !selection.empty && currentNode.textContent) {
-            const selectedText = editor.state.doc.textBetween(
+            selectedText = editor.state.doc.textBetween(
               selection.from,
               selection.to,
               "\n"
             );
-            const notSelectedText = currentNode.textContent.replace(
+            notSelectedText = currentNode.textContent.replace(
               selectedText,
               ""
             );
@@ -561,11 +545,10 @@ export default function Writing() {
               // If the selected text is not the same as the whole text of the paragraph
               gptPrompt += `it will be an addition on the existing: "${notSelectedText}", and wil replace this: "${selectedText}". `;
             } else if (
-              notSelectedText == "" &&
-              selectedText != currentNode.textContent
+              notSelectedText == "" 
             ) {
               // If the selected text is the same as the whole text of the paragraph
-              gptPrompt += `The newly generated will replace this: "${currentNode.textContent}". `;
+              gptPrompt += `The newly generated will be about the following subtitle: "${handleGetPreviousHeading()} and will replace this: "${currentNode.textContent}". `;
             } else {
               // If the user selected the option grammar
               gptPrompt += `The text is "${selectedText}". `;
@@ -615,11 +598,11 @@ export default function Writing() {
           }
         }
 
-        if (option && option != "shorten") {
+        if (option == "shorten" || option == "grammar" || (!editor?.state.selection.empty && notSelectedText == "")) {
           // Specify to the AI that only a string of the generated text is needed
-          gptPrompt += `Only give back the text including the old text and not the subtitle.`;
-        } else {
           gptPrompt += `Only give back the new text and not the subtitle.`;
+        } else {
+          gptPrompt += `Only give back the text including the old text and not the subtitle.`;
         }
 
         // Prompt building for when the element is an header
@@ -646,30 +629,26 @@ export default function Writing() {
           gptPrompt +=
             " Only give back the new subtitle and only the first letter of the string should be uppercase.";
           setOpenOptions(false);
-        } else if (currentNode.textContent == "") {
+        } else {
           const headingType = parseInt(
             currentNode.nodeName.replace("H", ""),
             10
           );
           const targetHeadingLevel = headingType - 1;
-
           const result = getPreviousHeadingText(targetHeadingLevel);
 
           gptPrompt = `Generate a subtitle for a ${
             contentInfo.type
           } text. The title of the text is: "${contentInfo.title}". ${
-            result && result.previousH2Text != ""
-              ? `The parent subtitle is: "${result?.previousH2Text}". `
+            result && result.previousParentHeadingText != ""
+              ? `The parent subtitle is: "${result?.previousParentHeadingText}". `
               : ""
-          }${
-            result && result.previousHeadingsTexts.length > 0
+          }${result && result.previousHeadingsTexts.length > 0
               ? `The parent subtitle already contains the following subtitles of the same type as the current subtitlte: ${result?.previousHeadingsTexts.join(
                   ","
                 )}. `
               : ""
-          }Only give back an string of the generated subtitle.`;
-        } else {
-          gptPrompt = `Regenerate The subtitle: "${currentNode?.textContent}". Only give back an string of the generated subtitle. `;
+          }${currentNode.textContent ? `The previous version of the subtitle is ${currentNode.textContent}. ` : ""}Only give back an string of the generated subtitle and only the first letter of the string should be uppercase.`;
         }
       }
 
@@ -732,7 +711,7 @@ export default function Writing() {
         for (const p of paragraphs) {
           const previousHeader = findPreviousHeader(p as HTMLElement);
           if (previousHeader) {
-            let gptPrompt = `Generate a paragraph for a ${contentInfo.type} text. It is for a ${contentInfo.type} text with the title "${contentInfo.title}" and will be about the following subtitle: "${previousHeader.innerText}". `;
+            let gptPrompt = `Generate a unique paragraph for a ${contentInfo.type} text. It is for a ${contentInfo.type} text with the title "${contentInfo.title}" and will be about the following subtitle: "${previousHeader.innerText}". `;
             if (
               currentContent[0].language ||
               currentContent[0].audience ||
