@@ -418,6 +418,92 @@ export default function Writing() {
     return element;
   };
 
+  function getPreviousHeadingsOfType(
+    doc: any,
+    startPos: any,
+    targetLevel: any
+  ) {
+    const previousHeadings = [];
+
+    for (let i = startPos - 1; i >= 0; i--) {
+      const node = doc.nodeAt(i);
+      if (node && node.type.name === "heading") {
+        if (node.attrs.level === targetLevel) {
+          previousHeadings.push({ node, pos: i });
+        } else if (node.attrs.level < targetLevel) {
+          break; // Stop if a higher level heading is encountered
+        }
+      }
+    }
+
+    return previousHeadings;
+  }
+
+  function getPreviousHeadingOfType(doc: any, startPos: any, targetLevel: any) {
+    for (let i = startPos - 1; i >= 0; i--) {
+      const node = doc.nodeAt(i);
+      if (
+        node &&
+        node.type.name === "heading" &&
+        node.attrs.level === targetLevel
+      ) {
+        return { node, pos: i };
+      } else if (
+        node &&
+        node.type.name === "heading" &&
+        node.attrs.level < targetLevel
+      ) {
+        break; // Stop if a higher level heading is encountered
+      }
+    }
+    return null;
+  }
+
+  function getPreviousHeadingText(targetHeadingLevel: any) {
+    if (!editor || !editor.state) return null;
+
+    const { state } = editor;
+    const { doc } = state;
+    let previousH2Text = null;
+    const previousHeadingsTexts: string[] = [];
+    let currentEmptyHeadings: any[] = [];
+    let headingsOfSameType: any[] = [];
+
+    const { selection } = editor.state;
+    const currentPos = selection.anchor;
+
+    doc.descendants((node, pos) => {
+      if (node.type.name === "heading" && node.attrs.level === targetHeadingLevel + 1 && node.textContent === "") {
+        // Get the previous heading of targetHeadingLevel
+        const previousHeading = getPreviousHeadingOfType(doc,pos,targetHeadingLevel);
+        currentEmptyHeadings.push({content: node.textContent,pos: pos,parent: previousHeading,});
+
+        // // Collect previous headings of the same level until an empty h3 is encountered
+        const previousHeadings = getPreviousHeadingsOfType(doc,pos,targetHeadingLevel + 1);
+        headingsOfSameType.push(previousHeadings);
+
+      }
+    });
+
+    currentEmptyHeadings.forEach((emptyHeading) => {
+      if (emptyHeading.pos == currentPos - 1){
+        previousH2Text = emptyHeading.parent.node.textContent;
+        headingsOfSameType.forEach((headingWrapper) => {
+          headingWrapper.forEach((heading:any) => {
+            if (heading.pos > emptyHeading.parent.pos && heading.pos < emptyHeading.pos) {
+              previousHeadingsTexts.push(heading.node.textContent)
+            }
+          })
+        })
+      }
+    });
+
+    return {
+      previousH2Text,
+      previousHeadingsTexts,
+    };
+  }
+
   // Build the prompt for generating content, depending different variables
   async function generateTitleContent(AiInputPrompt?: string, option?: string) {
     try {
@@ -467,10 +553,17 @@ export default function Writing() {
               selectedText,
               ""
             );
-            if (notSelectedText != "" && option != "grammar" && option != "expand") {
+            if (
+              notSelectedText != "" &&
+              option != "grammar" &&
+              option != "expand"
+            ) {
               // If the selected text is not the same as the whole text of the paragraph
               gptPrompt += `it will be an addition on the existing: "${notSelectedText}", and wil replace this: "${selectedText}". `;
-            } else if (notSelectedText == "" && selectedText != currentNode.textContent) {
+            } else if (
+              notSelectedText == "" &&
+              selectedText != currentNode.textContent
+            ) {
               // If the selected text is the same as the whole text of the paragraph
               gptPrompt += `The newly generated will replace this: "${currentNode.textContent}". `;
             } else {
@@ -522,7 +615,7 @@ export default function Writing() {
           }
         }
 
-        if (option && option != "shorten"){
+        if (option && option != "shorten") {
           // Specify to the AI that only a string of the generated text is needed
           gptPrompt += `Only give back the text including the old text and not the subtitle.`;
         } else {
@@ -553,6 +646,28 @@ export default function Writing() {
           gptPrompt +=
             " Only give back the new subtitle and only the first letter of the string should be uppercase.";
           setOpenOptions(false);
+        } else if (currentNode.textContent == "") {
+          const headingType = parseInt(
+            currentNode.nodeName.replace("H", ""),
+            10
+          );
+          const targetHeadingLevel = headingType - 1;
+
+          const result = getPreviousHeadingText(targetHeadingLevel);
+
+          gptPrompt = `Generate a subtitle for a ${
+            contentInfo.type
+          } text. The title of the text is: "${contentInfo.title}". ${
+            result && result.previousH2Text != ""
+              ? `The parent subtitle is: "${result?.previousH2Text}". `
+              : ""
+          }${
+            result && result.previousHeadingsTexts.length > 0
+              ? `The parent subtitle already contains the following subtitles of the same type as the current subtitlte: ${result?.previousHeadingsTexts.join(
+                  ","
+                )}. `
+              : ""
+          }Only give back an string of the generated subtitle.`;
         } else {
           gptPrompt = `Regenerate The subtitle: "${currentNode?.textContent}". Only give back an string of the generated subtitle. `;
         }
@@ -571,9 +686,9 @@ export default function Writing() {
 
       const { generatedContent } = await response.json();
       // if (editor?.state.selection.empty) {
-        if (currentNode instanceof HTMLElement) {
-          currentNode.innerText = generatedContent;
-        }
+      if (currentNode instanceof HTMLElement) {
+        currentNode.innerText = generatedContent;
+      }
       // } else {
       //   // Add the new generated text into the current selected element of the editor
       //   editor
