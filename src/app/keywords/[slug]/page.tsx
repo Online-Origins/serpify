@@ -372,8 +372,6 @@ export default function Collection({ params }: { params: { slug: string } }) {
             contentType.toLowerCase() == "custom" ? "writing" : "outlines",
           domain: selectedCollection[0].domain,
           type: contentType.toLowerCase(),
-          custom_keyword: customKeyword,
-          custom_sub_keywords: customSubKeywords,
         },
       ])
       .select();

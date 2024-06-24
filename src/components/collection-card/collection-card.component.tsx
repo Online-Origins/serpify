@@ -137,8 +137,6 @@ export default function CollectionCard({
             contentType.toLowerCase() == "custom" ? "writing" : "outlines",
           domain: currentDomain,
           type: contentType.toLowerCase(),
-          custom_keyword: customKeyword,
-          custom_sub_keywords: customSubKeywords,
         },
       ])
       .select();
