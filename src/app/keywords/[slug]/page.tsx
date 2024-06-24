@@ -19,7 +19,12 @@ import countryCodes from "@/json/country-codes.json";
 import InputWrapper from "@/components/ui/input-wrapper/input-wrapper.component";
 import CircularLoader from "@/components/circular-loader/circular-loader.component";
 import styles from "./page.module.scss";
-import { AddOutlined, AutoAwesome, SearchRounded } from "@mui/icons-material";
+import {
+  AddOutlined,
+  AutoAwesome,
+  GridViewOutlined,
+  SearchRounded,
+} from "@mui/icons-material";
 
 export default function Collection({ params }: { params: { slug: string } }) {
   const activeCollection = params.slug;
@@ -55,7 +60,8 @@ export default function Collection({ params }: { params: { slug: string } }) {
   const [possibleTitles, setPossibleTitles] = useState<string[]>([]);
   const [contentType, setContentType] = useState("Blog");
   const [customKeyword, setCustomKeyword] = useState<String>();
-  const [customSubKeywords, setCustomSubKeywords] = useState<String[]>();
+  const [customSubKeywords, setCustomSubKeywords] = useState<String[]>([]);
+  const [customWithCollection, setCustomWithCollection] = useState(false);
   const typesOfContent = [
     "Blog",
     "Product category",
@@ -343,11 +349,21 @@ export default function Collection({ params }: { params: { slug: string } }) {
       .from("contentItems")
       .insert([
         {
-          collection: contentType.toLowerCase() != "custom" ? selectedCollection[0].id : null,
+          collection:
+            contentType.toLowerCase() != "custom" || customWithCollection
+              ? selectedCollection[0].id
+              : null,
           language: chosenLanguage,
           keyword:
-            contentType.toLowerCase() != "custom" ? chosenFocusKeyword : null,
-          sub_keywords: chosenKeywords,
+            contentType.toLowerCase() != "custom" || customWithCollection
+              ? chosenFocusKeyword
+              : null,
+          sub_keywords:
+            contentType.toLowerCase() != "custom" || customWithCollection
+              ? chosenKeywords
+              : customSubKeywords.length > 0
+              ? customSubKeywords
+              : [],
           tone_of_voice: toneOfVoice,
           target_audience: targetAudience,
           content_title: contentTitle,
@@ -613,10 +629,39 @@ export default function Collection({ params }: { params: { slug: string } }) {
             }
             buttons={
               popUpStep == 1 ? (
-                <Button type={"solid"} onClick={() => setPopUpStep(2)}>
-                  <p>Next</p>
-                  <ArrowForwardRoundedIcon />
-                </Button>
+                <div className={styles.buttonsWrapper}>
+                  {contentType.toLowerCase() == "custom" ? (
+                    customWithCollection ? (
+                      <Button
+                        type={"textOnly"}
+                        onClick={() => {
+                          setCustomWithCollection(false);
+                          setChosenFocusKeywords([]);
+                        }}
+                      >
+                        <p>Use custom keywords</p>
+                      </Button>
+                    ) : (
+                      <Button
+                        type={"textOnly"}
+                        onClick={() => {
+                          setCustomWithCollection(true);
+                          setCustomKeyword("");
+                          setCustomSubKeywords([]);
+                        }}
+                      >
+                        <p>Use a keyword collection</p>
+                        <GridViewOutlined />
+                      </Button>
+                    )
+                  ) : (
+                    <p></p>
+                  )}
+                  <Button type={"solid"} onClick={() => setPopUpStep(2)}>
+                    <p>Next</p>
+                    <ArrowForwardRoundedIcon />
+                  </Button>
+                </div>
               ) : (
                 <div className={styles.buttonsWrapper}>
                   <Button type={"outline"} onClick={() => setPopUpStep(1)}>
@@ -648,7 +693,8 @@ export default function Collection({ params }: { params: { slug: string } }) {
                   options={typesOfContent}
                   onChange={(value: any) => setContentType(value)}
                 />
-                {contentType.toLowerCase() != "custom" ? (
+                {contentType.toLowerCase() != "custom" ||
+                customWithCollection ? (
                   <>
                     <div className={styles.collectionWrapper}>
                       <h4>Collection:</h4>
@@ -681,17 +727,17 @@ export default function Collection({ params }: { params: { slug: string } }) {
                   <>
                     <InputWrapper
                       type="text"
-                      title="Keywords: **"
+                      title="Focus keyword: **"
                       required={false}
                       onChange={(value: any) => setCustomKeyword(value)}
-                      placeholder="Enter your keyword"
+                      placeholder="Enter your focus keyword"
                     />
                     <InputWrapper
                       type="text"
-                      title="Sub keywords: **"
+                      title="Subkeywords: **"
                       required={false}
                       onChange={(value: any) => setCustomSubKeywords(value)}
-                      placeholder="Enter your keywords and devide them by a comma"
+                      placeholder="Enter your subkeywords and devide them by a comma"
                     />
                     <p style={{ fontSize: 12 }}>
                       ** You can keep this empty if you really want to start
