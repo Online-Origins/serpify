@@ -61,13 +61,44 @@
             position: relative;
 
             &.keywords{
+                gap: .5rem;
                 .pointsList{
-                    gap: .25rem;
+                    gap: .5rem;
+                }
+
+                .pointsHeader{
+                    svg{
+                        rotate: 0deg;
+                    }
                 }
 
                 .pointWrapper{
                     opacity: 1;
                     max-height: 5rem;
+                    
+                    &.good{
+                        .density{
+                            display: flex;
+                            align-items: center;
+                            padding: .25rem .5rem;
+                            border-radius: 1rem;
+                            background-color: rgba($color: $green, $alpha: .1);
+                            border: solid 2px rgba($color: $green, $alpha: .1);
+                        }
+                    }
+                    &.warning{
+                        .density{
+                            padding: .25rem .5rem;
+                            border-radius: 1rem;
+                            background-color: rgba($color: $red, $alpha: .2);
+                            border: solid 2px rgba($color: $red, $alpha: .1);
+                        }
+                    }
+
+                    svg{
+                        font-size: 1rem;
+                        margin-top: 0;
+                    }
                 }
             }
 

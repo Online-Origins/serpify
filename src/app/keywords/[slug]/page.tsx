@@ -25,6 +25,7 @@ import {
   GridViewOutlined,
   SearchRounded,
 } from "@mui/icons-material";
+import { getCurrentDateTime } from "@/app/utils/currentDateTime/dateUtils";
 
 export default function Collection({ params }: { params: { slug: string } }) {
   const activeCollection = params.slug;
@@ -331,18 +332,6 @@ export default function Collection({ params }: { params: { slug: string } }) {
       setEditPopUpOpen(false);
     }
   }
-
-  // Get the current date
-  function currentDate() {
-    const date = new Date();
-
-    let day = date.getDate();
-    let month = date.getMonth() + 1;
-    let year = date.getFullYear();
-
-    return `${year}-${month}-${day}`;
-  }
-
   // Create a content item
   async function createContent() {
     const inserting = await supabase
@@ -357,6 +346,8 @@ export default function Collection({ params }: { params: { slug: string } }) {
           keyword:
             contentType.toLowerCase() != "custom" || customWithCollection
               ? chosenFocusKeyword
+              : customKeyword
+              ? customKeyword
               : null,
           sub_keywords:
             contentType.toLowerCase() != "custom" || customWithCollection
@@ -367,7 +358,7 @@ export default function Collection({ params }: { params: { slug: string } }) {
           tone_of_voice: toneOfVoice,
           target_audience: targetAudience,
           content_title: contentTitle,
-          edited_on: currentDate(),
+          edited_on: getCurrentDateTime(),
           status:
             contentType.toLowerCase() == "custom" ? "writing" : "outlines",
           domain: selectedCollection[0].domain,

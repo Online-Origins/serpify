@@ -73,7 +73,7 @@ export default function Writing() {
     type: "",
   });
   const [seoAnalysis, setSeoAnalysis] = useState<any>();
-  const { setSharedData } = useSharedContext();
+  const { setSharedData, contentKeyword, setContentKeyword, contentSubKeywords, setContentSubKeywords } = useSharedContext();
   const [copyMessage, setCopyMessage] = useState(false);
 
   // Hide the copy message after 2.5s
@@ -89,24 +89,36 @@ export default function Writing() {
 
   // If the editor updates then update the content score
   useEffect(() => {
-    if (contentInfo.html && contentInfo.html != "") {
-      getContentScore();
+    // Only update contentInfo if contentKeyword or contentSubKeywords change
+    if (contentKeyword !== contentInfo.keyword || contentSubKeywords !== contentInfo.sub_keywords) {
+      setContentInfo((prevContentInfo) => ({
+        ...prevContentInfo,
+        keyword: contentKeyword,
+        sub_keywords: contentSubKeywords,
+      }));
+    }
+  }, [contentKeyword, contentSubKeywords]);
+  
+  useEffect(() => {
+    // Calculate SEO score if contentInfo changes
+    if ((contentInfo.html && contentInfo.html !== "") || contentKeyword !== contentInfo.keyword || contentSubKeywords !== contentInfo.sub_keywords) {
+      getContentScore(contentInfo);
     }
   }, [contentInfo]);
-
+  
   // Get the content score
-  function getContentScore() {
+  function getContentScore(updatedContentInfo:any) {
     const contentJson = {
-      title: contentInfo.title.replace(/[-_@#!'"]/g, " ").toLowerCase(), // Filter out punctuation marks
-      htmlText: contentInfo.html
+      title: updatedContentInfo.title.replace(/[-_@#!'"]/g, " ").toLowerCase(), // Filter out punctuation marks
+      htmlText: updatedContentInfo.html
         .replace(/[-_@#!'"]/g, " ") // Filter out punctuation marks
         .toLowerCase(),
-      subKeywords: contentInfo.sub_keywords,
-      keyword: contentInfo.keyword,
-      languageCode: contentInfo.language,
-      type: contentInfo.type,
+      subKeywords: updatedContentInfo.sub_keywords,
+      keyword: updatedContentInfo.keyword,
+      languageCode: updatedContentInfo.language,
+      type: updatedContentInfo.type,
     };
-
+  
     const { analyzedContent } = analyzeContent(contentJson);
     setSeoAnalysis(analyzedContent);
     setSharedData(analyzedContent);
@@ -273,6 +285,8 @@ export default function Writing() {
         html: data[0].content ? data[0].content : " ",
         type: data[0].type,
       });
+      setContentKeyword(data[0].keyword);
+      setContentSubKeywords(data[0].sub_keywords);
       setCurrentContent(data);
     }
   }
@@ -668,16 +682,6 @@ export default function Writing() {
       if (currentNode instanceof HTMLElement) {
         currentNode.innerText = generatedContent;
       }
-      // } else {
-      //   // Add the new generated text into the current selected element of the editor
-      //   editor
-      //     ?.chain()
-      //     .focus()
-      //     .deleteSelection()
-      //     .insertContent(generatedContent)
-      //     .run();
-      // }
-
       setGenerating(false);
     } catch (error) {
       console.log(error);

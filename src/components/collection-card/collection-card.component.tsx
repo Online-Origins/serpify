@@ -17,6 +17,7 @@ import InputWrapper from "../ui/input-wrapper/input-wrapper.component";
 import CircularLoader from "../circular-loader/circular-loader.component";
 import styles from "./collection-card.module.scss";
 import { AutoAwesome, GridViewOutlined } from "@mui/icons-material";
+import { getCurrentDateTime } from "@/app/utils/currentDateTime/dateUtils";
 
 export default function CollectionCard({
   collection,
@@ -97,17 +98,6 @@ export default function CollectionCard({
     }
   }
 
-  // Get the current date
-  function currentDate() {
-    const date = new Date();
-
-    let day = date.getDate();
-    let month = date.getMonth() + 1;
-    let year = date.getFullYear();
-
-    return `${year}-${month}-${day}`;
-  }
-
   // Create content
   async function createContent() {
     const inserting = await supabase
@@ -122,6 +112,8 @@ export default function CollectionCard({
           keyword:
             contentType.toLowerCase() != "custom" || customWithCollection
               ? chosenKeyword
+              : customKeyword
+              ? customKeyword
               : null,
           sub_keywords:
             contentType.toLowerCase() != "custom" || customWithCollection
@@ -132,7 +124,7 @@ export default function CollectionCard({
           tone_of_voice: toneOfVoice,
           target_audience: targetAudience,
           content_title: contentTitle,
-          edited_on: currentDate(),
+          edited_on: getCurrentDateTime(),
           status:
             contentType.toLowerCase() == "custom" ? "writing" : "outlines",
           domain: currentDomain,
