@@ -30,6 +30,8 @@ export default function ContentScore({ contentScore }: { contentScore: any }) {
     contentSubKeywords,
     setContentSubKeywords,
     currentUrl,
+    contentCollection,
+    setContentCollection,
   } = useSharedContext();
   const [goodOpen, setGoodOpen] = useState(true);
   const [minorOpen, setMinorOpen] = useState(true);
@@ -100,7 +102,6 @@ export default function ContentScore({ contentScore }: { contentScore: any }) {
           value: collection.collection_name,
         }));
 
-        // Add the new collection with id: 0 and value: ""
         collectionsUpdatedKey.push({ id: 1, value: "------" });
 
         setCollections(collectionsUpdatedKey);
@@ -124,6 +125,7 @@ export default function ContentScore({ contentScore }: { contentScore: any }) {
     return sortedArr1.every((value, index) => value === sortedArr2[index]);
   };
 
+  // Save the new keywords for the content
   async function saveKeywords() {
     setContentKeyword(chosenKeyword);
     setContentSubKeywords(
@@ -137,17 +139,25 @@ export default function ContentScore({ contentScore }: { contentScore: any }) {
     );
     setKeywordsOpen(false);
     setCustomKeywords("");
+    if (chosenCollection != 1){
+      setContentCollection(chosenCollection);
+    }
   }
 
+  // Reset all variables when deleting a collection
   async function deleteKeywords() {
-    setCollectionKeywords([]);
     setContentKeyword(null);
     setContentSubKeywords([]);
+    // Which focus and subkeywords the user chose
     setChosenKeyword("");
     setChosenKeywords([]);
+    // Subkeywords from text inputfield -> custom
     setCustomKeywords("");
     setKeywordsOpen(false);
+    // Current collection related
     setChosenCollection(1);
+    setCollectionKeywords([]);
+    setContentCollection(null);
   }
 
   async function getContentItem(contentId: any) {

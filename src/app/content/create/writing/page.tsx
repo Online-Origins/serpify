@@ -73,7 +73,7 @@ export default function Writing() {
     type: "",
   });
   const [seoAnalysis, setSeoAnalysis] = useState<any>();
-  const { setSharedData, contentKeyword, setContentKeyword, contentSubKeywords, setContentSubKeywords } = useSharedContext();
+  const { setSharedData, contentKeyword, setContentKeyword, contentSubKeywords, setContentSubKeywords, contentCollection, setContentCollection } = useSharedContext();
   const [copyMessage, setCopyMessage] = useState(false);
 
   // Hide the copy message after 2.5s
@@ -288,6 +288,7 @@ export default function Writing() {
         type: data[0].type,
       });
       setCurrentContent(data);
+      setContentCollection(data[0].collection);
     }
   }
 
@@ -318,6 +319,7 @@ export default function Writing() {
         content_title: contentInfo.title,
         keyword: contentKeyword,
         sub_keywords: contentSubKeywords,
+        collection: contentCollection
       })
       .eq("id", contentId);
     if (!error) {
