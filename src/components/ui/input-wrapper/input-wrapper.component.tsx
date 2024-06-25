@@ -128,7 +128,7 @@ export default function InputWrapper({
               <MenuItem
                 key={option.id ? option.id : option}
                 value={option.id ? option.id : option}
-                className={styles.menuItem}
+                className={styles.menuItem} 
               >
                 {domainDropdown && (
                   <img
@@ -149,7 +149,7 @@ export default function InputWrapper({
               "scrollbar"
             )}
           >
-            {options.map((option: string) => (
+            {options.length > 0 ? options.map((option: string) => (
               <label key={option}>
                 <input
                   type="checkbox"
@@ -158,7 +158,7 @@ export default function InputWrapper({
                 />
                 <p>{option}</p>
               </label>
-            ))}
+            )) : <p>No options found</p>}
           </div>
         );
       case type == "generate":

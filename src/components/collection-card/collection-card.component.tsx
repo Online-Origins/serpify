@@ -16,7 +16,8 @@ import toneOfVoices from "@/json/tone-of-voice.json";
 import InputWrapper from "../ui/input-wrapper/input-wrapper.component";
 import CircularLoader from "../circular-loader/circular-loader.component";
 import styles from "./collection-card.module.scss";
-import { AutoAwesome } from "@mui/icons-material";
+import { AutoAwesome, GridViewOutlined } from "@mui/icons-material";
+import { getCurrentDateTime } from "@/app/utils/currentDateTime/dateUtils";
 
 export default function CollectionCard({
   collection,
@@ -44,7 +45,8 @@ export default function CollectionCard({
   const [possibleTitles, setPossibleTitles] = useState<string[]>([]);
   const [contentType, setContentType] = useState("Blog");
   const [customKeyword, setCustomKeyword] = useState<String>();
-  const [customSubKeywords, setCustomSubKeywords] = useState<String[]>();
+  const [customSubKeywords, setCustomSubKeywords] = useState<String[]>([]);
+  const [customWithCollection, setCustomWithCollection] = useState(false);
   const typesOfContent = [
     "Blog",
     "Product category",
@@ -96,37 +98,37 @@ export default function CollectionCard({
     }
   }
 
-  // Get the current date
-  function currentDate() {
-    const date = new Date();
-
-    let day = date.getDate();
-    let month = date.getMonth() + 1;
-    let year = date.getFullYear();
-
-    return `${year}-${month}-${day}`;
-  }
-
   // Create content
   async function createContent() {
     const inserting = await supabase
       .from("contentItems")
       .insert([
         {
-          collection: contentType.toLowerCase() != "custom" ? collection.id : null,
+          collection:
+            contentType.toLowerCase() != "custom" || customWithCollection
+              ? collection.id
+              : null,
           language: chosenLanguage,
-          keyword: contentType.toLowerCase() != "custom" ? chosenKeyword : null,
-          sub_keywords: chosenKeywords,
+          keyword:
+            contentType.toLowerCase() != "custom" || customWithCollection
+              ? chosenKeyword
+              : customKeyword
+              ? customKeyword
+              : null,
+          sub_keywords:
+            contentType.toLowerCase() != "custom" || customWithCollection
+              ? chosenKeywords
+              : customSubKeywords.length > 0
+              ? customSubKeywords
+              : [],
           tone_of_voice: toneOfVoice,
           target_audience: targetAudience,
           content_title: contentTitle,
-          edited_on: currentDate(),
+          edited_on: getCurrentDateTime(),
           status:
             contentType.toLowerCase() == "custom" ? "writing" : "outlines",
           domain: currentDomain,
           type: contentType.toLowerCase(),
-          custom_keyword: customKeyword,
-          custom_sub_keywords: customSubKeywords,
         },
       ])
       .select();
@@ -140,7 +142,7 @@ export default function CollectionCard({
         // If neither localStorage nor sessionStorage is supported
         console.log("Web Storage is not supported in this environment.");
       }
-      if(contentType.toLowerCase() == "custom"){
+      if (contentType.toLowerCase() == "custom") {
         router.push("/content/create/writing");
       } else {
         router.push("/content/create/outlines");
@@ -238,6 +240,7 @@ export default function CollectionCard({
                   setPopUpOpen(false);
                   setcontentTitle("");
                   setPopUpStep(1);
+                  setContentType("Blog");
                 }}
               >
                 <p>Close</p>
@@ -246,10 +249,39 @@ export default function CollectionCard({
             }
             buttons={
               popUpStep == 1 ? (
-                <Button type={"solid"} onClick={() => setPopUpStep(2)}>
-                  <p>Next</p>
-                  <ArrowForwardRoundedIcon />
-                </Button>
+                <div className={styles.buttonsWrapper}>
+                  {contentType.toLowerCase() == "custom" ? (
+                    customWithCollection ? (
+                      <Button
+                        type={"textOnly"}
+                        onClick={() => {
+                          setCustomWithCollection(false);
+                          setChosenKeywords([]);
+                        }}
+                      >
+                        <p>Use custom keywords</p>
+                      </Button>
+                    ) : (
+                      <Button
+                        type={"textOnly"}
+                        onClick={() => {
+                          setCustomWithCollection(true);
+                          setCustomKeyword("");
+                          setCustomSubKeywords([]);
+                        }}
+                      >
+                        <p>Use a keyword collection</p>
+                        <GridViewOutlined />
+                      </Button>
+                    )
+                  ) : (
+                    <p></p>
+                  )}
+                  <Button type={"solid"} onClick={() => setPopUpStep(2)}>
+                    <p>Next</p>
+                    <ArrowForwardRoundedIcon />
+                  </Button>
+                </div>
               ) : (
                 <div className={styles.buttonsWrapper}>
                   <Button type={"outline"} onClick={() => setPopUpStep(1)}>
@@ -259,7 +291,11 @@ export default function CollectionCard({
                   <Button
                     type={"solid"}
                     onClick={() => createContent()}
-                    disabled={contentTitle == ""}
+                    disabled={
+                      contentType.toLowerCase() != "custom"
+                        ? toneOfVoice == null || contentTitle == ""
+                        : contentTitle == ""
+                    }
                   >
                     <p>Start creating</p>
                   </Button>
@@ -277,7 +313,8 @@ export default function CollectionCard({
                   options={typesOfContent}
                   onChange={(value: any) => setContentType(value)}
                 />
-                {contentType.toLowerCase() != "custom" ? (
+                {contentType.toLowerCase() != "custom" ||
+                customWithCollection ? (
                   <>
                     <div className={styles.collectionWrapper}>
                       <h4>Collection:</h4>

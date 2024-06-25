@@ -21,8 +21,8 @@ import languageCodes from "@/json/language-codes.json";
 import toneOfVoices from "@/json/tone-of-voice.json";
 import CircularLoader from "@/components/circular-loader/circular-loader.component";
 import styles from "./page.module.scss";
-import { AutoAwesome } from "@mui/icons-material";
-import { getCurrentDateTime } from '@/app/utils/currentDateTime/dateUtils';
+import { AutoAwesome, GridViewOutlined } from "@mui/icons-material";
+import { getCurrentDateTime } from "@/app/utils/currentDateTime/dateUtils";
 
 export default function ContentOverview() {
   const [popUpOpen, setPopUpOpen] = useState(false);
@@ -45,6 +45,7 @@ export default function ContentOverview() {
   const [contentType, setContentType] = useState("Blog");
   const [customKeyword, setCustomKeyword] = useState<String>();
   const [customSubKeywords, setCustomSubKeywords] = useState<String[]>([]);
+  const [customWithCollection, setCustomWithCollection] = useState(false);
   const typesOfContent = [
     "Blog",
     "Product category",
@@ -158,32 +159,35 @@ export default function ContentOverview() {
     }
   }
 
-  // Get current date
-  function currentDate() {
-    const date = new Date();
-
-    let day = date.getDate();
-    let month = date.getMonth() + 1;
-    let year = date.getFullYear();
-
-    return `${year}-${month}-${day}`;
-  }
-
   // Add content to the database and open the outlines step
   async function createContent() {
     const inserting = await supabase
       .from("contentItems")
       .insert([
         {
-          collection: contentType.toLowerCase() != "custom" ? chosenCollection : null,
+          collection:
+            contentType.toLowerCase() != "custom" || customWithCollection
+              ? chosenCollection
+              : null,
           language: chosenLanguage,
-          keyword: contentType.toLowerCase() != "custom" ? chosenKeyword : (customKeyword ? customKeyword : null),
-          sub_keywords: contentType.toLowerCase() != "custom" ? chosenKeywords : (customSubKeywords.length > 0 ? customSubKeywords : []),
+          keyword:
+            contentType.toLowerCase() != "custom" || customWithCollection
+              ? chosenKeyword
+              : customKeyword
+              ? customKeyword
+              : null,
+          sub_keywords:
+            contentType.toLowerCase() != "custom" || customWithCollection
+              ? chosenKeywords
+              : customSubKeywords.length > 0
+              ? customSubKeywords
+              : [],
           tone_of_voice: toneOfVoice,
           target_audience: targetAudience,
           content_title: contentTitle,
           edited_on: getCurrentDateTime(),
-          status: contentType.toLowerCase() == "custom" ? "writing" : "outlines",
+          status:
+            contentType.toLowerCase() == "custom" ? "writing" : "outlines",
           domain: currentDomain,
           type: contentType.toLowerCase(),
         },
@@ -200,7 +204,7 @@ export default function ContentOverview() {
         console.log("Web Storage is not supported in this environment.");
       }
 
-      if(contentType.toLowerCase() == "custom"){
+      if (contentType.toLowerCase() == "custom") {
         router.push("/content/create/writing");
       } else {
         router.push("/content/create/outlines");
@@ -240,10 +244,32 @@ export default function ContentOverview() {
             }
             buttons={
               popUpStep == 1 ? (
-                <Button type={"solid"} onClick={() => setPopUpStep(2)}>
-                  <p>Next</p>
-                  <ArrowForwardRoundedIcon />
-                </Button>
+                <div className={styles.buttonsWrapper}>
+                  {contentType.toLowerCase() == "custom" ? (
+                    customWithCollection ? (
+                      <Button
+                        type={"textOnly"}
+                        onClick={() => {setCustomWithCollection(false); setChosenKeywords([])}}
+                      >
+                        <p>Use custom keywords</p>
+                      </Button>
+                    ) : (
+                      <Button
+                        type={"textOnly"}
+                        onClick={() => {setCustomWithCollection(true); setCustomKeyword(""); setCustomSubKeywords([])}}
+                      >
+                        <p>Use a keyword collection</p>
+                        <GridViewOutlined />
+                      </Button>
+                    )
+                  ) : (
+                    <p></p>
+                  )}
+                  <Button type={"solid"} onClick={() => setPopUpStep(2)}>
+                    <p>Next</p>
+                    <ArrowForwardRoundedIcon />
+                  </Button>
+                </div>
               ) : (
                 <div className={styles.buttonsWrapper}>
                   <Button type={"outline"} onClick={() => setPopUpStep(1)}>
@@ -275,7 +301,8 @@ export default function ContentOverview() {
                   options={typesOfContent}
                   onChange={(value: any) => setContentType(value)}
                 />
-                {contentType.toLowerCase() != "custom" ? (
+                {contentType.toLowerCase() != "custom" ||
+                customWithCollection ? (
                   <>
                     <InputWrapper
                       type="dropdown"
@@ -316,20 +343,22 @@ export default function ContentOverview() {
                   <>
                     <InputWrapper
                       type="text"
-                      title="Keyword: **"
+                      title="Focus keyword: **"
                       required={false}
                       onChange={(value: any) => setCustomKeyword(value)}
-                      placeholder="Enter your keyword"
+                      placeholder="Enter your focus keyword"
                     />
                     <InputWrapper
                       type="text"
-                      title="Sub keywords: **"
+                      title="Subkeywords: **"
                       required={false}
                       onChange={(value: any) => setCustomSubKeywords(value)}
-                      placeholder="Enter your keywords and devide them by a comma"
+                      placeholder="Enter your subkeywords and devide them by a comma"
                     />
                     <p style={{ fontSize: 12 }}>
-                      ** You can keep this empty if you really want to start blank. It can help creating better content when filling this in.
+                      ** You can keep this empty if you really want to start
+                      blank. It can help creating better content when filling
+                      this in.
                     </p>
                   </>
                 )}
@@ -339,7 +368,9 @@ export default function ContentOverview() {
               <div className={styles.contentSettings}>
                 <InputWrapper
                   type="autocomplete"
-                  title={`Language: ${contentType.toLowerCase() == "custom" ? "**" : ""}`} 
+                  title={`Language: ${
+                    contentType.toLowerCase() == "custom" ? "**" : ""
+                  }`}
                   required={contentType.toLowerCase() != "custom"}
                   value={chosenLanguage}
                   options={languageCodes}
@@ -356,7 +387,9 @@ export default function ContentOverview() {
                 />
                 <InputWrapper
                   type="autocomplete"
-                  title={`Tone of voice: ${contentType.toLowerCase() == "custom" ? "**" : ""}`}
+                  title={`Tone of voice: ${
+                    contentType.toLowerCase() == "custom" ? "**" : ""
+                  }`}
                   required={contentType.toLowerCase() != "custom"}
                   value={toneOfVoice}
                   options={toneOfVoices}
@@ -373,7 +406,9 @@ export default function ContentOverview() {
                 />
                 <InputWrapper
                   type="text"
-                  title={`Target adience: ${contentType.toLowerCase() == "custom" ? "**" : ""}`}
+                  title={`Target adience: ${
+                    contentType.toLowerCase() == "custom" ? "**" : ""
+                  }`}
                   required={false}
                   onChange={(value: any) => setTargetAudience(value)}
                   placeholder="Who do you want to target?"
@@ -393,7 +428,9 @@ export default function ContentOverview() {
                 />
                 {contentType.toLowerCase() == "custom" && (
                   <p style={{ fontSize: 12 }}>
-                    ** You can keep this empty if you really want to start blank. It can help creating better content when filling this in.
+                    ** You can keep this empty if you really want to start
+                    blank. It can help creating better content when filling this
+                    in.
                   </p>
                 )}
                 {possibleTitles.length > 0 &&
