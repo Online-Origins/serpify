@@ -277,6 +277,8 @@ export default function Writing() {
         editor?.commands.setContent(data[0].content);
       }
       const language = languages.find((item) => item.id == data[0].language);
+      setContentKeyword(data[0].keyword);
+      setContentSubKeywords(data[0].sub_keywords);
       setContentInfo({
         title: data[0].content_title,
         sub_keywords: data[0].sub_keywords,
@@ -285,8 +287,6 @@ export default function Writing() {
         html: data[0].content ? data[0].content : " ",
         type: data[0].type,
       });
-      setContentKeyword(data[0].keyword);
-      setContentSubKeywords(data[0].sub_keywords);
       setCurrentContent(data);
     }
   }
@@ -316,6 +316,8 @@ export default function Writing() {
         content: editor?.getHTML(),
         content_score: seoAnalysis.seoScore,
         content_title: contentInfo.title,
+        keyword: contentKeyword,
+        sub_keywords: contentSubKeywords,
       })
       .eq("id", contentId);
     if (!error) {
@@ -659,8 +661,7 @@ export default function Writing() {
               : ""
           }${result && result.previousHeadingsTexts.length > 0
               ? `The parent subtitle already contains the following subtitles of the same type as the current subtitlte: ${result?.previousHeadingsTexts.join(
-                  ","
-                )}. `
+                  ",")}. `
               : ""
           }${currentNode.textContent ? `The previous version of the subtitle is ${currentNode.textContent}. ` : ""}Only give back an string of the generated subtitle and only the first letter of the string should be uppercase.`;
         }
