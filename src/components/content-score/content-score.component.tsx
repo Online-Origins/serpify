@@ -29,6 +29,7 @@ export default function ContentScore({ contentScore }: { contentScore: any }) {
     setContentKeyword,
     contentSubKeywords,
     setContentSubKeywords,
+    currentUrl,
   } = useSharedContext();
   const [goodOpen, setGoodOpen] = useState(true);
   const [minorOpen, setMinorOpen] = useState(true);
@@ -41,6 +42,9 @@ export default function ContentScore({ contentScore }: { contentScore: any }) {
   const [type, setType] = useState<string>("");
   const idCSS = "gradientId";
   const getContent = useRef(false);
+  const [collections, setCollections] = useState<any[]>([]);
+  const [chosenCollection, setChosenCollection] = useState(1);
+  const [keywordOptions, setKeywordOptions] = useState([]);
 
   useEffect(() => {
     if (!getContent.current && localStorage) {
@@ -57,6 +61,61 @@ export default function ContentScore({ contentScore }: { contentScore: any }) {
       setChosenKeywords(collectionKeywords);
     }
   }, [contentKeyword, contentSubKeywords]);
+
+  useEffect(() => {
+    if (currentUrl) {
+      getCollections();
+    }
+  }, [currentUrl]);
+
+  // Set the keywordOptions and chosenKeyword to the first one of the keywords if the chosenCollection is set
+  useEffect(() => {
+    const filtered = collections.filter(
+      (collection) => collection.id === chosenCollection
+    );
+    if (filtered.length > 0) {
+      if (filtered[0].keywords && filtered[0].keywords.length > 0) {
+        setKeywordOptions(filtered[0].keywords);
+        setChosenKeyword(filtered[0].keywords[0]);
+      } else {
+        setChosenKeyword('')
+        setKeywordOptions([]);
+      }
+    }
+  }, [chosenCollection]);
+
+  async function getCollections() {
+    const { data } = await supabase.from("collections").select();
+    if (data) {
+      const { domains } = await getDomains();
+      if (domains) {
+        const currentDomainId = domains.find(
+          (domain: any) => domain.domain == currentUrl
+        );
+        const filteredCollections = data.filter(
+          (item: any) => item.domain == currentDomainId.id
+        );
+        const collectionsUpdatedKey = filteredCollections.map((collection) => ({
+          ...collection,
+          value: collection.collection_name,
+        }));
+
+        // Add the new collection with id: 0 and value: ""
+        collectionsUpdatedKey.push({ id: 1, value: "------" });
+
+        setCollections(collectionsUpdatedKey);
+      }
+    }
+  }
+
+  // Get domains from database
+  async function getDomains() {
+    const { data } = await supabase.from("domains").select();
+    if (data) {
+      return { domains: data };
+    }
+    return { domains: [] };
+  }
 
   const areArraysEqual = (arr1: string[], arr2: string[]) => {
     if (arr1.length !== arr2.length) return false;
@@ -81,12 +140,14 @@ export default function ContentScore({ contentScore }: { contentScore: any }) {
   }
 
   async function deleteKeywords() {
+    setCollectionKeywords([]);
     setContentKeyword(null);
     setContentSubKeywords([]);
     setChosenKeyword("");
     setChosenKeywords([]);
     setCustomKeywords("");
     setKeywordsOpen(false);
+    setChosenCollection(1);
   }
 
   async function getContentItem(contentId: any) {
@@ -281,7 +342,14 @@ export default function ContentScore({ contentScore }: { contentScore: any }) {
           <PopUp
             title={"Edit keywords"}
             titleButtons={
-              <Button type={"textOnly"} onClick={() => {setKeywordsOpen(false); setChosenKeyword(contentKeyword); setChosenKeywords(contentSubKeywords)}}>
+              <Button
+                type={"textOnly"}
+                onClick={() => {
+                  setKeywordsOpen(false);
+                  setChosenKeyword(contentKeyword);
+                  setChosenKeywords(contentSubKeywords);
+                }}
+              >
                 <p>Close</p>
                 <CloseRounded />
               </Button>
@@ -302,7 +370,8 @@ export default function ContentScore({ contentScore }: { contentScore: any }) {
                   disabled={
                     contentKeyword
                       ? areArraysEqual(chosenKeywords, contentSubKeywords) &&
-                        customKeywords == "" && chosenKeyword == contentKeyword
+                        customKeywords == "" &&
+                        chosenKeyword == contentKeyword
                       : chosenKeyword == undefined || chosenKeyword == ""
                   }
                 >
@@ -319,13 +388,17 @@ export default function ContentScore({ contentScore }: { contentScore: any }) {
                   title="Focus keyword:"
                   required={false}
                   value={chosenKeyword}
-                  options={Array.from(
-                    new Set([
-                      ...(contentKeyword ? [contentKeyword] : []),
-                      ...collectionKeywords,
-                      ...contentSubKeywords,
-                    ])
-                  )}
+                  options={
+                    keywordOptions && keywordOptions.length > 0
+                      ? keywordOptions
+                      : Array.from(
+                          new Set([
+                            ...(contentKeyword ? [contentKeyword] : []),
+                            ...collectionKeywords,
+                            ...contentSubKeywords,
+                          ])
+                        )
+                  }
                   information="This will be the keyword your content is focused on."
                   onChange={(value: string) => {
                     setChosenKeyword(value);
@@ -334,49 +407,103 @@ export default function ContentScore({ contentScore }: { contentScore: any }) {
                     ]);
                   }}
                 />
-                {contentSubKeywords.length > 0 && (
+                {(contentSubKeywords.length > 0 || keywordOptions.length > 0) && (
                   <InputWrapper
                     type="vertMultiSelect"
                     title="Subkeywords to use:"
                     required={false}
-                    options={Array.from(
-                      new Set([
-                        ...(contentKeyword ? [contentKeyword] : []),
-                        ...collectionKeywords,
-                        ...contentSubKeywords,
-                      ])
-                    ).filter((option: string) => option != chosenKeyword)}
+                    options={
+                      keywordOptions && keywordOptions.length > 0
+                        ? keywordOptions.filter(
+                            (option: string) => option != chosenKeyword
+                          )
+                        : Array.from(
+                            new Set([
+                              ...(contentKeyword ? [contentKeyword] : []),
+                              ...collectionKeywords,
+                              ...contentSubKeywords,
+                            ])
+                          ).filter((option: string) => option != chosenKeyword)
+                    }
                     defValue={chosenKeywords}
                     information="Keywords that help by enhancing the relevance, reach, and effectiveness of your main keyword strategy."
                     onChange={(value: any) => setChosenKeywords(value)}
                   />
                 )}
-                {type == "custom" && (
-                  <InputWrapper
-                    type="text"
-                    title="Add subkeywords:"
-                    required={false}
-                    onChange={(value: any) => setCustomKeywords(value)}
-                    placeholder="Enter your subkeywords and devide them by a comma"
-                  />
-                )}
+                {type == "custom" &&
+                  keywordOptions &&
+                  keywordOptions.length == 0 && (
+                    <InputWrapper
+                      type="text"
+                      title="Add subkeywords:"
+                      required={false}
+                      onChange={(value: any) => setCustomKeywords(value)}
+                      placeholder="Enter your subkeywords and devide them by a comma"
+                    />
+                  )}
               </>
             ) : (
               <>
                 <InputWrapper
-                  type="text"
-                  title="Focus keyword:"
+                  type="dropdown"
+                  title="Keyword collection:"
                   required={false}
-                  onChange={(value: any) => setChosenKeyword(value)}
-                  placeholder="Enter your focus keyword"
+                  value={chosenCollection}
+                  options={collections ? collections : null}
+                  onChange={(value: any) => setChosenCollection(value)}
+                  placeholder="Which collection do you want to use?"
                 />
-                <InputWrapper
-                  type="text"
-                  title="Subkeywords:"
-                  required={false}
-                  onChange={(value: any) => setCustomKeywords(value)}
-                  placeholder="Enter your subkeywords and devide them by a comma"
-                />
+                {chosenCollection != 1 && chosenKeyword != null ? (
+                  <>
+                    <InputWrapper
+                      type="dropdown"
+                      title="Focus keyword:"
+                      required={false}
+                      value={chosenKeyword}
+                      options={keywordOptions}
+                      information="This will be the keyword your content is focused on."
+                      onChange={(value: string) => {
+                        setChosenKeyword(value);
+                        setChosenKeywords([
+                          ...chosenKeywords.filter(
+                            (item: string) => item != value
+                          ),
+                        ]);
+                      }}
+                    />
+                    {keywordOptions && keywordOptions.length > 1 && (
+                      <InputWrapper
+                        type="vertMultiSelect"
+                        title="Subkeywords to use:"
+                        required={false}
+                        options={keywordOptions.filter(
+                          (option: string) => option != chosenKeyword
+                        )}
+                        defValue={chosenKeywords}
+                        information="Keywords that help by enhancing the relevance, reach, and effectiveness of your main keyword strategy."
+                        onChange={(value: any) => setChosenKeywords(value)}
+                      />
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <h5>Or</h5>
+                    <InputWrapper
+                      type="text"
+                      title="Focus keyword:"
+                      required={false}
+                      onChange={(value: any) => setChosenKeyword(value)}
+                      placeholder="Enter your focus keyword"
+                    />
+                    <InputWrapper
+                      type="text"
+                      title="Subkeywords:"
+                      required={false}
+                      onChange={(value: any) => setCustomKeywords(value)}
+                      placeholder="Enter your subkeywords and devide them by a comma"
+                    />
+                  </>
+                )}
               </>
             )}
           </PopUp>
