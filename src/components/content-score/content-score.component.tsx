@@ -54,7 +54,7 @@ export default function ContentScore({ contentScore }: { contentScore: any }) {
       getContentItem(contentId);
       getContent.current = true;
     }
-
+    
     if (contentKeyword && contentKeyword != "") {
       setChosenKeyword(contentKeyword);
       setChosenKeywords(contentSubKeywords);
@@ -181,9 +181,6 @@ export default function ContentScore({ contentScore }: { contentScore: any }) {
       .eq("id", collectionId);
     if (data) {
       setCollectionKeywords(data[0].keywords);
-      if (!contentKeyword || contentKeyword == "") {
-        setChosenKeyword(data[0].keywords[0]);
-      }
     }
   }
 
@@ -420,7 +417,7 @@ export default function ContentScore({ contentScore }: { contentScore: any }) {
                 {(contentSubKeywords.length > 0 || keywordOptions.length > 0) && (
                   <InputWrapper
                     type="vertMultiSelect"
-                    title="Subkeywords to use:"
+                    title="Subkeywords to use: "
                     required={false}
                     options={
                       keywordOptions && keywordOptions.length > 0
@@ -443,13 +440,16 @@ export default function ContentScore({ contentScore }: { contentScore: any }) {
                 {type == "custom" &&
                   keywordOptions &&
                   keywordOptions.length == 0 && (
+                    <>
                     <InputWrapper
                       type="text"
-                      title="Add subkeywords:"
+                      title="Add subkeywords: "
                       required={false}
                       onChange={(value: any) => setCustomKeywords(value)}
                       placeholder="Enter your subkeywords and devide them by a comma"
                     />
+                    <p style={{marginTop: -8, fontSize: 12}}>*Enter your subjects and devide them by a comma</p>
+                    </>
                   )}
               </>
             ) : (
