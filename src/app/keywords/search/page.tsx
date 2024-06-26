@@ -124,6 +124,12 @@ export default function KeywordSearching() {
           (domain: any) => domain.domain == currentUrl
         );
         setCurrentDomain(currentDomainId.id)
+        const currentCollection = localStorage.getItem("collection")
+        if (currentCollection) {
+          const collection = data.find((item: any) => item.id == currentCollection);
+          setCollectionToSave(collection?.collection_name)
+          localStorage.removeItem("collection");
+        }
         setCollections(
           data
             .filter((item: any) => item.domain == currentDomainId.id)
@@ -623,7 +629,7 @@ export default function KeywordSearching() {
                 <div key={collection} className={styles.collection}>
                   <Selector
                     string
-                    group={collectionToSave}
+                    group={[collectionToSave]}
                     item={collection}
                     selecting={(value: any) => setCollectionToSave(value)}
                   />

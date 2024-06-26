@@ -83,6 +83,7 @@ export default function CollectionCard({
             language: data[0].language,
             country: data[0].country,
             domain: data[0].domain,
+            edited_on: getCurrentDateTime(),
           },
         ])
         .select();
@@ -91,8 +92,8 @@ export default function CollectionCard({
         (smallWrapper ? shownCollections.length < 3 : true)
       ) {
         setShownCollections([
+          { ...data[0], id: inserting.data[0].id, edited_on: inserting.data[0].edited_on },
           ...shownCollections,
-          { ...data[0], id: inserting.data[0].id },
         ]);
       }
     }

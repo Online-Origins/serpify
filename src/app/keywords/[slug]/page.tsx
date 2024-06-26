@@ -469,6 +469,7 @@ export default function Collection({ params }: { params: { slug: string } }) {
           potential: { min: potential[0], max: potential[1] },
         })
       );
+      localStorage.setItem("collection", activeCollection)
       router.push("/keywords/search");
     } catch (error) {
       console.log(error);
