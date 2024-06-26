@@ -181,6 +181,7 @@ export default function ContentScore({ contentScore }: { contentScore: any }) {
       .eq("id", collectionId);
     if (data) {
       setCollectionKeywords(data[0].keywords);
+      console.log(data[0].keywords)
     }
   }
 
@@ -414,7 +415,7 @@ export default function ContentScore({ contentScore }: { contentScore: any }) {
                     ]);
                   }}
                 />
-                {(contentSubKeywords.length > 0 || keywordOptions.length > 0) && (
+                {(contentSubKeywords.length > 0 || keywordOptions.length > 0 || collectionKeywords.length > 0) && (
                   <InputWrapper
                     type="vertMultiSelect"
                     title="Subkeywords to use: "
