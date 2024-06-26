@@ -414,7 +414,7 @@ export default function ContentScore({ contentScore }: { contentScore: any }) {
                     ]);
                   }}
                 />
-                {(contentSubKeywords.length > 0 || keywordOptions.length > 0) && (
+                {(contentSubKeywords.length > 0 || keywordOptions.length > 0 || collectionKeywords.filter((option: string) => option != chosenKeyword).length > 0) && (
                   <InputWrapper
                     type="vertMultiSelect"
                     title="Subkeywords to use: "

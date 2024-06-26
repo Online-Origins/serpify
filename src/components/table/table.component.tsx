@@ -63,7 +63,7 @@ export default function Table({
         return "low";
     }
   }
-  
+
   // Convert the value to an indexation specific for the search volume
   function searchVolumeIndication(googleVolume: number) {
     switch (true) {
@@ -198,16 +198,27 @@ export default function Table({
                   ) : null}
                 </div>
                 <div className={classNames(styles.item, styles.searchVolume)}>
-                  <p>
-                    {searchVolume(keyword.keywordMetrics.avgMonthlySearches)}
-                  </p>
-                  <IndicationIcon
-                    indication={searchVolumeIndication(
-                      keyword.keywordMetrics.avgMonthlySearches
-                    )}
-                  />
+                  {keyword.keywordMetrics.avgMonthlySearches != null ? (
+                    <>
+                      <p>
+                        {searchVolume(
+                          keyword.keywordMetrics.avgMonthlySearches
+                        )}
+                      </p>
+
+                      <IndicationIcon
+                        indication={searchVolumeIndication(
+                          keyword.keywordMetrics.avgMonthlySearches
+                        )}
+                      />
+                    </>
+                  ) : (
+                    <p>No data</p>
+                  )}
                 </div>
                 <div className={classNames(styles.item, styles.competition)}>
+                  {keyword.keywordMetrics.competitionIndex != null ? (
+                    <>
                   <p>{keyword.keywordMetrics.competitionIndex}</p>
                   <IndicationIcon
                     indication={Indexation(
@@ -215,8 +226,14 @@ export default function Table({
                     )}
                     competition
                   />
+                    </>
+                  ) : (
+                    <p>No data</p>
+                  )}
                 </div>
                 <div className={classNames(styles.item, styles.potential)}>
+                  {keyword.keywordMetrics.avgMonthlySearches != null ? (
+                    <>
                   <p>
                     {Math.ceil(
                       potentialIndex(
@@ -236,6 +253,10 @@ export default function Table({
                         )
                     )}
                   />
+                    </>
+                  ) : (
+                    <p>No data</p>
+                  )}
                 </div>
               </div>
             ))

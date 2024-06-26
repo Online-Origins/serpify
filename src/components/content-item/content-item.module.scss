@@ -81,14 +81,18 @@
         display: flex;
         justify-content: space-between;
         gap: 1rem;
-
+        
         @media (min-width:1800px) {
             gap: 2rem;
         }
-
+        
         .editIcon {
             color: $purple_primary;
             cursor: pointer;
+        }
+        
+        #dotsMenu{
+            padding-right: 1rem;            
         }
     }
 }
