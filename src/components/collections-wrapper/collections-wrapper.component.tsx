@@ -30,9 +30,18 @@ export default function CollectionsWrapper({ small }: { small?: boolean }) {
   async function getCollections() {
     const { data } = await supabase.from("collections").select();
     if (data) {
-      setCollections(data);
+      setCollections(sortCollections(data));
     }
   }
+    // Sort the contents by date
+    function sortCollections(array: any) {
+      const sorted = array.sort((a: any, b: any) => {
+        const dateA = new Date(a.edited_on);
+        const dateB = new Date(b.edited_on);
+        return dateB.getTime() - dateA.getTime(); // Sort descending, for ascending: dateA - dateB
+      });
+      return sorted;
+    }
 
   async function getDomains() {
     const { data } = await supabase.from("domains").select();

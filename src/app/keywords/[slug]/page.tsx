@@ -69,6 +69,9 @@ export default function Collection({ params }: { params: { slug: string } }) {
     "Company service",
     "Custom",
   ];
+  const [customOpen, setCustomOpen] = useState(false);
+  const [customCollectionKeywords, setCustomCollectionKeywords] =
+    useState<string>("");
 
   // Get the selected collection
   useEffect(() => {
@@ -126,7 +129,7 @@ export default function Collection({ params }: { params: { slug: string } }) {
   }
 
   // Get the keywords data
-  async function getKeywordsData() {
+  async function getKeywordsData(keywords?: string[]) {
     setLoading(true);
     let attempt = 0;
     const retries = 3;
@@ -138,7 +141,7 @@ export default function Collection({ params }: { params: { slug: string } }) {
             "Content-Type": "application/x-www-form-urlencoded",
           },
           body: JSON.stringify({
-            keywords: selectedCollection[0].keywords,
+            keywords: keywords ? keywords : selectedCollection[0].keywords,
             language: selectedCollection[0].language,
             country: selectedCollection[0].country,
           }),
@@ -150,12 +153,12 @@ export default function Collection({ params }: { params: { slug: string } }) {
           ...keyword,
           keywordMetrics: {
             ...keyword.keywordMetrics,
-            potential: Math.ceil(
+            potential: keyword.keywordMetrics ? Math.ceil(
               potentialIndex(
                 keyword.keywordMetrics.avgMonthlySearches,
                 keyword.keywordMetrics.competitionIndex
               )
-            ),
+            ): null,
           },
         }));
         setKeywordsData(updatedData);
@@ -167,9 +170,14 @@ export default function Collection({ params }: { params: { slug: string } }) {
           array.push(keyword);
         });
         setSelectedKeywords(array);
+
+        if(keywords){
+          updateCollection(keywords);
+        }
         attempt = 3;
       } catch (error) {
         attempt++;
+        console.log(error)
         if (attempt === retries) {
           alert("Something went wrong. Please try again later.");
           router.back();
@@ -227,28 +235,31 @@ export default function Collection({ params }: { params: { slug: string } }) {
   }
 
   // Update the collection
-  async function updateCollection() {
+  async function updateCollection(keywords?:string[]) {
     const { error } = await supabase
       .from("collections")
       .update({
-        keywords: selectedKeywords.map(
+        keywords: keywords ? keywords : selectedKeywords.map(
           (selectedKeyword) => selectedKeyword.text
         ),
+        edited_on: getCurrentDateTime()
       })
       .eq("id", activeCollection);
     if (error) {
       console.log(error);
     }
 
-    let array: any[] = [];
-    keywordsData.map((keyword: any) => {
-      selectedKeywords.map((selectedKeyword) => {
-        if (keyword.text == selectedKeyword.text) {
-          array.push(keyword);
-        }
+    if (!keywords) {
+      let array: any[] = [];
+      keywordsData.map((keyword: any) => {
+        selectedKeywords.map((selectedKeyword) => {
+          if (keyword.text == selectedKeyword.text) {
+            array.push(keyword);
+          }
+        });
       });
-    });
-    setKeywordsData(sortKeywords(array));
+      setKeywordsData(sortKeywords(array));
+    }
   }
 
   // Sort the keywords on the sorting type
@@ -480,6 +491,20 @@ export default function Collection({ params }: { params: { slug: string } }) {
       default:
         return 0;
     }
+  }
+
+  async function addCustomKeywords() {
+    const keywords = customCollectionKeywords.split(", ");
+    selectedKeywords.map((keyword: any) => {
+      if (!keywords.includes(keyword.text)){
+        keywords.push(keyword.text);
+      }
+    });
+
+    getKeywordsData(keywords);
+
+    setCustomCollectionKeywords("");
+    setCustomOpen(false);
   }
 
   return (
@@ -842,7 +867,7 @@ export default function Collection({ params }: { params: { slug: string } }) {
       {addPopUpOpen && (
         <PopUpWrapper>
           <PopUp
-            title={"Keyword research"}
+            title={"Add keywords"}
             titleButtons={
               <Button type={"textOnly"} onClick={() => setAddPopUpOpen(false)}>
                 <p>Close</p>
@@ -850,14 +875,26 @@ export default function Collection({ params }: { params: { slug: string } }) {
               </Button>
             }
             buttons={
-              <Button
-                type={"solid"}
-                onClick={startSearching}
-                disabled={subjectsInput == ""}
-              >
-                <p>Start searching</p>
-                <SearchRounded />
-              </Button>
+              <div className={styles.buttonsWrapper}>
+                <Button
+                  type={"outline"}
+                  onClick={() => {
+                    setCustomOpen(true);
+                    setAddPopUpOpen(false);
+                  }}
+                >
+                  <p>Custom keywords</p>
+                  <AddOutlined />
+                </Button>
+                <Button
+                  type={"solid"}
+                  onClick={startSearching}
+                  disabled={subjectsInput == ""}
+                >
+                  <p>Start searching</p>
+                  <SearchRounded />
+                </Button>
+              </div>
             }
           >
             <InputWrapper
@@ -1002,6 +1039,38 @@ export default function Collection({ params }: { params: { slug: string } }) {
                 ]}
               />
             </div>
+          </PopUp>
+        </PopUpWrapper>
+      )}
+      {customOpen && (
+        <PopUpWrapper>
+          <PopUp
+            title={"Custom keywords"}
+            titleButtons={
+              <Button type={"textOnly"} onClick={() => setCustomOpen(false)}>
+                <p>Close</p> <CloseRoundedIcon />
+              </Button>
+            }
+            buttons={
+              <Button
+                type={"solid"}
+                onClick={() => addCustomKeywords()}
+                disabled={customCollectionKeywords == ""}
+              >
+                <p>Save</p>
+                <SaveOutlinedIcon />
+              </Button>
+            }
+          >
+            <InputWrapper
+              type="text"
+              title="Keywords: "
+              value={customCollectionKeywords}
+              onChange={(value: string) => setCustomCollectionKeywords(value)}
+            />
+            <p style={{ marginTop: -8, fontSize: 12 }}>
+              *Enter your keywords and devide them by a comma
+            </p>
           </PopUp>
         </PopUpWrapper>
       )}

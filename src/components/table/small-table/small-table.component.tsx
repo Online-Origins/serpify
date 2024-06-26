@@ -25,7 +25,7 @@ export default function SmallTable({
     return array;
   }
 
-  // Get the data for the keywords 
+  // Get the data for the keywords
   useEffect(() => {
     if (!isGettingData.current) {
       getKeywordsData().then((data) => {
@@ -33,12 +33,14 @@ export default function SmallTable({
           ...keyword,
           keywordMetrics: {
             ...keyword.keywordMetrics,
-            potentialIndex: Math.ceil(
-              potentialIndex(
-                keyword.keywordMetrics.avgMonthlySearches,
-                keyword.keywordMetrics.competitionIndex
-              )
-            ),
+            potentialIndex: keyword.keywordMetrics
+              ? Math.ceil(
+                  potentialIndex(
+                    keyword.keywordMetrics.avgMonthlySearches,
+                    keyword.keywordMetrics.competitionIndex
+                  )
+                )
+              : null,
           },
         }));
         newData.sort(
@@ -55,9 +57,10 @@ export default function SmallTable({
   async function getKeywordsData() {
     let attempt = 0;
     const retries = 3;
-    const timeout = (ms:any) => new Promise(resolve => setTimeout(resolve, ms));
-  
-    // Retry the fetch if it fails 
+    const timeout = (ms: any) =>
+      new Promise((resolve) => setTimeout(resolve, ms));
+
+    // Retry the fetch if it fails
     while (attempt < retries) {
       try {
         const response = await fetch("/api/keywordMetrics", {
@@ -71,7 +74,7 @@ export default function SmallTable({
             country: country,
           }),
         });
-  
+
         const data = await response.json();
         attempt = retries;
         return data;
@@ -85,7 +88,7 @@ export default function SmallTable({
       }
     }
   }
-  
+
   // Convert the search volume
   function searchVolume(googleVolume: number) {
     switch (true) {
@@ -168,41 +171,63 @@ export default function SmallTable({
           <p>Potential</p>
         </div>
       </div>
-      {keywordsData && keywordsData.length > 0
-        ? keywordsData.map((keyword: any) => (
-            <div className={styles.row} key={keyword.text}>
-              <div className={classNames(styles.item, styles.keyword)}>
-                <p>{keyword.text}</p>
-              </div>
-              <div className={classNames(styles.item, styles.searchVolume)}>
-                <p>{searchVolume(keyword.keywordMetrics.avgMonthlySearches)}</p>
-                <IndicationIcon
-                  indication={searchVolumeIndication(
-                    keyword.keywordMetrics.avgMonthlySearches
-                  )}
-                />
-              </div>
-              <div className={classNames(styles.item, styles.competition)}>
-                <p>{keyword.keywordMetrics.competitionIndex}</p>
-                <IndicationIcon
-                  indication={Indication(
-                    100 - keyword.keywordMetrics.competitionIndex
-                  )}
-                  competition
-                />
-              </div>
-              <div className={classNames(styles.item, styles.potential)}>
-                <p>{keyword.keywordMetrics.potentialIndex.toString()}</p>
-
-                <IndicationIcon
-                  indication={Indication(
-                    100 - keyword.keywordMetrics.potentialIndex
-                  )}
-                />
-              </div>
+      {keywordsData && keywordsData.length > 0 ? (
+        keywordsData.map((keyword: any) => (
+          <div className={styles.row} key={keyword.text}>
+            <div className={classNames(styles.item, styles.keyword)}>
+              <p>{keyword.text}</p>
             </div>
-          ))
-        : <p>Loading...</p>}
+            <div className={classNames(styles.item, styles.searchVolume)}>
+              {keyword.keywordMetrics.avgMonthlySearches != null ? (
+                <>
+                  <p>
+                    {searchVolume(keyword.keywordMetrics.avgMonthlySearches)}
+                  </p>
+                  <IndicationIcon
+                    indication={searchVolumeIndication(
+                      keyword.keywordMetrics.avgMonthlySearches
+                    )}
+                  />
+                </>
+              ) : (
+                <p>No data</p>
+              )}
+            </div>
+            <div className={classNames(styles.item, styles.competition)}>
+              {keyword.keywordMetrics.competitionIndex != null ? (
+                <>
+                  <p>{keyword.keywordMetrics.competitionIndex}</p>
+                  <IndicationIcon
+                    indication={Indication(
+                      100 - keyword.keywordMetrics.competitionIndex
+                    )}
+                    competition
+                  />
+                </>
+              ) : (
+                <p>No data</p>
+              )}
+            </div>
+            <div className={classNames(styles.item, styles.potential)}>
+              {keyword.keywordMetrics.potentialIndex != null ? (
+                <>
+                  <p>{keyword.keywordMetrics.potentialIndex.toString()}</p>
+
+                  <IndicationIcon
+                    indication={Indication(
+                      100 - keyword.keywordMetrics.potentialIndex
+                    )}
+                  />
+                </>
+              ) : (
+                <p>No data</p>
+              )}
+            </div>
+          </div>
+        ))
+      ) : (
+        <p>Loading...</p>
+      )}
     </div>
   );
 }
