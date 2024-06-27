@@ -20,7 +20,7 @@ export default function Home() {
   const gottenData = useRef(false);
   const [role, setRole] = useState("");
   const gotSearchConsoleData = useRef(false);
-  const { currentUrl, setWebData, setPagesData, setQueryData } =
+  const { currentUrl, setWebData, setPagesData, setQueryData, setWebDataPrev, setPagesDataPrev, setQueryDataPrev } =
     useSharedContext();
 
   useEffect(() => {
@@ -136,6 +136,40 @@ export default function Home() {
         "query",
         "queryData",
         setQueryData
+      );
+
+      const prevStartDate = new Date(
+        today.getFullYear(),
+        today.getMonth() - 2,
+        today.getDate()
+      );
+
+      fetchData(
+        currentToken,
+        correctUrl[0],
+        prevStartDate,
+        startDate,
+        "date",
+        "webDataPrev",
+        setWebDataPrev
+      );
+      fetchData(
+        currentToken,
+        correctUrl[0],
+        prevStartDate,
+        startDate,
+        "page",
+        "pagesDataPrev",
+        setPagesDataPrev
+      );
+      fetchData(
+        currentToken,
+        correctUrl[0],
+        prevStartDate,
+        startDate,
+        "query",
+        "queryDataPrev",
+        setQueryDataPrev
       );
     }
   }

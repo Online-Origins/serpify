@@ -16,6 +16,7 @@ import {
 import styles from "./page.module.scss";
 import Link from "next/link";
 import { useSharedContext } from "@/context/SharedContext";
+import { formatNumber } from "../utils/formatNumber/formatNumber";
 
 export default function AnalyticsPage() {
   const gotData = useRef(false);
@@ -27,7 +28,15 @@ export default function AnalyticsPage() {
   const [role, setRole] = useState("");
   const [keywordSorting, setKeywordSorting] = useState("clicks");
   const [pagesSorting, setPagesSorting] = useState("clicks");
-  const { pagesData, webData, queryData, currentUrl } = useSharedContext();
+  const {
+    pagesData,
+    webData,
+    queryData,
+    currentUrl,
+    pagesDataPrev,
+    webDataPrev,
+    queryDataPrev,
+  } = useSharedContext();
 
   useEffect(() => {
     const role = sessionStorage.getItem("role");
@@ -109,6 +118,17 @@ export default function AnalyticsPage() {
       return array.sort((a: any, b: any) => a.clicks - b.clicks);
     } else {
       return array.sort((a: any, b: any) => b.clicks - a.clicks);
+    }
+  }
+
+  function getDifference(item: any, previous: any, type: string): number {
+    const previousItem = previous.find(
+      (previousItem: any) => previousItem.keys[0] == item.keys[0]
+    );
+    if (previousItem) {
+      return item[type] - previousItem[type];
+    } else {
+      return 0;
     }
   }
 
@@ -241,7 +261,27 @@ export default function AnalyticsPage() {
                           </Link>
                         </div>
                         <div className={classNames(styles.item, styles.clicks)}>
-                          <p>{page.clicks}</p>
+                          {getDifference(page, pagesDataPrev, "clicks") !=
+                            0 && (
+                            <p
+                              className={
+                                getDifference(page, pagesDataPrev, "clicks") < 0
+                                  ? styles.bad
+                                  : styles.good
+                              }
+                            >
+                              {formatNumber(
+                                getDifference(page, pagesDataPrev, "clicks")
+                              )}
+                              {getDifference(page, pagesDataPrev, "clicks") <
+                              0 ? (
+                                <ArrowDownwardRounded />
+                              ) : (
+                                <ArrowUpwardRounded />
+                              )}
+                            </p>
+                          )}
+                          <p>{formatNumber(page.clicks)}</p>
                         </div>
                         <div
                           className={classNames(
@@ -249,9 +289,60 @@ export default function AnalyticsPage() {
                             styles.impressions
                           )}
                         >
-                          <p>{page.impressions}</p>
+                          {getDifference(page, pagesDataPrev, "impressions") !=
+                            0 && (
+                            <p
+                              className={
+                                getDifference(
+                                  page,
+                                  pagesDataPrev,
+                                  "impressions"
+                                ) < 0
+                                  ? styles.bad
+                                  : styles.good
+                              }
+                            >
+                              {formatNumber(
+                                getDifference(
+                                  page,
+                                  pagesDataPrev,
+                                  "impressions"
+                                )
+                              )}
+                              {getDifference(
+                                page,
+                                pagesDataPrev,
+                                "impressions"
+                              ) < 0 ? (
+                                <ArrowDownwardRounded />
+                              ) : (
+                                <ArrowUpwardRounded />
+                              )}
+                            </p>
+                          )}
+                          <p>{formatNumber(page.impressions)}</p>
                         </div>
                         <div className={classNames(styles.item, styles.ctr)}>
+                          {!(getDifference(page, pagesDataPrev, "ctr") * 100)
+                            .toFixed(1)
+                            .includes("0.0") && (
+                            <p
+                              className={
+                                getDifference(page, pagesDataPrev, "ctr") < 0
+                                  ? styles.bad
+                                  : styles.good
+                              }
+                            >
+                              {(
+                                getDifference(page, pagesDataPrev, "ctr") * 100
+                              ).toFixed(1)}
+                              {getDifference(page, pagesDataPrev, "ctr") < 0 ? (
+                                <ArrowDownwardRounded />
+                              ) : (
+                                <ArrowUpwardRounded />
+                              )}
+                            </p>
+                          )}
                           <p>{(page.ctr * 100).toFixed(1)} %</p>
                         </div>
                       </div>
@@ -376,17 +467,116 @@ export default function AnalyticsPage() {
                         <p>{keyword.keys[0]}</p>
                       </div>
                       <div className={classNames(styles.item, styles.position)}>
+                        {getDifference(keyword, queryDataPrev, "position") !=
+                          0 && (
+                          <p
+                            className={
+                              getDifference(
+                                keyword,
+                                queryDataPrev,
+                                "position"
+                              ) < 0
+                                ? styles.bad
+                                : styles.good
+                            }
+                          >
+                            {getDifference(
+                              keyword,
+                              queryDataPrev,
+                              "position"
+                            ).toFixed(1)}
+                            {getDifference(keyword, queryDataPrev, "position") <
+                            0 ? (
+                              <ArrowDownwardRounded />
+                            ) : (
+                              <ArrowUpwardRounded />
+                            )}
+                          </p>
+                        )}
                         <p>{keyword.position.toFixed(1)}</p>
                       </div>
                       <div className={classNames(styles.item, styles.clicks)}>
-                        <p>{keyword.clicks}</p>
+                        {getDifference(keyword, queryDataPrev, "clicks") !=
+                          0 && (
+                          <p
+                            className={
+                              getDifference(keyword, queryDataPrev, "clicks") <
+                              0
+                                ? styles.bad
+                                : styles.good
+                            }
+                          >
+                            {formatNumber(
+                              getDifference(keyword, queryDataPrev, "clicks")
+                            )}
+                            {getDifference(keyword, queryDataPrev, "clicks") <
+                            0 ? (
+                              <ArrowDownwardRounded />
+                            ) : (
+                              <ArrowUpwardRounded />
+                            )}
+                          </p>
+                        )}
+                        <p>{formatNumber(keyword.clicks)}</p>
                       </div>
                       <div
                         className={classNames(styles.item, styles.impressions)}
                       >
-                        <p>{keyword.impressions}</p>
+                        {getDifference(keyword, queryDataPrev, "impressions") !=
+                          0 && (
+                          <p
+                            className={
+                              getDifference(
+                                keyword,
+                                queryDataPrev,
+                                "impressions"
+                              ) < 0
+                                ? styles.bad
+                                : styles.good
+                            }
+                          >
+                            {formatNumber(
+                              getDifference(
+                                keyword,
+                                queryDataPrev,
+                                "impressions"
+                              )
+                            )}
+                            {getDifference(
+                              keyword,
+                              queryDataPrev,
+                              "impressions"
+                            ) < 0 ? (
+                              <ArrowDownwardRounded />
+                            ) : (
+                              <ArrowUpwardRounded />
+                            )}
+                          </p>
+                        )}
+                        <p>{formatNumber(keyword.impressions)}</p>
                       </div>
                       <div className={classNames(styles.item, styles.ctr)}>
+                        {!(getDifference(keyword, queryDataPrev, "ctr") * 100)
+                          .toFixed(1)
+                          .includes("0.0") && (
+                          <p
+                            className={
+                              getDifference(keyword, queryDataPrev, "ctr") < 0
+                                ? styles.bad
+                                : styles.good
+                            }
+                          >
+                            {(
+                              getDifference(keyword, queryDataPrev, "ctr") * 100
+                            ).toFixed(1)}
+                            {getDifference(keyword, queryDataPrev, "ctr") <
+                            0 ? (
+                              <ArrowDownwardRounded />
+                            ) : (
+                              <ArrowUpwardRounded />
+                            )}
+                          </p>
+                        )}
                         <p>{(keyword.ctr * 100).toFixed(1)} %</p>
                       </div>
                     </div>

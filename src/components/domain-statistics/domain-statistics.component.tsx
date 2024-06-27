@@ -15,7 +15,10 @@ export default function DomainStatistics() {
   const [totalAnalytics, setTotalAnalytics] = useState<AnalyticsData | null>(
     null
   );
-  const {webData} = useSharedContext();
+  const [totalAnalyticsPrev, setTotalAnalyticsPrev] = useState<AnalyticsData | null>(
+    null
+  );
+  const {webData, webDataPrev} = useSharedContext();
 
   // Set the analytics if the webdata is updated
   useEffect(() => {
@@ -30,6 +33,25 @@ export default function DomainStatistics() {
       setTotalAnalytics(null);
     }
   }, [webData]);
+
+  useEffect(() => {
+    console.log(webDataPrev)
+    if (webDataPrev && webDataPrev.length > 0) {
+      setTotalAnalyticsPrev({
+        clicks: collectTotal("clicks", webDataPrev),
+        impressions: collectTotal("impressions", webDataPrev),
+        ctr: collectAverage("ctr", webDataPrev) * 100,
+        position: collectAverage("position", webDataPrev),
+      });
+    } else {
+      setTotalAnalyticsPrev({
+        clicks: 0,
+        impressions: 0,
+        ctr: 0,
+        position: 0,
+      });
+    }
+  }, [webDataPrev]);
 
   // Get the total
   function collectTotal(key: string, data: any[]) {
@@ -55,21 +77,25 @@ export default function DomainStatistics() {
       <Statistic
         title="Total impressions"
         amount={formatNumber(totalAnalytics.impressions)}
+        diffAmount={totalAnalyticsPrev && formatNumber(totalAnalytics.impressions - totalAnalyticsPrev.impressions)}
         information="How many times a user saw a link to your site in search results."
       />
       <Statistic
         title="Total clicks"
         amount={formatNumber(totalAnalytics.clicks)}
+        diffAmount={totalAnalyticsPrev && totalAnalytics.clicks - totalAnalyticsPrev.clicks}
         information="How often a user clicked through to your site from the Google result pages."
       />
       <Statistic
         title="Average CTR"
         amount={`${totalAnalytics.ctr.toFixed(2)}%`}
+        diffAmount={totalAnalyticsPrev && (totalAnalytics.ctr - totalAnalyticsPrev.ctr).toFixed(2)}
         information="(Click Through Rate) Percentage of impressions that led to a click."
       />
       <Statistic
         title="Average position"
         amount={totalAnalytics.position.toFixed(1)}
+        diffAmount={totalAnalyticsPrev && (totalAnalytics.position - totalAnalyticsPrev.position).toFixed(1)}
         information="Average position for your site in search results, using the highest position for your site when it appears in search results."
       />
     </div>

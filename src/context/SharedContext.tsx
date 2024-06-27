@@ -14,6 +14,12 @@ interface SharedContextProps {
   setPagesData: (data: any) => void;
   queryData: any;
   setQueryData: (data: any) => void;
+  webDataPrev: any;
+  setWebDataPrev: (data: any) => void;
+  pagesDataPrev: any;
+  setPagesDataPrev: (data: any) => void;
+  queryDataPrev: any;
+  setQueryDataPrev: (data: any) => void;
   availableDomains: any;
   setAvailableDomains: (data: any) => void;
   contentKeyword: any;
@@ -33,6 +39,9 @@ export const SharedProvider = ({ children }: { children: ReactNode }) => {
   const [webData, setWebData] = useState();
   const [pagesData, setPagesData] = useState();
   const [queryData, setQueryData] = useState();
+  const [webDataPrev, setWebDataPrev] = useState();
+  const [pagesDataPrev, setPagesDataPrev] = useState();
+  const [queryDataPrev, setQueryDataPrev] = useState();
   const [availableDomains, setAvailableDomains] = useState<any[]>([]);
   const [contentKeyword, setContentKeyword] = useState<any>();
   const [contentSubKeywords, setContentSubKeywords] = useState<any[]>([]);
@@ -53,6 +62,12 @@ export const SharedProvider = ({ children }: { children: ReactNode }) => {
         setPagesData,
         queryData,
         setQueryData,
+        webDataPrev,
+        setWebDataPrev,
+        pagesDataPrev,
+        setPagesDataPrev,
+        queryDataPrev,
+        setQueryDataPrev,
         availableDomains,
         setAvailableDomains,
         contentKeyword,

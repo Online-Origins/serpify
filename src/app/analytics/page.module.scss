@@ -77,12 +77,34 @@
             text-wrap: nowrap;
             cursor: pointer;
 
+            p {
+                display: flex;
+                align-items: center;
+                gap: .1rem;
+
+                &.bad {
+                font-size: .8rem;
+                    color: $red;
+                }
+
+                &.good {
+                font-size: .8rem;
+                    color: $green;
+                }
+
+                svg {
+                    opacity: 1;
+                    font-size: .8rem;
+                }
+            }
+
+
             &:not(:last-of-type) {
                 border-right: solid 2px $white;
             }
 
             &.page {
-                width: 8.5rem;
+                width: 7.5rem;
                 justify-content: flex-start;
                 cursor: default;
 
@@ -98,12 +120,8 @@
                     }
                 }
 
-                @media (min-width: 1450px) {
-                    width: 10rem;
-                }
-
                 @media (min-width: 1800px) {
-                    width: 21rem;
+                    width: 19rem;
                 }
             }
 
@@ -112,11 +130,11 @@
             }
 
             &.impressions {
-                width: 7rem;
+                width: 6.5rem;
             }
 
             &.ctr {
-                width: 4rem;
+                width: 6.5rem;
             }
 
             svg {

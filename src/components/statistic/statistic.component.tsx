@@ -1,14 +1,18 @@
+import classNames from "classnames";
 import Information from "../information/information.component";
 import styles from "./statistic.module.scss";
+import { ArrowDownward, ArrowUpward } from "@mui/icons-material";
 
 export default function Statistic({
   title,
   information,
   amount,
+  diffAmount,
 }: {
   title: string;
   information: string;
   amount: any;
+  diffAmount?: any;
 }) {
   return (
     <div className={styles.stat}>
@@ -16,7 +20,15 @@ export default function Statistic({
         <h4>{title}</h4>
         <Information information={information} />
       </div>
-      <h2>{amount}</h2>
+      <div className={styles.horizontal}>
+        <h2>{amount}</h2>
+        {diffAmount && (
+          <div className={classNames(styles.difference, diffAmount.toString().includes("-") ? styles.bad : styles.good)}>
+            {diffAmount.toString().includes("-") ? <ArrowDownward/> : <ArrowUpward/>}
+            <h5>{diffAmount}</h5>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

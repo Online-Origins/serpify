@@ -37,6 +37,12 @@ export default function MenuBar({
     setQueryData,
     availableDomains,
     setAvailableDomains,
+    webDataPrev,
+    setWebDataPrev,
+    pagesDataPrev,
+    setPagesDataPrev,
+    queryDataPrev,
+    setQueryDataPrev,
   } = useSharedContext();
   const [domains, setDomains] = useState<string[]>([]);
 
@@ -45,19 +51,31 @@ export default function MenuBar({
     const sessionWebData = sessionStorage.getItem("webData");
     const sessionPagesData = sessionStorage.getItem("pagesData");
     const sessionQueryData = sessionStorage.getItem("queryData");
+    const sessionWebDataPrev = sessionStorage.getItem("webDataPrev");
+    const sessionPagesDataPrev = sessionStorage.getItem("pagesDataPrev");
+    const sessionQueryDataPrev = sessionStorage.getItem("queryDataPrev");
     if (!webData) {
       if (sessionWebData) {
         setWebData(JSON.parse(sessionWebData));
+      }
+      if (sessionWebDataPrev) {
+        setWebDataPrev(JSON.parse(sessionWebDataPrev));
       }
     }
     if (!pagesData) {
       if (sessionPagesData) {
         setPagesData(JSON.parse(sessionPagesData));
       }
+      if (sessionPagesDataPrev) {
+        setPagesDataPrev(JSON.parse(sessionPagesDataPrev));
+      }
     }
     if (!queryData) {
       if (sessionQueryData) {
         setQueryData(JSON.parse(sessionQueryData));
+      }
+      if (sessionQueryDataPrev) {
+        setQueryDataPrev(JSON.parse(sessionQueryDataPrev));
       }
     }
   }, [webData]);
@@ -143,6 +161,37 @@ export default function MenuBar({
           "query",
           setQueryData
         );
+        
+      const prevStartDate = new Date(
+        today.getFullYear(),
+        today.getMonth() - 2,
+        today.getDate()
+      );
+
+      fetchData(
+        currentToken,
+        correctUrl[0],
+        prevStartDate,
+        startDate,
+        "date",
+        setWebDataPrev
+      );
+      fetchData(
+        currentToken,
+        correctUrl[0],
+        prevStartDate,
+        startDate,
+        "page",
+        setPagesDataPrev
+      );
+      fetchData(
+        currentToken,
+        correctUrl[0],
+        prevStartDate,
+        startDate,
+        "query",
+        setQueryDataPrev
+      );
       }
     }
   }
@@ -193,7 +242,7 @@ export default function MenuBar({
     if (currentUrl && !availableDomains.includes(currentUrl)) {
       // The current url is deleted from the available domains
       setCurrentDomain(availableDomains[0]);
-      setDomains(availableDomains)
+      setDomains(availableDomains);
     } else if (availableDomains.length > domains.length) {
       // A domain is added to the platform
       setCurrentDomain(availableDomains[availableDomains.length - 1]);
