@@ -138,6 +138,7 @@ export default function Home() {
         setQueryData
       );
 
+      // Get data for the 30 days before the last 30 days
       const prevStartDate = new Date(
         today.getFullYear(),
         today.getMonth() - 2,

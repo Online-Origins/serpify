@@ -161,37 +161,38 @@ export default function MenuBar({
           "query",
           setQueryData
         );
-        
-      const prevStartDate = new Date(
-        today.getFullYear(),
-        today.getMonth() - 2,
-        today.getDate()
-      );
 
-      fetchData(
-        currentToken,
-        correctUrl[0],
-        prevStartDate,
-        startDate,
-        "date",
-        setWebDataPrev
-      );
-      fetchData(
-        currentToken,
-        correctUrl[0],
-        prevStartDate,
-        startDate,
-        "page",
-        setPagesDataPrev
-      );
-      fetchData(
-        currentToken,
-        correctUrl[0],
-        prevStartDate,
-        startDate,
-        "query",
-        setQueryDataPrev
-      );
+        // Get the data for the 30 days before the last 30 days
+        const prevStartDate = new Date(
+          today.getFullYear(),
+          today.getMonth() - 2,
+          today.getDate()
+        );
+
+        fetchData(
+          currentToken,
+          correctUrl[0],
+          prevStartDate,
+          startDate,
+          "date",
+          setWebDataPrev
+        );
+        fetchData(
+          currentToken,
+          correctUrl[0],
+          prevStartDate,
+          startDate,
+          "page",
+          setPagesDataPrev
+        );
+        fetchData(
+          currentToken,
+          correctUrl[0],
+          prevStartDate,
+          startDate,
+          "query",
+          setQueryDataPrev
+        );
       }
     }
   }
