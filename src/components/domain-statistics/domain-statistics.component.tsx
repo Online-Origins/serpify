@@ -35,7 +35,6 @@ export default function DomainStatistics() {
   }, [webData]);
 
   useEffect(() => {
-    console.log(webDataPrev)
     if (webDataPrev && webDataPrev.length > 0) {
       setTotalAnalyticsPrev({
         clicks: collectTotal("clicks", webDataPrev),

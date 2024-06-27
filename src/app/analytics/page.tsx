@@ -159,7 +159,7 @@ export default function AnalyticsPage() {
                     options={["impressions", "clicks", "ctr", "position"]}
                   />
                 </div>
-                <LineChart data={webData} type={chartType} />
+                <LineChart data={webData} type={chartType} dataPrev={webDataPrev} />
               </div>
               <div className={styles.analyticsItem}>
                 <div className={styles.titleWrapper}>

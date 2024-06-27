@@ -22,7 +22,7 @@ ChartJS.register(
   Legend
 );
 
-const LineChart = ({ data, type }: { data: any; type: string }) => {
+const LineChart = ({ data, type, dataPrev }: { data: any; type: string, dataPrev: any }) => {
   const [aspectRatio, setAspectRatio] = useState(1.5);
 
   // Check the width of the window and change the aspect ratio of the chart
@@ -40,20 +40,32 @@ const LineChart = ({ data, type }: { data: any; type: string }) => {
   // Extract dates and clicks from the data
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", { month: "long", day: "numeric" });
+    if(dataPrev) {
+    return date.toLocaleDateString("en-US", { day: "numeric" });
+    }
   };
   const dates = data.map((entry: any) => formatDate(entry.keys[0]));
   const selectedData = data.map((entry: any) => type == "ctr" ? (entry[type] * 100) : entry[type]);
+  const selectedDataPrev = dataPrev.map((entry: any) => type == "ctr" ? (entry[type] * 100) : entry[type]);
 
   const chartData = {
     labels: dates,
     datasets: [
       {
+        label: "Last 30 days",
         data: selectedData,
         fill: false,
         borderColor: "#6210CC",
         tension: 0.2,
-        pointBorderColor: "rgba(0,0,0,1)",
+        pointBorderColor: "rgb(98, 16, 204)",
+      },
+      {
+        label: "Previous 30 days",
+        data: selectedDataPrev,
+        fill: false,
+        borderColor: "rgba(98, 16, 204, .2)",
+        tension: 0.2,
+        pointBorderColor: "rgba(98, 16, 204, 0)",
       },
     ],
   };
@@ -62,7 +74,7 @@ const LineChart = ({ data, type }: { data: any; type: string }) => {
     responsive: true,
     plugins: {
       legend: {
-        display: false,
+        display: true,
       },
     },
     scales: {
