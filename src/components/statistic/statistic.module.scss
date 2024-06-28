@@ -19,4 +19,30 @@
             margin-bottom: .2rem;
         }
     }
+
+    .horizontal{
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+
+        .difference{
+            height: 100%;
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            color: $white;
+
+            svg {
+                font-size: 1.1rem;
+            }
+
+            &.bad{
+                color: $red;
+            }
+            
+            &.good{
+                color: $green;
+            }
+        }
+    }
 }

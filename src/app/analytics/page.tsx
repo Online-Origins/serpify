@@ -16,6 +16,7 @@ import {
 import styles from "./page.module.scss";
 import Link from "next/link";
 import { useSharedContext } from "@/context/SharedContext";
+import { formatNumber } from "../utils/formatNumber/formatNumber";
 
 export default function AnalyticsPage() {
   const gotData = useRef(false);
@@ -27,7 +28,17 @@ export default function AnalyticsPage() {
   const [role, setRole] = useState("");
   const [keywordSorting, setKeywordSorting] = useState("clicks");
   const [pagesSorting, setPagesSorting] = useState("clicks");
-  const { pagesData, webData, queryData, currentUrl } = useSharedContext();
+  const {
+    pagesData,
+    webData,
+    queryData,
+    currentUrl,
+    pagesDataPrev,
+    webDataPrev,
+    queryDataPrev,
+    analyticsPeriod,
+    setAnalyticsPeriod,
+  } = useSharedContext();
 
   useEffect(() => {
     const role = sessionStorage.getItem("role");
@@ -112,6 +123,21 @@ export default function AnalyticsPage() {
     }
   }
 
+  function getDifference(item: any, previous: any, type: string): number {
+    if (previous) {
+      const previousItem = previous.find(
+        (previousItem: any) => previousItem.keys[0] == item.keys[0]
+      );
+      if (previousItem) {
+        return item[type] - previousItem[type];
+      } else {
+        return 0;
+      }
+    } else {
+      return 0;
+    }
+  }
+
   return (
     <InnerWrapper className={styles.analyticsWrapper}>
       <PageTitle
@@ -119,7 +145,21 @@ export default function AnalyticsPage() {
         information={
           "Website analytics involves tracking and analyzing web traffic data to understand user behavior, improve site performance, and optimize content for better engagement and conversion rates. The entirety of our data and analytics infrastructure relies exclusively on Google's platform."
         }
-        smallTitle="(Last month)"
+        buttons={
+          <InputWrapper
+            className={styles.analyticsInput}
+            type="dropdown"
+            options={[
+              "Last week",
+              "Last 2 weeks",
+              "Last month",
+              "Last 6 months",
+              "Last year"
+            ]}
+            value={analyticsPeriod}
+            onChange={(value: string) => setAnalyticsPeriod(value)}
+          />
+        }
       />
       {role != "guest" && role != "unauthorized" && (
         <div
@@ -139,7 +179,11 @@ export default function AnalyticsPage() {
                     options={["impressions", "clicks", "ctr", "position"]}
                   />
                 </div>
-                <LineChart data={webData} type={chartType} />
+                <LineChart
+                  data={webData}
+                  type={chartType}
+                  dataPrev={webDataPrev}
+                />
               </div>
               <div className={styles.analyticsItem}>
                 <div className={styles.titleWrapper}>
@@ -241,7 +285,27 @@ export default function AnalyticsPage() {
                           </Link>
                         </div>
                         <div className={classNames(styles.item, styles.clicks)}>
-                          <p>{page.clicks}</p>
+                          {getDifference(page, pagesDataPrev, "clicks") !=
+                            0 && (
+                            <p
+                              className={
+                                getDifference(page, pagesDataPrev, "clicks") < 0
+                                  ? styles.bad
+                                  : styles.good
+                              }
+                            >
+                              {formatNumber(
+                                getDifference(page, pagesDataPrev, "clicks")
+                              )}
+                              {getDifference(page, pagesDataPrev, "clicks") <
+                              0 ? (
+                                <ArrowDownwardRounded />
+                              ) : (
+                                <ArrowUpwardRounded />
+                              )}
+                            </p>
+                          )}
+                          <p>{formatNumber(page.clicks)}</p>
                         </div>
                         <div
                           className={classNames(
@@ -249,9 +313,60 @@ export default function AnalyticsPage() {
                             styles.impressions
                           )}
                         >
-                          <p>{page.impressions}</p>
+                          {getDifference(page, pagesDataPrev, "impressions") !=
+                            0 && (
+                            <p
+                              className={
+                                getDifference(
+                                  page,
+                                  pagesDataPrev,
+                                  "impressions"
+                                ) < 0
+                                  ? styles.bad
+                                  : styles.good
+                              }
+                            >
+                              {formatNumber(
+                                getDifference(
+                                  page,
+                                  pagesDataPrev,
+                                  "impressions"
+                                )
+                              )}
+                              {getDifference(
+                                page,
+                                pagesDataPrev,
+                                "impressions"
+                              ) < 0 ? (
+                                <ArrowDownwardRounded />
+                              ) : (
+                                <ArrowUpwardRounded />
+                              )}
+                            </p>
+                          )}
+                          <p>{formatNumber(page.impressions)}</p>
                         </div>
                         <div className={classNames(styles.item, styles.ctr)}>
+                          {!(getDifference(page, pagesDataPrev, "ctr") * 100)
+                            .toFixed(1)
+                            .includes("0.0") && (
+                            <p
+                              className={
+                                getDifference(page, pagesDataPrev, "ctr") < 0
+                                  ? styles.bad
+                                  : styles.good
+                              }
+                            >
+                              {(
+                                getDifference(page, pagesDataPrev, "ctr") * 100
+                              ).toFixed(1)}
+                              {getDifference(page, pagesDataPrev, "ctr") < 0 ? (
+                                <ArrowDownwardRounded />
+                              ) : (
+                                <ArrowUpwardRounded />
+                              )}
+                            </p>
+                          )}
                           <p>{(page.ctr * 100).toFixed(1)} %</p>
                         </div>
                       </div>
@@ -376,17 +491,116 @@ export default function AnalyticsPage() {
                         <p>{keyword.keys[0]}</p>
                       </div>
                       <div className={classNames(styles.item, styles.position)}>
+                        {(getDifference(keyword, queryDataPrev, "position").toFixed(1).replace("-", "")) !=
+                          "0.0" && (
+                          <p
+                            className={
+                              getDifference(
+                                keyword,
+                                queryDataPrev,
+                                "position"
+                              ) < 0
+                                ? styles.bad
+                                : styles.good
+                            }
+                          >
+                            {getDifference(
+                              keyword,
+                              queryDataPrev,
+                              "position"
+                            ).toFixed(1)}
+                            {getDifference(keyword, queryDataPrev, "position") <
+                            0 ? (
+                              <ArrowDownwardRounded />
+                            ) : (
+                              <ArrowUpwardRounded />
+                            )}
+                          </p>
+                        )}
                         <p>{keyword.position.toFixed(1)}</p>
                       </div>
                       <div className={classNames(styles.item, styles.clicks)}>
-                        <p>{keyword.clicks}</p>
+                        {getDifference(keyword, queryDataPrev, "clicks") !=
+                          0 && (
+                          <p
+                            className={
+                              getDifference(keyword, queryDataPrev, "clicks") <
+                              0
+                                ? styles.bad
+                                : styles.good
+                            }
+                          >
+                            {formatNumber(
+                              getDifference(keyword, queryDataPrev, "clicks")
+                            )}
+                            {getDifference(keyword, queryDataPrev, "clicks") <
+                            0 ? (
+                              <ArrowDownwardRounded />
+                            ) : (
+                              <ArrowUpwardRounded />
+                            )}
+                          </p>
+                        )}
+                        <p>{formatNumber(keyword.clicks)}</p>
                       </div>
                       <div
                         className={classNames(styles.item, styles.impressions)}
                       >
-                        <p>{keyword.impressions}</p>
+                        {getDifference(keyword, queryDataPrev, "impressions") !=
+                          0 && (
+                          <p
+                            className={
+                              getDifference(
+                                keyword,
+                                queryDataPrev,
+                                "impressions"
+                              ) < 0
+                                ? styles.bad
+                                : styles.good
+                            }
+                          >
+                            {formatNumber(
+                              getDifference(
+                                keyword,
+                                queryDataPrev,
+                                "impressions"
+                              )
+                            )}
+                            {getDifference(
+                              keyword,
+                              queryDataPrev,
+                              "impressions"
+                            ) < 0 ? (
+                              <ArrowDownwardRounded />
+                            ) : (
+                              <ArrowUpwardRounded />
+                            )}
+                          </p>
+                        )}
+                        <p>{formatNumber(keyword.impressions)}</p>
                       </div>
                       <div className={classNames(styles.item, styles.ctr)}>
+                        {!(getDifference(keyword, queryDataPrev, "ctr") * 100)
+                          .toFixed(1)
+                          .includes("0.0") && (
+                          <p
+                            className={
+                              getDifference(keyword, queryDataPrev, "ctr") < 0
+                                ? styles.bad
+                                : styles.good
+                            }
+                          >
+                            {(
+                              getDifference(keyword, queryDataPrev, "ctr") * 100
+                            ).toFixed(1)}
+                            {getDifference(keyword, queryDataPrev, "ctr") <
+                            0 ? (
+                              <ArrowDownwardRounded />
+                            ) : (
+                              <ArrowUpwardRounded />
+                            )}
+                          </p>
+                        )}
                         <p>{(keyword.ctr * 100).toFixed(1)} %</p>
                       </div>
                     </div>
@@ -398,15 +612,6 @@ export default function AnalyticsPage() {
       )}
       {role == "guest" && (
         <h5>You need to log in with Google for this feature</h5>
-      )}
-      {role == "unauthorized" && (
-        <h5>
-          You need to enable this domain in your Google Search console. Check{" "}
-          <a href="https://www.youtube.com/watch?v=OT7gotTCR7s" target="_blank">
-            here
-          </a>{" "}
-          how to do this.
-        </h5>
       )}
     </InnerWrapper>
   );

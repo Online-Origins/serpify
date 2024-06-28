@@ -19,9 +19,7 @@ export default function Home() {
   const router = useRouter();
   const gottenData = useRef(false);
   const [role, setRole] = useState("");
-  const gotSearchConsoleData = useRef(false);
-  const { currentUrl, setWebData, setPagesData, setQueryData } =
-    useSharedContext();
+  const { currentUrl, analyticsPeriod, setUserRole } = useSharedContext();
 
   useEffect(() => {
     const authorizationCode = getAuthorizationCode();
@@ -40,7 +38,7 @@ export default function Home() {
     ) {
       // Get search console data if a user is authenticated
       if (loadingRef.current) {
-        handleExecute(authorizationCode, currentUrl);
+        handleExecute(authorizationCode);
         loadingRef.current = false;
       }
     } else if (role) {
@@ -50,7 +48,7 @@ export default function Home() {
   }, [currentUrl, loadingRef.current, gottenData.current]);
 
   // Handle getting search console data
-  async function handleExecute(authorizationCode: any, websiteUrl: string) {
+  async function handleExecute(authorizationCode: any) {
     try {
       const tokenResponse = await fetch("/api/exchangeCode", {
         method: "POST",
@@ -61,121 +59,18 @@ export default function Home() {
       });
       const { accessToken, entries, refreshToken } = await tokenResponse.json();
 
+      sessionStorage.setItem("role", "user");
+      setUserRole("user")
       sessionStorage.setItem("accessToken", accessToken);
       sessionStorage.setItem("refreshToken", refreshToken);
       sessionStorage.setItem("entries", JSON.stringify(entries));
 
-      gettingData(websiteUrl, accessToken, entries);
       gottenData.current = true;
       router.push("/");
     } catch (error) {
       alert(
         "Something went wrong while authenticating. Please try again later"
       );
-    }
-  }
-
-  // Get data
-  function gettingData(
-    websiteUrl: string,
-    accessToken?: string,
-    passedEntries?: any
-  ) {
-    const pageDomains = JSON.parse(sessionStorage.getItem("entries") || "");
-    const userAccessToken = sessionStorage.getItem("accessToken");
-    if (
-      (pageDomains != "" || passedEntries) &&
-      (userAccessToken != "" || accessToken)
-    ) {
-      const currentToken = userAccessToken || accessToken || "";
-      const entries = pageDomains || passedEntries || [""];
-      let correctUrl = [];
-      if (entries) {
-        correctUrl = entries
-          .filter((item: any) => item.siteUrl.includes(websiteUrl))
-          .map((item: any) => item.siteUrl);
-      }
-      if (correctUrl.length == 0) {
-        alert("The chosen domain isn't activated in your Search console.");
-        return;
-      }
-      const today = new Date();
-      const startDate = new Date(
-        today.getFullYear(),
-        today.getMonth() - 1,
-        today.getDate()
-      );
-      const endDate = new Date(
-        today.getFullYear(),
-        today.getMonth(),
-        today.getDate()
-      );
-      fetchData(
-        currentToken,
-        correctUrl[0],
-        startDate,
-        endDate,
-        "date",
-        "webData",
-        setWebData
-      );
-      fetchData(
-        currentToken,
-        correctUrl[0],
-        startDate,
-        endDate,
-        "page",
-        "pagesData",
-        setPagesData
-      );
-      fetchData(
-        currentToken,
-        correctUrl[0],
-        startDate,
-        endDate,
-        "query",
-        "queryData",
-        setQueryData
-      );
-    }
-  }
-  
-  // Fetch specific dimension type data
-  async function fetchData(
-    accessToken: string,
-    correctUrl: string,
-    startDate: any,
-    endDate: any,
-    dimension: string,
-    storageType: string,
-    saveData: (data: any) => void
-  ) {
-    const refreshToken = sessionStorage.getItem("refreshToken");
-    try {
-      const response = await fetch("/api/domainData", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          accessToken: accessToken,
-          websiteUrl: correctUrl,
-          startDate: startDate.toISOString().split("T")[0],
-          endDate: endDate.toISOString().split("T")[0],
-          dimension: [dimension],
-          refreshToken: refreshToken,
-        }),
-      });
-
-      const data = await response.json();
-      saveData(data.rows);
-      sessionStorage.setItem(storageType, JSON.stringify(data.rows)); // Store as back-up for when user refresh
-      sessionStorage.setItem("role", "user");
-      gotSearchConsoleData.current = true;
-    } catch (error) {
-      sessionStorage.setItem("role", "unauthorized");
-      setRole("unauthorized");
-      console.error("Error fetching search console data", error);
     }
   }
 
@@ -198,7 +93,7 @@ export default function Home() {
       <div className={styles.toolWrapper}>
         <PageTitle
           title={"Website analytics"}
-          smallTitle={"(Last month)"}
+          smallTitle={`(${analyticsPeriod})`}
           smallerHeader
           buttons={
             <Button type={"textOnly"} onClick={() => router.push("/analytics")}>
@@ -210,18 +105,6 @@ export default function Home() {
         {role != "guest" && role != "unauthorized" && <DomainStatistics />}
         {role == "guest" && (
           <h5>You need to log in with Google for this feature</h5>
-        )}
-        {role == "unauthorized" && (
-          <h5>
-            You need to enable this domain in your Google Search console. Check{" "}
-            <a
-              href="https://www.youtube.com/watch?v=OT7gotTCR7s"
-              target="_blank"
-            >
-              here
-            </a>{" "}
-            how to do this.
-          </h5>
         )}
       </div>
       <div className={styles.toolWrapper}>
