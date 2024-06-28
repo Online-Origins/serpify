@@ -36,6 +36,8 @@ export default function AnalyticsPage() {
     pagesDataPrev,
     webDataPrev,
     queryDataPrev,
+    analyticsPeriod,
+    setAnalyticsPeriod,
   } = useSharedContext();
 
   useEffect(() => {
@@ -122,11 +124,15 @@ export default function AnalyticsPage() {
   }
 
   function getDifference(item: any, previous: any, type: string): number {
-    const previousItem = previous.find(
-      (previousItem: any) => previousItem.keys[0] == item.keys[0]
-    );
-    if (previousItem) {
-      return item[type] - previousItem[type];
+    if (previous) {
+      const previousItem = previous.find(
+        (previousItem: any) => previousItem.keys[0] == item.keys[0]
+      );
+      if (previousItem) {
+        return item[type] - previousItem[type];
+      } else {
+        return 0;
+      }
     } else {
       return 0;
     }
@@ -139,7 +145,21 @@ export default function AnalyticsPage() {
         information={
           "Website analytics involves tracking and analyzing web traffic data to understand user behavior, improve site performance, and optimize content for better engagement and conversion rates. The entirety of our data and analytics infrastructure relies exclusively on Google's platform."
         }
-        smallTitle="(Last month)"
+        buttons={
+          <InputWrapper
+            className={styles.analyticsInput}
+            type="dropdown"
+            options={[
+              "Last week",
+              "Last 2 weeks",
+              "Last month",
+              "Last 6 months",
+              "Last year"
+            ]}
+            value={analyticsPeriod}
+            onChange={(value: string) => setAnalyticsPeriod(value)}
+          />
+        }
       />
       {role != "guest" && role != "unauthorized" && (
         <div
@@ -159,7 +179,11 @@ export default function AnalyticsPage() {
                     options={["impressions", "clicks", "ctr", "position"]}
                   />
                 </div>
-                <LineChart data={webData} type={chartType} dataPrev={webDataPrev} />
+                <LineChart
+                  data={webData}
+                  type={chartType}
+                  dataPrev={webDataPrev}
+                />
               </div>
               <div className={styles.analyticsItem}>
                 <div className={styles.titleWrapper}>
@@ -467,8 +491,8 @@ export default function AnalyticsPage() {
                         <p>{keyword.keys[0]}</p>
                       </div>
                       <div className={classNames(styles.item, styles.position)}>
-                        {getDifference(keyword, queryDataPrev, "position") !=
-                          0 && (
+                        {(getDifference(keyword, queryDataPrev, "position").toFixed(1).replace("-", "")) !=
+                          "0.0" && (
                           <p
                             className={
                               getDifference(
@@ -588,15 +612,6 @@ export default function AnalyticsPage() {
       )}
       {role == "guest" && (
         <h5>You need to log in with Google for this feature</h5>
-      )}
-      {role == "unauthorized" && (
-        <h5>
-          You need to enable this domain in your Google Search console. Check{" "}
-          <a href="https://www.youtube.com/watch?v=OT7gotTCR7s" target="_blank">
-            here
-          </a>{" "}
-          how to do this.
-        </h5>
       )}
     </InnerWrapper>
   );

@@ -11,6 +11,7 @@ import {
   Legend,
 } from "chart.js";
 import { ChartOptions } from "chart.js";
+import { useSharedContext } from "@/context/SharedContext";
 
 ChartJS.register(
   CategoryScale,
@@ -22,8 +23,18 @@ ChartJS.register(
   Legend
 );
 
-const LineChart = ({ data, type, dataPrev }: { data: any; type: string, dataPrev: any }) => {
+const LineChart = ({
+  data,
+  type,
+  dataPrev,
+}: {
+  data: any;
+  type: string;
+  dataPrev: any;
+}) => {
   const [aspectRatio, setAspectRatio] = useState(1.5);
+  const { analyticsPeriod } = useSharedContext();
+  const [periodText, setPeriodText] = useState<string>("");
 
   // Check the width of the window and change the aspect ratio of the chart
   useEffect(() => {
@@ -33,26 +44,65 @@ const LineChart = ({ data, type, dataPrev }: { data: any; type: string, dataPrev
 
     handleResize();
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  // Function to get one object per 7 days
+  const getWeeklyData = (data: any[]) => {
+    const result = [];
+    for (let i = 0; i < data.length; i += 7) {
+      result.push(data[i]);
+    }
+    return result;
+  };
+
+  // Function to fill up dataPrev with empty items if shorter than data
+  const fillDataPrev = (data: any[], dataPrev: any[]) => {
+    if (data && dataPrev) {
+      const difference = data.length - dataPrev.length;
+      if (difference > 0) {
+        const emptyItems = Array(difference).fill(null);
+        dataPrev = emptyItems.concat(dataPrev);
+      }
+    }
+    return dataPrev;
+  };
+
+  // Reduce data and dataPrev if their length is greater than 150
+  if (data && data.length > 150) {
+    data = getWeeklyData(data);
+    dataPrev = getWeeklyData(dataPrev);
+  }
+
+  // Fill dataPrev if necessary
+  dataPrev = fillDataPrev(data, dataPrev);
 
   // Extract dates and clicks from the data
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    if(dataPrev) {
-    return date.toLocaleDateString("en-US", { day: "numeric" });
-    }
+    return date.toLocaleDateString("en-US", { month: "long", day: "numeric" });
   };
+
   const dates = data.map((entry: any) => formatDate(entry.keys[0]));
-  const selectedData = data.map((entry: any) => type == "ctr" ? (entry[type] * 100) : entry[type]);
-  const selectedDataPrev = dataPrev.map((entry: any) => type == "ctr" ? (entry[type] * 100) : entry[type]);
+  const selectedData = data.map((entry: any) =>
+    type == "ctr" ? entry[type] * 100 : entry[type]
+  );
+  const selectedDataPrev = dataPrev.map((entry: any) =>
+    entry ? (type == "ctr" ? entry[type] * 100 : entry[type]) : null
+  );
+
+  useEffect(() => {
+    if (data.length > 0) {
+      setPeriodText(analyticsPeriod);
+    }
+  }, [data]);
 
   const chartData = {
     labels: dates,
     datasets: [
       {
-        label: "Last 30 days",
+        label: periodText,
         data: selectedData,
         fill: false,
         borderColor: "#6210CC",
@@ -60,7 +110,7 @@ const LineChart = ({ data, type, dataPrev }: { data: any; type: string, dataPrev
         pointBorderColor: "rgb(98, 16, 204)",
       },
       {
-        label: "Previous 30 days",
+        label: periodText.replace("Last", "Previous"),
         data: selectedDataPrev,
         fill: false,
         borderColor: "rgba(98, 16, 204, .2)",
@@ -80,7 +130,7 @@ const LineChart = ({ data, type, dataPrev }: { data: any; type: string, dataPrev
     scales: {
       x: {
         ticks: {
-          maxTicksLimit: 8, 
+          maxTicksLimit: 8,
         },
       },
       y: {

@@ -23,7 +23,7 @@ export default function Statistic({
       <div className={styles.horizontal}>
         <h2>{amount}</h2>
         {diffAmount && (
-          <div className={classNames(styles.difference, diffAmount.toString().includes("-") ? styles.bad : styles.good)}>
+          <div className={classNames(styles.difference, diffAmount.toString().includes("-") && !title.includes("position") ? styles.bad : !diffAmount.toString().includes("-") && title.includes("position") ? styles.bad : styles.good)}>
             {diffAmount.toString().includes("-") ? <ArrowDownward/> : <ArrowUpward/>}
             <h5>{diffAmount}</h5>
           </div>

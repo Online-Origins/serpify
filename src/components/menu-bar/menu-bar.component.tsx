@@ -29,56 +29,20 @@ export default function MenuBar({
   const {
     currentUrl,
     setCurrentUrl,
-    webData,
     setWebData,
-    pagesData,
     setPagesData,
-    queryData,
     setQueryData,
     availableDomains,
     setAvailableDomains,
-    webDataPrev,
     setWebDataPrev,
-    pagesDataPrev,
     setPagesDataPrev,
-    queryDataPrev,
     setQueryDataPrev,
+    analyticsPeriod,
+    setAnalyticsPeriod,
+    userRole,
+    setUserRole,
   } = useSharedContext();
   const [domains, setDomains] = useState<string[]>([]);
-
-  // Get the default data from the session when reloaded
-  useEffect(() => {
-    const sessionWebData = sessionStorage.getItem("webData");
-    const sessionPagesData = sessionStorage.getItem("pagesData");
-    const sessionQueryData = sessionStorage.getItem("queryData");
-    const sessionWebDataPrev = sessionStorage.getItem("webDataPrev");
-    const sessionPagesDataPrev = sessionStorage.getItem("pagesDataPrev");
-    const sessionQueryDataPrev = sessionStorage.getItem("queryDataPrev");
-    if (!webData) {
-      if (sessionWebData) {
-        setWebData(JSON.parse(sessionWebData));
-      }
-      if (sessionWebDataPrev) {
-        setWebDataPrev(JSON.parse(sessionWebDataPrev));
-      }
-    }
-    if (!pagesData) {
-      if (sessionPagesData) {
-        setPagesData(JSON.parse(sessionPagesData));
-      }
-      if (sessionPagesDataPrev) {
-        setPagesDataPrev(JSON.parse(sessionPagesDataPrev));
-      }
-    }
-    if (!queryData) {
-      if (sessionQueryData) {
-        setQueryData(JSON.parse(sessionQueryData));
-      }
-      if (sessionQueryDataPrev) {
-        setQueryDataPrev(JSON.parse(sessionQueryDataPrev));
-      }
-    }
-  }, [webData]);
 
   // Check the pathname and change the menu to a smaller version
   useEffect(() => {
@@ -90,29 +54,93 @@ export default function MenuBar({
   // Update the current url if the current domain changes
   // Also get the data from the domain
   useEffect(() => {
-    if (currentUrl && currentUrl != currentDomain) {
-      setCurrentUrl(currentDomain);
-      const role = sessionStorage.getItem("role");
-      if (role && role != "guest") {
-        gettingData(currentDomain, undefined, undefined);
+    if (currentUrl) {
+      if (currentUrl != currentDomain) {
+        setCurrentUrl(currentDomain);
+        const pageDomains = JSON.parse(sessionStorage.getItem("entries") || "");
+        if (pageDomains != "") {
+          const entries = pageDomains || [""];
+          let correctUrl = [];
+          if (entries) {
+            correctUrl = entries
+              .filter((item: any) => item.siteUrl.includes(currentDomain))
+              .map((item: any) => item.siteUrl);
+          }
+          if (correctUrl.length == 0) {
+            alert("The chosen domain isn't activated in your Search console.");
+            setUserRole("unauthorized");
+          } else {
+            setUserRole("user")
+          }
+        }
+      }
+      if (userRole && userRole != "guest" && userRole != "unauthorized") {
+        getData();
+      } else if (!userRole) {
+        const role = sessionStorage.getItem("role");
+        setUserRole(role);
       }
     }
-  }, [currentDomain]);
+  }, [currentDomain, analyticsPeriod, userRole]);
+
+  function getData() {
+    const today = new Date();
+    if (analyticsPeriod == "Last month") {
+      today.setDate(today.getDate() - 2);
+      const startDate = new Date();
+      startDate.setMonth(today.getMonth() - 1);
+      const prevStartDate = new Date();
+      prevStartDate.setMonth(today.getMonth() - 2);
+      gettingData(currentDomain, startDate, today, prevStartDate);
+    } else if (analyticsPeriod == "Last week") {
+      today.setDate(today.getDate() - 2);
+      const startDate = new Date();
+      startDate.setDate(today.getDate() - 7);
+      const prevStartDate = new Date();
+      prevStartDate.setDate(startDate.getDate() - 7);
+      gettingData(currentDomain, startDate, today, prevStartDate);
+    } else if (analyticsPeriod == "Last 2 weeks") {
+      today.setDate(today.getDate() - 2);
+      const startDate = new Date();
+      startDate.setDate(today.getDate() - 14);
+      const prevStartDate = new Date();
+      prevStartDate.setDate(startDate.getDate() - 14);
+      gettingData(currentDomain, startDate, today, prevStartDate);
+    } else if (analyticsPeriod == "Last 6 months") {
+      today.setDate(today.getDate() - 2);
+      const startDate = new Date();
+      startDate.setMonth(today.getMonth() - 6);
+      const prevStartDate = new Date();
+      prevStartDate.setMonth(today.getMonth() - 12);
+      gettingData(currentDomain, startDate, today, prevStartDate);
+    } else if (analyticsPeriod == "Last year") {
+      today.setDate(today.getDate() - 2);
+      const startDate = new Date();
+      startDate.setFullYear(today.getFullYear() - 1);
+      const prevStartDate = new Date();
+      prevStartDate.setFullYear(today.getFullYear() - 2);
+      gettingData(currentDomain, startDate, today, prevStartDate);
+    }
+  }
+
+  useEffect(() => {
+    if (!analyticsPeriod) {
+      setAnalyticsPeriod("Last month");
+    }
+  }, [analyticsPeriod]);
 
   // Get the data from search console
   function gettingData(
     websiteUrl: string,
-    accessToken?: string,
-    passedEntries?: any
+    startDate: any,
+    endDate: any,
+    prevStartDate: any
   ) {
     const pageDomains = JSON.parse(sessionStorage.getItem("entries") || "");
     const userAccessToken = sessionStorage.getItem("accessToken");
-    if (
-      (pageDomains != "" || passedEntries) &&
-      (userAccessToken != "" || accessToken)
-    ) {
-      const currentToken = userAccessToken || accessToken || "";
-      const entries = pageDomains || passedEntries || [""];
+    if (pageDomains != "" && userAccessToken != "") {
+      const currentToken = userAccessToken || "";
+      const entries = pageDomains || [""];
       let correctUrl = [];
       if (entries) {
         correctUrl = entries
@@ -120,23 +148,11 @@ export default function MenuBar({
           .map((item: any) => item.siteUrl);
       }
       if (correctUrl.length == 0) {
-        alert("The chosen domain isn't activated in your Search console.");
         setWebData([]);
         setPagesData([]);
         setQueryData([]);
         return;
       } else {
-        const today = new Date();
-        const startDate = new Date(
-          today.getFullYear(),
-          today.getMonth() - 1,
-          today.getDate()
-        );
-        const endDate = new Date(
-          today.getFullYear(),
-          today.getMonth(),
-          today.getDate()
-        );
         fetchData(
           currentToken,
           correctUrl[0],
@@ -163,11 +179,6 @@ export default function MenuBar({
         );
 
         // Get the data for the 30 days before the last 30 days
-        const prevStartDate = new Date(
-          today.getFullYear(),
-          today.getMonth() - 2,
-          today.getDate()
-        );
 
         fetchData(
           currentToken,

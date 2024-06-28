@@ -22,6 +22,10 @@
     overflow-y: scroll !important;
 }
 
+.analyticsInput {
+    transform: translateX(-2px);
+}
+
 .analyticsItem {
     background-color: $white;
     display: flex;
@@ -43,10 +47,13 @@
         display: flex;
         width: 100%;
         justify-content: space-between;
+        position: relative;
 
         h3 {
             width: 100%;
         }
+
+
     }
 
     .tableButtons {
@@ -83,12 +90,12 @@
                 gap: .1rem;
 
                 &.bad {
-                font-size: .8rem;
+                    font-size: .8rem;
                     color: $red;
                 }
 
                 &.good {
-                font-size: .8rem;
+                    font-size: .8rem;
                     color: $green;
                 }
 

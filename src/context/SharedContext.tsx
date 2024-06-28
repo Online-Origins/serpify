@@ -6,8 +6,8 @@ interface SharedContextProps {
   setSharedData: (data: any) => void;
   currentUrl: string | null;
   setCurrentUrl: (data: any) => void;
-  userAccessToken: string | null;
-  setUserAccessToken: (data: any) => void;
+  userRole: string | null;
+  setUserRole: (data: any) => void;
   webData: any;
   setWebData: (data: any) => void;
   pagesData: any;
@@ -28,6 +28,8 @@ interface SharedContextProps {
   setContentSubKeywords: (data: any) => void;
   contentCollection: any;
   setContentCollection: (data: any) => void;
+  analyticsPeriod: any;
+  setAnalyticsPeriod: (data: any) => void;
 }
 
 const SharedContext = createContext<SharedContextProps | undefined>(undefined);
@@ -35,7 +37,7 @@ const SharedContext = createContext<SharedContextProps | undefined>(undefined);
 export const SharedProvider = ({ children }: { children: ReactNode }) => {
   const [sharedData, setSharedData] = useState<string | null>(null);
   const [currentUrl, setCurrentUrl] = useState<string | null>(null);
-  const [userAccessToken, setUserAccessToken] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
   const [webData, setWebData] = useState();
   const [pagesData, setPagesData] = useState();
   const [queryData, setQueryData] = useState();
@@ -46,6 +48,7 @@ export const SharedProvider = ({ children }: { children: ReactNode }) => {
   const [contentKeyword, setContentKeyword] = useState<any>();
   const [contentSubKeywords, setContentSubKeywords] = useState<any[]>([]);
   const [contentCollection, setContentCollection] = useState<any>();
+  const [analyticsPeriod, setAnalyticsPeriod] = useState<string>("");
 
   return (
     <SharedContext.Provider
@@ -54,8 +57,8 @@ export const SharedProvider = ({ children }: { children: ReactNode }) => {
         setSharedData,
         currentUrl,
         setCurrentUrl,
-        userAccessToken,
-        setUserAccessToken,
+        userRole,
+        setUserRole,
         webData,
         setWebData,
         pagesData,
@@ -76,6 +79,8 @@ export const SharedProvider = ({ children }: { children: ReactNode }) => {
         setContentSubKeywords,
         contentCollection,
         setContentCollection,
+        analyticsPeriod, 
+        setAnalyticsPeriod,
       }}
     >
       {children}
