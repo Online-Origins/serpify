@@ -57,9 +57,9 @@ export default function MenuBar({
     if (currentUrl) {
       if (currentUrl != currentDomain) {
         setCurrentUrl(currentDomain);
-        const pageDomains = JSON.parse(sessionStorage.getItem("entries") || "");
-        if (pageDomains != "") {
-          const entries = pageDomains || [""];
+        const pageDomains = sessionStorage.getItem("entries");
+        if (pageDomains) {
+          const entries = JSON.parse(pageDomains) || [""];
           let correctUrl = [];
           if (entries) {
             correctUrl = entries

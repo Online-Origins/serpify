@@ -15,12 +15,14 @@ export default function Subtitle({
   removeTitle,
   draggable,
   language,
+  typeChange
 }: {
   draggable?: boolean;
   title: any;
   onChange: any;
   removeTitle: any;
   language: string;
+  typeChange?: any;
 }) {
   const [openTooltip, setOpenTooltip] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -76,7 +78,7 @@ export default function Subtitle({
         ) : (
           <DragIndicatorIcon />
         ))}
-      <div className={styles.type}>
+      <div className={styles.type} onClick={() => typeChange(title.id, parseInt(title.type.replace("h", "")))}>
         <h4>{title.type}</h4>
       </div>
       <input
