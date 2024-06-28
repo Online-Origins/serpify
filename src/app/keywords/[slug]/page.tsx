@@ -540,7 +540,6 @@ export default function Collection({ params }: { params: { slug: string } }) {
                 setSorting={setSorting}
                 selectedKeywords={selectedKeywords}
                 setSelectedKeywords={setSelectedKeywords}
-                searchVolume={searchVolumeString}
                 potentialIndex={potentialIndex}
               />
               <div className={styles.buttonWrapper}>

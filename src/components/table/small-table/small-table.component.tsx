@@ -2,6 +2,7 @@ import classNames from "classnames";
 import { useEffect, useRef, useState } from "react";
 import IndicationIcon from "@/components/indication-icon/indication-icon.component";
 import styles from "./small-table.module.scss";
+import { formatNumber } from "@/app/utils/formatNumber/formatNumber";
 
 export default function SmallTable({
   keywords,
@@ -181,7 +182,7 @@ export default function SmallTable({
               {keyword.keywordMetrics.avgMonthlySearches != null ? (
                 <>
                   <p>
-                    {searchVolume(keyword.keywordMetrics.avgMonthlySearches)}
+                    {formatNumber(keyword.keywordMetrics.avgMonthlySearches)}
                   </p>
                   <IndicationIcon
                     indication={searchVolumeIndication(
