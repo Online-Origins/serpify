@@ -25,6 +25,7 @@ import { useRouter } from "next/navigation";
 import CircularLoader from "@/components/circular-loader/circular-loader.component";
 import styles from "./page.module.scss";
 import { useSharedContext } from "@/context/SharedContext";
+import { BorderColorRounded, CheckRounded } from "@mui/icons-material";
 
 export default function KeywordSearching() {
   const router = useRouter();
@@ -68,6 +69,8 @@ export default function KeywordSearching() {
   const { currentUrl } = useSharedContext();
   const [currentDomain, setCurrentDomain] = useState();
   const getCollectionsRef = useRef(false);
+  const [edit, setEdit] = useState(false);
+  const [subjects, setSubjects] = useState<string[]>([]);
 
   // Remove a alert when the new collection name is not empty
   useEffect(() => {
@@ -123,11 +126,13 @@ export default function KeywordSearching() {
         const currentDomainId = domains.find(
           (domain: any) => domain.domain == currentUrl
         );
-        setCurrentDomain(currentDomainId.id)
-        const currentCollection = localStorage.getItem("collection")
+        setCurrentDomain(currentDomainId.id);
+        const currentCollection = localStorage.getItem("collection");
         if (currentCollection) {
-          const collection = data.find((item: any) => item.id == currentCollection);
-          setCollectionToSave(collection?.collection_name)
+          const collection = data.find(
+            (item: any) => item.id == currentCollection
+          );
+          setCollectionToSave(collection?.collection_name);
           localStorage.removeItem("collection");
         }
         setCollections(
@@ -151,6 +156,7 @@ export default function KeywordSearching() {
   // Generate keywords if the user filled in the subjects
   useEffect(() => {
     if (!isKeywordsGenerated.current && filters.subjects[0] != "") {
+      setSubjects(filters.subjects);
       generateKeywords();
       isKeywordsGenerated.current = true;
     }
@@ -300,17 +306,37 @@ export default function KeywordSearching() {
   // Sort the keywords on the sorting type
   function sortKeywords(array: any) {
     if (sorting == "potential") {
-      return array.sort((a: any, b: any) =>b.keywordMetrics.potential - a.keywordMetrics.potential);
+      return array.sort(
+        (a: any, b: any) =>
+          b.keywordMetrics.potential - a.keywordMetrics.potential
+      );
     } else if (sorting == "potentialRev") {
-      return array.sort((a: any, b: any) =>a.keywordMetrics.potential - b.keywordMetrics.potential);
+      return array.sort(
+        (a: any, b: any) =>
+          a.keywordMetrics.potential - b.keywordMetrics.potential
+      );
     } else if (sorting == "competition") {
-      return array.sort((a: any, b: any) =>a.keywordMetrics.competitionIndex - b.keywordMetrics.competitionIndex);
+      return array.sort(
+        (a: any, b: any) =>
+          a.keywordMetrics.competitionIndex - b.keywordMetrics.competitionIndex
+      );
     } else if (sorting == "competitionRev") {
-      return array.sort((a: any, b: any) =>b.keywordMetrics.competitionIndex - a.keywordMetrics.competitionIndex
-      );} else if (sorting == "searchVolume") {
-      return array.sort((a: any, b: any) =>b.keywordMetrics.avgMonthlySearches -a.keywordMetrics.avgMonthlySearches);
+      return array.sort(
+        (a: any, b: any) =>
+          b.keywordMetrics.competitionIndex - a.keywordMetrics.competitionIndex
+      );
+    } else if (sorting == "searchVolume") {
+      return array.sort(
+        (a: any, b: any) =>
+          b.keywordMetrics.avgMonthlySearches -
+          a.keywordMetrics.avgMonthlySearches
+      );
     } else if (sorting == "searchVolumeRev") {
-      return array.sort((a: any, b: any) =>a.keywordMetrics.avgMonthlySearches -b.keywordMetrics.avgMonthlySearches);
+      return array.sort(
+        (a: any, b: any) =>
+          a.keywordMetrics.avgMonthlySearches -
+          b.keywordMetrics.avgMonthlySearches
+      );
     } else if (sorting == "keywordRev") {
       return array.sort((a: any, b: any) => {
         // Compare the text values
@@ -423,7 +449,7 @@ export default function KeywordSearching() {
             keywords: selectedKeywords.map((keyword: any) => keyword.text),
             language: filters.language,
             country: filters.country,
-            domain: currentDomain
+            domain: currentDomain,
           },
         ]);
         if (error) {
@@ -441,10 +467,7 @@ export default function KeywordSearching() {
     if (newCollection == "") {
       setShowAlert(true);
     } else {
-      setCollections((prevState: any) => [
-        ...prevState,
-        newCollection
-      ]);
+      setCollections((prevState: any) => [...prevState, newCollection]);
       setCollectionToSave(newCollection);
       setNewCollection("");
     }
@@ -453,13 +476,6 @@ export default function KeywordSearching() {
   // Update the subject filters when the user deletes a subject
   function updateSubjectFilters(value: string) {
     if (filters.subjects.length > 1) {
-      setFilters((prevState: any) => ({
-        ...prevState,
-        subjects: [
-          ...prevState.subjects.filter((subject: string) => subject != value),
-        ],
-      }));
-      isKeywordsGenerated.current = false;
     } else {
       alert("You need at least one subject to search");
     }
@@ -532,17 +548,48 @@ export default function KeywordSearching() {
             <TuneRoundedIcon />
           </Button>
         </div>
+        <p style={{marginTop: -4, fontSize: 12}}>*Enter your subjects and devide them by a comma</p>
         <div className={styles.subjects}>
           <h5>Subjects:</h5>
-          {filters.subjects &&
-            filters.subjects.map((value: string) => (
+          {subjects.length > 0 &&
+            subjects.map((value: string) => (
               <div key={value} className={styles.value}>
                 <p>{value}</p>
-                <div onClick={() => updateSubjectFilters(value)}>
-                  <CloseRoundedIcon />
-                </div>
+                {edit && (
+                  <div
+                    onClick={() => {
+                      if (subjects.length > 1) {
+                        setSubjects(
+                          subjects.filter((subject: string) => subject != value)
+                        );
+                      } else {
+                        alert("You need to have at least one subject");
+                        setEdit(false)
+                      }
+                    }}
+                  >
+                    <CloseRoundedIcon />
+                  </div>
+                )}
               </div>
             ))}
+          <div
+            className={styles.edit}
+            onClick={() => {
+              if (edit) {
+                if (subjects.length != filters.subjects.length) {
+                  setFilters((prevState: any) => ({
+                    ...prevState,
+                    subjects: subjects,
+                  }));
+                  isKeywordsGenerated.current = false;
+                }
+              }
+              setEdit(!edit);
+            }}
+          >
+            {!edit ? <BorderColorRounded /> : <CheckRounded />}
+          </div>
         </div>
       </div>
       {!loading ? (

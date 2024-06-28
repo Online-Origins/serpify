@@ -6,6 +6,7 @@ import IndicationIcon from "../indication-icon/indication-icon.component";
 import Selector from "../ui/selector/selector.component";
 import { useEffect, useRef, useState } from "react";
 import styles from "./table.module.scss";
+import { formatNumber } from "@/app/utils/formatNumber/formatNumber";
 
 export default function Table({
   shownKeywords,
@@ -201,7 +202,7 @@ export default function Table({
                   {keyword.keywordMetrics.avgMonthlySearches != null ? (
                     <>
                       <p>
-                        {searchVolume(
+                        {formatNumber(
                           keyword.keywordMetrics.avgMonthlySearches
                         )}
                       </p>
