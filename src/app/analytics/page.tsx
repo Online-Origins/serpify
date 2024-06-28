@@ -499,7 +499,7 @@ export default function AnalyticsPage() {
                                 keyword,
                                 queryDataPrev,
                                 "position"
-                              ) < 0
+                              ) > 0
                                 ? styles.bad
                                 : styles.good
                             }
