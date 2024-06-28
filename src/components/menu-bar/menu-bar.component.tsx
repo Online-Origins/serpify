@@ -57,9 +57,9 @@ export default function MenuBar({
     if (currentUrl) {
       if (currentUrl != currentDomain) {
         setCurrentUrl(currentDomain);
-        const pageDomains = JSON.parse(sessionStorage.getItem("entries") || "");
-        if (pageDomains != "") {
-          const entries = pageDomains || [""];
+        const pageDomains = sessionStorage.getItem("entries");
+        if (pageDomains) {
+          const entries = JSON.parse(pageDomains) || [""];
           let correctUrl = [];
           if (entries) {
             correctUrl = entries
@@ -86,35 +86,35 @@ export default function MenuBar({
   function getData() {
     const today = new Date();
     if (analyticsPeriod == "Last month") {
-      today.setDate(today.getDate() - 2);
+      today.setDate(today.getDate() - 1);
       const startDate = new Date();
       startDate.setMonth(today.getMonth() - 1);
       const prevStartDate = new Date();
       prevStartDate.setMonth(today.getMonth() - 2);
       gettingData(currentDomain, startDate, today, prevStartDate);
     } else if (analyticsPeriod == "Last week") {
-      today.setDate(today.getDate() - 2);
+      today.setDate(today.getDate() - 1);
       const startDate = new Date();
       startDate.setDate(today.getDate() - 7);
       const prevStartDate = new Date();
       prevStartDate.setDate(startDate.getDate() - 7);
       gettingData(currentDomain, startDate, today, prevStartDate);
     } else if (analyticsPeriod == "Last 2 weeks") {
-      today.setDate(today.getDate() - 2);
+      today.setDate(today.getDate() - 1);
       const startDate = new Date();
       startDate.setDate(today.getDate() - 14);
       const prevStartDate = new Date();
       prevStartDate.setDate(startDate.getDate() - 14);
       gettingData(currentDomain, startDate, today, prevStartDate);
     } else if (analyticsPeriod == "Last 6 months") {
-      today.setDate(today.getDate() - 2);
+      today.setDate(today.getDate() - 1);
       const startDate = new Date();
       startDate.setMonth(today.getMonth() - 6);
       const prevStartDate = new Date();
       prevStartDate.setMonth(today.getMonth() - 12);
       gettingData(currentDomain, startDate, today, prevStartDate);
     } else if (analyticsPeriod == "Last year") {
-      today.setDate(today.getDate() - 2);
+      today.setDate(today.getDate() - 1);
       const startDate = new Date();
       startDate.setFullYear(today.getFullYear() - 1);
       const prevStartDate = new Date();

@@ -28,7 +28,7 @@ import DraggableSubtitle from "@/components/draggable-subtitle/draggable-subtitl
 import CustomizedTooltip from "@/components/ui/custom-tooltip/custom-tooltip.component";
 import { ArrowForwardRounded } from "@mui/icons-material";
 import styles from "./page.module.scss";
-import { getCurrentDateTime } from '@/app/utils/currentDateTime/dateUtils';
+import { getCurrentDateTime } from "@/app/utils/currentDateTime/dateUtils";
 
 export default function CreateOutlines() {
   const router = useRouter();
@@ -146,7 +146,7 @@ export default function CreateOutlines() {
           language: language?.value,
           audience: currentContent[0].target_audience,
           toneOfVoice: toneOfVoice?.value,
-          type: currentContent[0].type
+          type: currentContent[0].type,
         }),
       });
 
@@ -246,7 +246,7 @@ export default function CreateOutlines() {
       const parentIndex = result.source.droppableId;
       const destinationParentIndex = result.destination.droppableId;
       const updatedOutlines = contentGeneratedOutlines.map((outline) => {
-        const updatedSubtitles = outline.subtitles.map((subtitle) => {
+        const updatedSubtitles = outline.subtitles?.map((subtitle) => {
           if (subtitle.id == parentIndex) {
             if (parentIndex == destinationParentIndex) {
               const items = Array.from(subtitle.subtitles);
@@ -265,7 +265,7 @@ export default function CreateOutlines() {
             let parent: any = [];
 
             contentGeneratedOutlines.forEach((item) => {
-              item.subtitles.forEach((subtitle) => {
+              item.subtitles?.forEach((subtitle) => {
                 if (subtitle.id == parentIndex) {
                   parent = subtitle;
                 }
@@ -401,6 +401,57 @@ export default function CreateOutlines() {
     }
   }
 
+  function typeChange(id: number, type: number) {
+    const outlines = [...contentGeneratedOutlines]; // Create a shallow copy of the array
+    const index = outlines.findIndex((item) => item.id === id);
+
+    // if (type == 2) {
+    //   if (index === -1) {
+    //     throw new Error("ID not found in the array");
+    //   }
+
+    //   // Find the previous h2 element
+    //   let previousH2Index = -1;
+    //   for (let i = index - 1; i >= 0; i--) {
+    //     if (outlines[i].type == "h2") {
+    //       previousH2Index = i;
+    //       break;
+    //     }
+    //   }
+
+    //   if (previousH2Index == -1) {
+    //     throw new Error("No previous h2 element found");
+    //   }
+
+    //   // Change the type of the element with the given ID and get its subtitles
+    //   const updatedElement = { ...outlines[index], type: "h3", subtitles: [] };
+    //   const elementSubtitles = outlines[index].subtitles || [];
+
+    //   // Add the updated element and its subtitles to the subtitles array of the previous h2 element
+    //   const updatedPreviousH2Element = {
+    //     ...outlines[previousH2Index],
+    //     subtitles: [
+    //       ...(outlines[previousH2Index].subtitles || []),
+    //       ...elementSubtitles,
+    //       updatedElement,
+    //     ].sort((a: any, b: any) => a.id - b.id),
+    //   };
+
+    //   // Create a new array with the updated elements
+    //   const newOutlines = [
+    //     ...outlines.slice(0, previousH2Index),
+    //     updatedPreviousH2Element,
+    //     ...outlines.slice(previousH2Index + 1, index),
+    //     ...outlines.slice(index + 1),
+    //   ];
+
+    //   setContentGeneratedOutlines(newOutlines);
+
+    //   console.log(JSON.stringify(newOutlines));
+    //   console.log(newOutlines);
+    // }
+  }
+
   return (
     <InnerWrapper>
       <PageTitle
@@ -452,6 +503,7 @@ export default function CreateOutlines() {
                             }
                             contentGeneratedOutlines={contentGeneratedOutlines}
                             language={currentContent[0].language}
+                            typeChange={typeChange}
                           />
                         ))
                       : ""}

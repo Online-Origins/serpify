@@ -10,6 +10,7 @@ export default function DraggableSubtitle({
   setContentGeneratedOutlines,
   contentGeneratedOutlines,
   language,
+  typeChange
 }: {
   title: any;
   index: any;
@@ -17,6 +18,7 @@ export default function DraggableSubtitle({
   setContentGeneratedOutlines: any;
   contentGeneratedOutlines: any;
   language: string;
+  typeChange: any;
 }) {
   return (
     <Draggable draggableId={title.id.toString()} index={index}>
@@ -39,6 +41,7 @@ export default function DraggableSubtitle({
               )
             }
             language={language}
+            typeChange={typeChange}
           />
           {title.subtitles && (
             <Droppable droppableId={title.id.toString()} type="h3">
