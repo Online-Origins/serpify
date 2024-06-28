@@ -246,7 +246,7 @@ export default function CreateOutlines() {
       const parentIndex = result.source.droppableId;
       const destinationParentIndex = result.destination.droppableId;
       const updatedOutlines = contentGeneratedOutlines.map((outline) => {
-        const updatedSubtitles = outline.subtitles.map((subtitle) => {
+        const updatedSubtitles = outline.subtitles?.map((subtitle) => {
           if (subtitle.id == parentIndex) {
             if (parentIndex == destinationParentIndex) {
               const items = Array.from(subtitle.subtitles);
@@ -265,7 +265,7 @@ export default function CreateOutlines() {
             let parent: any = [];
 
             contentGeneratedOutlines.forEach((item) => {
-              item.subtitles.forEach((subtitle) => {
+              item.subtitles?.forEach((subtitle) => {
                 if (subtitle.id == parentIndex) {
                   parent = subtitle;
                 }
