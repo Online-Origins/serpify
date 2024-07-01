@@ -70,7 +70,7 @@ export default function MenuBar({
             alert("The chosen domain isn't activated in your Search console.");
             setUserRole("unauthorized");
           } else {
-            setUserRole("user")
+            setUserRole("user");
           }
         }
       }
@@ -87,38 +87,38 @@ export default function MenuBar({
     const today = new Date();
     if (analyticsPeriod == "Last month") {
       today.setDate(today.getDate() - 1);
-      const startDate = new Date();
+      const startDate = new Date(today);
       startDate.setMonth(today.getMonth() - 1);
-      const prevStartDate = new Date();
+      const prevStartDate = new Date(startDate);
       prevStartDate.setMonth(today.getMonth() - 2);
       gettingData(currentDomain, startDate, today, prevStartDate);
     } else if (analyticsPeriod == "Last week") {
       today.setDate(today.getDate() - 1);
-      const startDate = new Date();
-      startDate.setDate(today.getDate() - 7);
-      const prevStartDate = new Date();
-      prevStartDate.setDate(startDate.getDate() - 7);
+      const startDate = new Date(today); // Create a new Date object based on 'today'
+      startDate.setDate(today.getDate() - 8);
+      const prevStartDate = new Date(startDate); // Create a new Date object based on 'startDate'
+      prevStartDate.setDate(startDate.getDate() - 8);
       gettingData(currentDomain, startDate, today, prevStartDate);
     } else if (analyticsPeriod == "Last 2 weeks") {
       today.setDate(today.getDate() - 1);
-      const startDate = new Date();
-      startDate.setDate(today.getDate() - 14);
-      const prevStartDate = new Date();
-      prevStartDate.setDate(startDate.getDate() - 14);
+      const startDate = new Date(today);
+      startDate.setDate(today.getDate() - 15);
+      const prevStartDate = new Date(startDate);
+      prevStartDate.setDate(startDate.getDate() - 15);
       gettingData(currentDomain, startDate, today, prevStartDate);
     } else if (analyticsPeriod == "Last 6 months") {
       today.setDate(today.getDate() - 1);
       const startDate = new Date();
       startDate.setMonth(today.getMonth() - 6);
       const prevStartDate = new Date();
-      prevStartDate.setMonth(today.getMonth() - 12);
+      prevStartDate.setMonth(startDate.getMonth() - 6);
       gettingData(currentDomain, startDate, today, prevStartDate);
     } else if (analyticsPeriod == "Last year") {
       today.setDate(today.getDate() - 1);
       const startDate = new Date();
       startDate.setFullYear(today.getFullYear() - 1);
       const prevStartDate = new Date();
-      prevStartDate.setFullYear(today.getFullYear() - 2);
+      prevStartDate.setFullYear(prevStartDate.getFullYear() - 1);
       gettingData(currentDomain, startDate, today, prevStartDate);
     }
   }
