@@ -91,21 +91,13 @@ export default function CreateOutlines() {
     titles.map((title: any, index: number) => {
       if (title.type == "h2") {
         array.push(title);
-      } else if (title.type == "h3") {
+      } else {
         if (array.length > 0) {
           let lastIndex = array.length - 1;
           if (!array[lastIndex].subtitles) {
             array[lastIndex].subtitles = [];
           }
           array[lastIndex].subtitles.push(title);
-        }
-      } else if (title.type == "h4") {
-        if (array.length > 0 && array[array.length - 1].subtitles) {
-          let lastH3Index = array[array.length - 1].subtitles.length - 1;
-          if (!array[array.length - 1].subtitles[lastH3Index].subtitles) {
-            array[array.length - 1].subtitles[lastH3Index].subtitles = [];
-          }
-          array[array.length - 1].subtitles[lastH3Index].subtitles.push(title);
         }
       }
     });
@@ -197,7 +189,7 @@ export default function CreateOutlines() {
       items.splice(result.destination.index, 0, reorderedItem);
 
       setContentGeneratedOutlines(items);
-    } else if (result.type == "h3") {
+    } else {
       const parentIndex = result.source.droppableId;
       const destinationParentIndex = result.destination.droppableId;
       const updatedOutlines = contentGeneratedOutlines.map((outline) => {
@@ -242,51 +234,6 @@ export default function CreateOutlines() {
       });
 
       setContentGeneratedOutlines(updatedOutlines);
-    } else if (result.type == "h4") {
-      const parentIndex = result.source.droppableId;
-      const destinationParentIndex = result.destination.droppableId;
-      const updatedOutlines = contentGeneratedOutlines.map((outline) => {
-        const updatedSubtitles = outline.subtitles?.map((subtitle) => {
-          if (subtitle.id == parentIndex) {
-            if (parentIndex == destinationParentIndex) {
-              const items = Array.from(subtitle.subtitles);
-              const [reorderedItem] = items.splice(result.source.index, 1);
-              items.splice(result.destination.index, 0, reorderedItem);
-              return { ...subtitle, subtitles: items };
-            } else {
-              return {
-                ...subtitle,
-                subtitles: subtitle.subtitles.filter(
-                  (child: any) => child.id != result.draggableId
-                ),
-              };
-            }
-          } else if (subtitle.id == destinationParentIndex) {
-            let parent: any = [];
-
-            contentGeneratedOutlines.forEach((item) => {
-              item.subtitles?.forEach((subtitle) => {
-                if (subtitle.id == parentIndex) {
-                  parent = subtitle;
-                }
-              });
-            });
-            const draggable = parent.subtitles.filter(
-              (subtitle: any) => subtitle.id == result.draggableId
-            );
-            const destinationSubtitles = subtitle.subtitles || [];
-            destinationSubtitles.splice(
-              result.destination.index,
-              0,
-              draggable[0]
-            );
-            return { ...subtitle, subtitles: destinationSubtitles };
-          }
-          return subtitle;
-        });
-        return { ...outline, subtitles: updatedSubtitles };
-      });
-      setContentGeneratedOutlines(updatedOutlines);
     }
   };
 
@@ -299,7 +246,7 @@ export default function CreateOutlines() {
           if (item.id > maxId) {
             maxId = item.id;
           }
-          if (item.subtitles.length > 0) {
+          if (item.subtitles && item.subtitles.length > 0) {
             const subMaxId = Math.max(...item.subtitles.map((sub) => sub.id));
             if (subMaxId > maxId) {
               maxId = subMaxId;
@@ -401,55 +348,157 @@ export default function CreateOutlines() {
     }
   }
 
-  function typeChange(id: number, type: number) {
+  function typeChange(id: number, newType: number, oldType: number) {
     const outlines = [...contentGeneratedOutlines]; // Create a shallow copy of the array
-    const index = outlines.findIndex((item) => item.id === id);
 
-    // if (type == 2) {
-    //   if (index === -1) {
-    //     throw new Error("ID not found in the array");
-    //   }
+    // Helper function to find an item recursively and return its parent and index
+    function findItemAndParent(
+      outlines: any,
+      id: any,
+      parent = null,
+      parentIndex = -1
+    ) {
+      for (let i = 0; i < outlines.length; i++) {
+        if (outlines[i].id == id) {
+          if (!parent) {
+            console.log(i)
+            return { item: outlines[i], index: i, parent };
+          } else {
+            console.log(parentIndex)
+            return { item: outlines[i], index: parentIndex + 1, parent };
+          }
+        }
+        if (outlines[i].subtitles && outlines[i].subtitles.length > 0) {
+          const result: any = findItemAndParent(
+            outlines[i].subtitles,
+            id,
+            outlines[i],
+            parent ? parentIndex : i
+          );
+          if (result) {
+            return result;
+          }
+        }
+      }
+      return null;
+    }
 
-    //   // Find the previous h2 element
-    //   let previousH2Index = -1;
-    //   for (let i = index - 1; i >= 0; i--) {
-    //     if (outlines[i].type == "h2") {
-    //       previousH2Index = i;
-    //       break;
-    //     }
-    //   }
+    const { item, index, parent } = findItemAndParent(outlines, id) || {};
 
-    //   if (previousH2Index == -1) {
-    //     throw new Error("No previous h2 element found");
-    //   }
+    if (!item) {
+      throw new Error("ID not found in the array");
+    }
 
-    //   // Change the type of the element with the given ID and get its subtitles
-    //   const updatedElement = { ...outlines[index], type: "h3", subtitles: [] };
-    //   const elementSubtitles = outlines[index].subtitles || [];
+    if (oldType == 2) {
+      // Find the previous h2 element
+      let previousH2Index = -1;
+      for (let i = index - 1; i >= 0; i--) {
+        if (outlines[i].type == "h2") {
+          previousH2Index = i;
+          break;
+        }
+      }
 
-    //   // Add the updated element and its subtitles to the subtitles array of the previous h2 element
-    //   const updatedPreviousH2Element = {
-    //     ...outlines[previousH2Index],
-    //     subtitles: [
-    //       ...(outlines[previousH2Index].subtitles || []),
-    //       ...elementSubtitles,
-    //       updatedElement,
-    //     ].sort((a: any, b: any) => a.id - b.id),
-    //   };
+      if (previousH2Index == -1) {
+        return;
+      }
 
-    //   // Create a new array with the updated elements
-    //   const newOutlines = [
-    //     ...outlines.slice(0, previousH2Index),
-    //     updatedPreviousH2Element,
-    //     ...outlines.slice(previousH2Index + 1, index),
-    //     ...outlines.slice(index + 1),
-    //   ];
+      // Change the type of the element with the given ID and get its subtitles
+      const updatedElement = {
+        ...item,
+        type: `h${newType}`,
+        subtitles: [],
+      };
+      const elementSubtitles = item.subtitles || [];
 
-    //   setContentGeneratedOutlines(newOutlines);
+      // Add the updated element and its subtitles to the subtitles array of the previous h2 element
+      const updatedPreviousH2Element = {
+        ...outlines[previousH2Index],
+        subtitles: [
+          ...(outlines[previousH2Index].subtitles || []),
+          ...elementSubtitles,
+          updatedElement,
+        ].sort((a: any, b: any) => a.id - b.id),
+      };
 
-    //   console.log(JSON.stringify(newOutlines));
-    //   console.log(newOutlines);
-    // }
+      // Create a new array with the updated elements
+      const newOutlines = [
+        ...outlines.slice(0, previousH2Index),
+        updatedPreviousH2Element,
+        ...outlines.slice(previousH2Index + 1, index),
+        ...outlines.slice(index + 1),
+      ];
+
+      setContentGeneratedOutlines(newOutlines);
+    } else {
+      if (!parent) {
+        throw new Error("Parent not found for the item with oldType 3");
+      }
+
+      if (newType != 2) {
+        // Update the type to "h4"
+        const updatedElement = { ...item, type: `h${newType}` };
+
+        // Find the parent subtitle array and replace the updated element
+        const updatedSubtitles = parent.subtitles.map((subtitle: any) =>
+          subtitle.id === id ? updatedElement : subtitle
+        );
+
+        // Update the parent with new subtitles
+        const updatedParent = { ...parent, subtitles: updatedSubtitles };
+
+        // Function to update the outlines array recursively
+        const updateOutlines = (outlines: any, updatedParent: any) => {
+          return outlines.map((outline: any) => {
+            if (outline.id === updatedParent.id) {
+              return updatedParent;
+            }
+            return outline;
+          });
+        };
+
+        const newOutlines = updateOutlines(outlines, updatedParent);
+        setContentGeneratedOutlines(newOutlines);
+      } else if (newType == 2) {
+        // Change the type of the element with the given ID to "h2"
+        const updatedElement = { ...item, type: "h2" };
+
+        // Remove the element from its parent's subtitles
+        const updatedSubtitles = parent.subtitles.filter(
+          (subtitle: any) => subtitle.id !== id
+        );
+
+        // Update the parent with the new subtitles
+        const updatedParent = { ...parent, subtitles: updatedSubtitles };
+
+        // Function to update the outlines array recursively
+        const updateOutlines = (outlines: any, updatedParent: any) => {
+          return outlines.map((outline: any) => {
+            if (outline.id === updatedParent.id) {
+              return updatedParent;
+            }
+            if (outline.subtitles && outline.subtitles.length > 0) {
+              return {
+                ...outline,
+                subtitles: updateOutlines(outline.subtitles, updatedParent),
+              };
+            }
+            return outline;
+          });
+        };
+
+        let newOutlines = updateOutlines(outlines, updatedParent);
+
+        // Add the updated element to the main array at the appropriate position
+        newOutlines = [
+          ...newOutlines.slice(0, index),
+          updatedElement,
+          ...newOutlines.slice(index),
+        ];
+
+        setContentGeneratedOutlines(newOutlines);
+      }
+    }
   }
 
   return (

@@ -3,7 +3,7 @@
 .subtitle {
     display: flex;
     gap: 1rem;
-    padding: .5rem 0;
+    padding: .25rem 0;
     align-items: center;
 
     &.h3 {
@@ -20,44 +20,54 @@
         padding: .25rem .5rem;
         text-transform: uppercase;
         border-radius: .25rem;
+
+        .dropdown{
+        display: flex;
+        gap: .25rem;
+        cursor: pointer;
+        }
     }
 
     .title {
         width: 100%;
         border: none;
         font-size: 1.2rem;
+        height: 1.4rem;
         font-family: $lexend_deca;
         font-weight: 700;
         padding: .5rem .25rem;
         border-radius: .5rem;
         background-color: rgba($color: $purple_50, $alpha: 0);
-        overflow-y: hidden;
+        overflow: hidden !important;
 
         &:focus {
             outline: none;
         }
     }
 
-    .delete{
+    .delete {
         transition: .3s all ease-in-out;
         opacity: 0;
         cursor: pointer;
 
         color: red;
     }
-    
-    .generate{
+
+    .generate {
         transition: .3s all ease-in-out;
         opacity: 0;
         cursor: pointer;
     }
 
-    &:hover{
+    &:hover {
         cursor: grab;
-        .title{
+
+        .title {
             background-color: $purple_50;
         }
-        .delete, .generate{
+
+        .delete,
+        .generate {
             opacity: 1;
         }
     }

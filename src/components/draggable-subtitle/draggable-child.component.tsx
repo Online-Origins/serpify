@@ -1,6 +1,5 @@
 import { Draggable, Droppable } from "@hello-pangea/dnd";
 import Subtitle from "../subtitle/subtitle.component";
-import DraggableBaby from "./draggable-baby.component";
 import classNames from "classnames";
 
 // Child element from draggable subtitle
@@ -12,6 +11,7 @@ export default function DraggableChild({
   contentGeneratedOutlines,
   grantParentId,
   language,
+  typeChange,
 }: {
   title: any;
   index: any;
@@ -20,6 +20,7 @@ export default function DraggableChild({
   contentGeneratedOutlines: any;
   grantParentId: any;
   language: string;
+  typeChange: any;
 }) {
   return (
     <Draggable draggableId={title.id.toString()} index={index}>
@@ -50,27 +51,8 @@ export default function DraggableChild({
                 })
               )
             }
+            typeChange={typeChange}
           />
-          <Droppable droppableId={title.id.toString()} type="h4">
-            {(provided, snapshot) => (
-              <div ref={provided.innerRef} {...provided.droppableProps} className={classNames("dropPlace", snapshot.isDraggingOver && 'dropHover')}>
-                {title.subtitles && title.subtitles.length> 0 ?
-                  title.subtitles.map((subtitle: any, index: any) => (
-                    <DraggableBaby
-                      key={subtitle.id}
-                      title={subtitle}
-                      index={index}
-                      grantParentId={title.id}
-                      handleTitleChange={handleTitleChange}
-                      setContentGeneratedOutlines={setContentGeneratedOutlines}
-                      contentGeneratedOutlines={contentGeneratedOutlines}
-                      language={language}
-                    />
-                  )) : ""}
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
         </div>
       )}
     </Draggable>

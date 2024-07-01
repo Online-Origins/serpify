@@ -4,10 +4,16 @@ import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded";
 import CustomizedTooltip from "../ui/custom-tooltip/custom-tooltip.component";
 import { useEffect, useState } from "react";
 import styles from "./subtitle.module.scss";
-import { AutoAwesome } from "@mui/icons-material";
+import { AutoAwesome, KeyboardArrowDownRounded } from "@mui/icons-material";
 import CircularLoader from "../circular-loader/circular-loader.component";
 import PopUpWrapper from "../ui/popup-wrapper/popup-wrapper.component";
 import languageCodes from "@/json/language-codes.json";
+import {
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+} from "@nextui-org/dropdown";
 
 export default function Subtitle({
   title,
@@ -15,7 +21,7 @@ export default function Subtitle({
   removeTitle,
   draggable,
   language,
-  typeChange
+  typeChange,
 }: {
   draggable?: boolean;
   title: any;
@@ -38,7 +44,9 @@ export default function Subtitle({
 
   // Rephrase the title with OpenAI GPT
   async function rephraseTitle() {
-    const languageValue = languageCodes.find((lang) => lang.id.toString() == language);
+    const languageValue = languageCodes.find(
+      (lang) => lang.id.toString() == language
+    );
     setLoading(true);
     try {
       const response = await fetch("/api/generateContent", {
@@ -78,8 +86,38 @@ export default function Subtitle({
         ) : (
           <DragIndicatorIcon />
         ))}
-      <div className={styles.type} onClick={() => typeChange(title.id, parseInt(title.type.replace("h", "")))}>
-        <h4>{title.type}</h4>
+      <div className={styles.type}>
+        <Dropdown>
+          <DropdownTrigger>
+            <div className={styles.dropdown}>
+              <h4>{title.type}</h4>
+              <KeyboardArrowDownRounded />
+            </div>
+          </DropdownTrigger>
+          <DropdownMenu
+            aria-label="Static Actions"
+            disallowEmptySelection
+            selectionMode="single"
+            onAction={(key) =>
+              typeChange(
+                title.id,
+                parseInt(key.toString().replace("h", "")),
+                parseInt(title.type.toString().replace("h", ""))
+              )
+            }
+            className="typeDropdown"
+          >
+            <DropdownItem key="h2" textValue="h2">
+              <h4>H2</h4>
+            </DropdownItem>
+            <DropdownItem key="h3" textValue="h3">
+              <h4>H3</h4>
+            </DropdownItem>
+            <DropdownItem key="h4" textValue="h4">
+              <h4>H4</h4>
+            </DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
       </div>
       <input
         type="text"
