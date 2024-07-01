@@ -235,11 +235,6 @@ export default function Writing() {
           if (outline.subtitles) {
             outline.subtitles.map((subtitle: any) => {
               content += `<${subtitle.type}>${subtitle.title}</${subtitle.type}><p></p>`;
-              if (subtitle.subtitles) {
-                subtitle.subtitles.map((subsubtitle: any) => {
-                  content += `<${subsubtitle.type}>${subsubtitle.title}</${subsubtitle.type}><p></p>`;
-                });
-              }
             });
           }
         });

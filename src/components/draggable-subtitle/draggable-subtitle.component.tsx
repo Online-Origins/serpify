@@ -64,6 +64,7 @@ export default function DraggableSubtitle({
                           }
                           contentGeneratedOutlines={contentGeneratedOutlines}
                           language={language}
+                          typeChange={typeChange}
                         />
                       ))
                     : ""}
